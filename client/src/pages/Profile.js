@@ -188,11 +188,6 @@ const Bio = styled.div`
   color: ${props => props.theme.text};
   line-height: 1.5;
   margin-bottom: 12px;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
 `;
 
 const BioText = styled.p`
@@ -469,22 +464,26 @@ const Profile = () => {
             <Bio theme={theme}>
               <BioText theme={theme}>
                 {profile.fullName}
+                {profile.bio && (
+                  <>
+                    <br />
+                    {profile.bio.split('\n').map((line, index) => (
+                      <span key={index}>
+                        {line}
+                        {index < profile.bio.split('\n').length - 1 && <br />}
+                      </span>
+                    ))}
+                  </>
+                )}
+                {profile.website && (
+                  <>
+                    <br />
+                    <BioLink theme={theme} href={profile.website} target="_blank" rel="noopener noreferrer">
+                      {profile.website}
+                    </BioLink>
+                  </>
+                )}
               </BioText>
-              {profile.bio && (
-                <BioText theme={theme}>
-                  {profile.bio.split('\n').map((line, index) => (
-                    <span key={index}>
-                      {line}
-                      {index < profile.bio.split('\n').length - 1 && <br />}
-                    </span>
-                  ))}
-                </BioText>
-              )}
-              {profile.website && (
-                <BioLink theme={theme} href={profile.website} target="_blank" rel="noopener noreferrer">
-                  {profile.website}
-                </BioLink>
-              )}
             </Bio>
           </ProfileInfo>
         </ProfileHeader>
