@@ -8,10 +8,33 @@ import ArtistsSidebar from '../components/ArtistsSidebar';
 
 const Container = styled.div`
   min-height: 100vh;
-  background: ${props => props.theme.surface};
+  background: linear-gradient(135deg, #FF6B35 0%, #F7931E 25%, #FFFFFF 50%, #FFF8F5 75%, #FF6B35 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
   padding: 0;
   width: 100vw;
   overflow-x: hidden;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(255, 107, 53, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(247, 147, 30, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
 `;
 
 const MainLayout = styled.div`
@@ -62,11 +85,13 @@ const LeftSidebar = styled.div`
   left: 0;
   width: 280px;
   height: 100vh;
-  background: ${props => props.theme.surface};
-  border-right: 1px solid #262626;
+  background: linear-gradient(180deg, rgba(255, 107, 53, 0.95) 0%, rgba(247, 147, 30, 0.9) 50%, rgba(255, 255, 255, 0.95) 100%);
+  backdrop-filter: blur(20px);
+  border-right: 2px solid rgba(255, 107, 53, 0.3);
   padding: 20px 0;
   z-index: 1000;
   overflow-y: auto;
+  box-shadow: 4px 0 20px rgba(255, 107, 53, 0.2);
 
   @media (max-width: 1200px) {
     display: none;
@@ -100,15 +125,20 @@ const MenuItem = styled.div`
   align-items: center;
   gap: 16px;
   padding: 12px 16px;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  color: ${props => props.active ? '#FF6B35' : '#FFFFFF'};
-  background: ${props => props.active ? 'rgba(255, 107, 53, 0.1)' : 'transparent'};
+  transition: all 0.3s ease;
+  color: ${props => props.active ? '#FFFFFF' : '#2C1810'};
+  background: ${props => props.active ? 'linear-gradient(135deg, #FF6B35, #F7931E)' : 'transparent'};
+  margin: 4px 12px;
+  box-shadow: ${props => props.active ? '0 4px 15px rgba(255, 107, 53, 0.3)' : 'none'};
+  transform: ${props => props.active ? 'translateX(8px)' : 'translateX(0)'};
 
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #FF6B35;
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.8), rgba(247, 147, 30, 0.8));
+    color: #FFFFFF;
+    transform: translateX(8px);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
   }
 `;
 

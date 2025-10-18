@@ -501,17 +501,6 @@ const Navbar = () => {
   const [currentTrack, setCurrentTrack] = useState(0);
   const [audio, setAudio] = useState(null);
 
-  // Test için mock user - gerçek giriş yapıldığında kaldırılacak
-  const mockUser = {
-    _id: '1',
-    username: 'testuser',
-    email: 'test@example.com',
-    name: 'Test User'
-  };
-  
-  // Geçici olarak mock user kullan
-  const currentUser = user || mockUser;
-
   // Sanatsal müzik dosyaları - Ücretsiz jazz müzik kaynakları
   const musicTracks = [
     {
@@ -590,50 +579,28 @@ const Navbar = () => {
   };
 
   return (
-    <Nav>
-      <NavContainer>
-        <LeftNavActions>
-          <Logo to="/">
-            <LogoIcon>
-              <img 
-                src="/images/feellink.logo.png" 
-                alt="Feellink Logo" 
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                  const fallback = e.target.parentNode.querySelector('.logo-fallback');
-                  if (fallback) fallback.style.display = 'block';
-                }} 
-              />
-              <div 
-                className="logo-fallback"
-                style={{
-                  display: 'none', 
-                  fontSize: '24px', 
-                  fontWeight: 'bold', 
-                  background: 'linear-gradient(45deg, #FF6B35, #8B5CF6, #3B82F6)', 
-                  WebkitBackgroundClip: 'text', 
-                  WebkitTextFillColor: 'transparent'
-                }}
-              >
-                feellink
-              </div>
-            </LogoIcon>
-          </Logo>
-          
-        </LeftNavActions>
-
-        <SearchContainer>
-          <SearchInput
-            type="text"
-            placeholder="Eserler, sanatçılar, kategoriler ara..."
-            onClick={() => navigate('/explore')}
-          />
-          <SearchIcon>
-            <FiSearch size={18} />
-          </SearchIcon>
-        </SearchContainer>
-
-        <NavActions>
+    <Nav style={{ 
+      position: 'fixed', 
+      top: '20px', 
+      right: '20px', 
+      zIndex: 1000,
+      background: 'transparent',
+      border: 'none',
+      backdropFilter: 'none',
+      width: 'auto',
+      height: 'auto'
+    }}>
+      <NavContainer style={{ 
+        padding: '0',
+        height: 'auto',
+        justifyContent: 'flex-end',
+        width: 'auto'
+      }}>
+        <NavActions style={{ 
+          display: 'flex', 
+          gap: '12px',
+          alignItems: 'center'
+        }}>
           <MusicToggle onClick={toggleMusic} isPlaying={isMusicPlaying}>
             {isMusicPlaying ? <FiVolume2 size={20} /> : <FiVolumeX size={20} />}
           </MusicToggle>
@@ -641,61 +608,6 @@ const Navbar = () => {
           <ThemeToggle onClick={toggleTheme}>
             {isDark ? <FiSun size={20} /> : <FiMoon size={20} />}
           </ThemeToggle>
-
-          {currentUser ? (
-            <UserMenu>
-              <UserButton onClick={() => setShowUserMenu(!showUserMenu)}>
-                {currentUser.avatar ? (
-                  <UserAvatar src={currentUser.avatar} alt={currentUser.name} />
-                ) : (
-                  <UserAvatar>
-                    {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
-                  </UserAvatar>
-                )}
-              </UserButton>
-
-              <AnimatePresence>
-                {showUserMenu && (
-                  <Dropdown
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <DropdownItem onClick={() => navigate(`/profile/${currentUser.username}`)}>
-                      <FiUser size={18} />
-                      Profilim
-                    </DropdownItem>
-                    <DropdownItem onClick={() => navigate('/saved')}>
-                      <FiBookmark size={18} />
-                      Kaydedilenler
-                    </DropdownItem>
-                    <DropdownItem onClick={() => navigate('/settings')}>
-                      <FiSettings size={18} />
-                      Ayarlar
-                    </DropdownItem>
-                    <DropdownItem onClick={handleLogout}>
-                      <FiLogOut size={18} />
-                      Çıkış Yap
-                    </DropdownItem>
-                  </Dropdown>
-                )}
-              </AnimatePresence>
-            </UserMenu>
-          ) : (
-            <AuthButtons>
-              <AuthButton to="/login" className="secondary">
-                Giriş Yap
-              </AuthButton>
-              <AuthButton to="/register" className="primary">
-                Kayıt Ol
-              </AuthButton>
-            </AuthButtons>
-          )}
-
-          <MobileMenuButton onClick={() => setShowMobileMenu(!showMobileMenu)}>
-            {showMobileMenu ? <FiX size={20} /> : <FiMenu size={20} />}
-          </MobileMenuButton>
         </NavActions>
       </NavContainer>
 

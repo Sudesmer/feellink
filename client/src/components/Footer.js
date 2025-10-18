@@ -6,8 +6,8 @@ import { FiGithub, FiTwitter, FiInstagram, FiLinkedin } from 'react-icons/fi';
 const FooterContainer = styled.footer`
   background: ${props => props.theme.surface};
   border-top: 1px solid ${props => props.theme.border};
-  padding: 40px 0 20px;
-  margin-top: 80px;
+  padding: 20px 0 15px;
+  margin-top: 40px;
 `;
 
 const Container = styled.div`
@@ -19,12 +19,12 @@ const Container = styled.div`
 const FooterContent = styled.div`
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 40px;
-  margin-bottom: 40px;
+  gap: 30px;
+  margin-bottom: 20px;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    gap: 30px;
+    gap: 20px;
   }
 `;
 

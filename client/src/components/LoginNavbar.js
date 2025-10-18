@@ -22,7 +22,7 @@ const NavContainer = styled.div`
   padding: 20px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   height: auto;
   width: 100%;
   box-sizing: border-box;
@@ -87,11 +87,6 @@ const LoginNavbar = () => {
   return (
     <Nav>
       <NavContainer>
-        <Logo to="/">
-          <LogoIcon>F</LogoIcon>
-          Feellink
-        </Logo>
-
         <NavActions>
           <ThemeToggle onClick={toggleTheme}>
             {isDark ? <FiSun size={20} /> : <FiMoon size={20} />}

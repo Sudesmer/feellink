@@ -389,20 +389,10 @@ const ArtistsSidebar = () => {
                   alt={article.author.name}
                   onError={(e) => {
                     e.target.style.display = 'none';
-                    const fallback = e.target.parentNode.querySelector('.avatar-fallback');
-                    if (fallback) fallback.style.display = 'flex';
+                    e.target.nextSibling.style.display = 'flex';
                   }}
                 />
-                <div 
-                  className="avatar-fallback"
-                  style={{ 
-                    display: 'none', 
-                    width: '100%', 
-                    height: '100%', 
-                    alignItems: 'center', 
-                    justifyContent: 'center' 
-                  }}
-                >
+                <div style={{ display: 'none', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
                   {article.author.name.split(' ').map(n => n[0]).join('')}
                 </div>
               </AuthorAvatar>

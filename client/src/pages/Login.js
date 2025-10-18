@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -13,27 +14,72 @@ const Container = styled.div`
   justify-content: center;
   padding: 20px;
   position: relative;
+  
+  /* Giriş sayfasına özel sınıf - Feellink logo renkleri ile uyumlu */
+  &.login-page-container {
+    background: ${props => props.theme.background};
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(255, 107, 53, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(247, 147, 30, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 60% 60%, rgba(255, 107, 53, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+  }
 `;
 
 
 const LoginCard = styled(motion.div)`
-  background: #1a1a1a;
-  border: 1px solid ${props => props.theme.border};
-  border-radius: 20px;
-  padding: 40px;
+  background: ${props => props.theme.surface};
+  border: 3px solid ${props => props.theme.surface};
+  border-radius: 28px;
+  padding: 4px 40px 12px 40px;
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 20px 60px ${props => props.theme.shadow};
+  box-shadow: 
+    0 25px 80px rgba(0, 0, 0, 0.1),
+    0 12px 35px rgba(0, 0, 0, 0.05),
+    0 5px 15px rgba(0, 0, 0, 0.1),
+    inset 0 2px 0 rgba(255, 255, 255, 0.8);
+  position: relative;
+  z-index: 10;
+  
+  /* Giriş sayfasına özel sınıf */
+  &.login-page-card {
+    background: ${props => props.theme.surface};
+    border: 3px solid ${props => props.theme.surface};
+    padding: 4px 40px 12px 40px;
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: ${props => props.theme.surface};
+    border-radius: 28px;
+    z-index: -1;
+  }
 `;
 
 const Logo = styled.div`
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 0px;
 `;
 
 const LogoIcon = styled.div`
   width: 600px;
-  height: 240px;
+  height: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -57,6 +103,7 @@ const Form = styled.form`
   display: flex;
   flex-direction: column;
   gap: 2px;
+  margin-top: -10px;
 `;
 
 const FormGroup = styled.div`
@@ -69,7 +116,7 @@ const FormGroup = styled.div`
 const Label = styled.label`
   font-size: 0.9rem;
   font-weight: 600;
-  color: ${props => props.theme.text};
+  color: #2C1810;
 `;
 
 const InputContainer = styled.div`
@@ -79,21 +126,31 @@ const InputContainer = styled.div`
 const Input = styled.input`
   width: 100%;
   padding: 16px 20px;
-  border: 2px solid ${props => props.theme.border};
-  border-radius: 12px;
-  background: #FFFFFF;
-  color: #000000;
+  border: 2px solid ${props => props.theme.primary};
+  border-radius: 18px;
+  background: ${props => props.theme.surface};
+  color: ${props => props.theme.text};
   font-size: 1rem;
+  font-weight: 500;
   transition: all 0.3s ease;
+  box-shadow: 
+    0 6px 20px rgba(255, 107, 53, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 
   &:focus {
     outline: none;
-    border-color: ${props => props.theme.primary};
-    box-shadow: 0 0 0 3px ${props => props.theme.primary}20;
+    border-color: ${props => props.theme.primaryHover};
+    background: ${props => props.theme.surfaceHover};
+    box-shadow: 
+      0 0 0 4px rgba(255, 107, 53, 0.3),
+      0 12px 35px rgba(255, 107, 53, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    transform: translateY(-3px);
   }
 
   &::placeholder {
-    color: #666666;
+    color: ${props => props.theme.primary};
+    font-weight: 400;
   }
 `;
 
@@ -123,24 +180,38 @@ const PasswordToggle = styled.button`
 
 const SubmitButton = styled.button`
   width: 100%;
-  padding: 16px;
+  padding: 18px;
   background: ${props => props.theme.gradient};
   color: white;
   border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: 20px;
+  font-size: 1.1rem;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   margin-top: 20px;
+  box-shadow: 
+    0 8px 25px rgba(255, 107, 53, 0.4),
+    0 4px 15px rgba(247, 147, 30, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 
   &:hover {
+    transform: translateY(-4px);
+    box-shadow: 
+      0 15px 45px rgba(255, 107, 53, 0.5),
+      0 8px 25px rgba(247, 147, 30, 0.4),
+      inset 0 2px 0 rgba(255, 255, 255, 0.4);
+    background: ${props => props.theme.primaryHover};
+  }
+
+  &:active {
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px ${props => props.theme.primary}40;
   }
 
   &:disabled {
@@ -154,7 +225,7 @@ const Divider = styled.div`
   text-align: center;
   color: ${props => props.theme.textSecondary};
   font-size: 0.9rem;
-  margin: 20px 0;
+  margin: 15px 0;
   position: relative;
 
   &::before {
@@ -169,7 +240,7 @@ const Divider = styled.div`
   }
 
   span {
-    background: #1a1a1a;
+    background: ${props => props.theme.surface};
     padding: 0 20px;
     position: relative;
     z-index: 2;
@@ -214,6 +285,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
+  const { theme } = useTheme();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -249,8 +321,10 @@ const Login = () => {
   };
 
   return (
-    <Container>
+    <Container className="login-page-container" theme={theme}>
         <LoginCard
+          className="login-page-card"
+          theme={theme}
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -259,7 +333,6 @@ const Login = () => {
             <LogoIcon>
               <img src="/images/feellink.logo.png" alt="Feellink Logo" />
             </LogoIcon>
-            <LogoSubtext>Hesabınıza giriş yapın</LogoSubtext>
           </Logo>
 
           <Form onSubmit={handleSubmit}>
@@ -276,6 +349,7 @@ const Login = () => {
                   placeholder="ornek@email.com"
                   value={formData.email}
                   onChange={handleChange}
+                  theme={theme}
                   required
                   style={{ paddingLeft: '50px' }}
                 />
@@ -293,6 +367,7 @@ const Login = () => {
                   placeholder="Şifrenizi girin"
                   value={formData.password}
                   onChange={handleChange}
+                  theme={theme}
                   required
                   style={{ paddingLeft: '50px', paddingRight: '50px' }}
                 />
@@ -305,7 +380,7 @@ const Login = () => {
               </PasswordContainer>
             </FormGroup>
 
-            <SubmitButton type="submit" disabled={loading}>
+            <SubmitButton type="submit" disabled={loading} theme={theme}>
               {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
               <FiArrowRight size={18} />
             </SubmitButton>
@@ -315,7 +390,7 @@ const Login = () => {
             <span>veya</span>
           </Divider>
 
-          <SignupLink>
+          <SignupLink theme={theme}>
             Hesabınız yok mu?{' '}
             <Link to="/register">Kayıt olun</Link>
           </SignupLink>
