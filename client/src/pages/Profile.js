@@ -189,8 +189,10 @@ const Bio = styled.div`
   line-height: 1.5;
   margin-bottom: 12px;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
 `;
 
 const BioText = styled.p`
