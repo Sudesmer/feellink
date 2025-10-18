@@ -188,10 +188,13 @@ const Bio = styled.div`
   color: ${props => props.theme.text};
   line-height: 1.5;
   margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 `;
 
 const BioText = styled.p`
-  margin: 0 0 8px 0;
+  margin: 0;
   font-size: 0.95rem;
 `;
 
