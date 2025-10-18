@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FiSearch, FiTrendingUp, FiStar, FiUsers, FiArrowRight, FiAward, FiMessageCircle, FiMapPin, FiHeart, FiEye, FiAward as FiBadge } from 'react-icons/fi';
+import { FiSearch, FiEye, FiAward as FiBadge, FiHome, FiBell, FiUser, FiBookmark } from 'react-icons/fi';
 import WorkCard from '../components/WorkCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ArtistsSidebar from '../components/ArtistsSidebar';
 
 const Container = styled.div`
   min-height: 100vh;
-  background: #000000;
+  background: ${props => props.theme.surface};
   padding: 0;
   width: 100vw;
   overflow-x: hidden;
@@ -38,18 +38,37 @@ const MainLayout = styled.div`
 const MainContent = styled.div`
   flex: 1;
   min-width: 0;
-  width: calc(100vw - 400px);
+  width: calc(100vw - 680px); /* 280px (sol) + 400px (sağ) = 680px */
   height: 100vh;
   overflow-y: auto;
   padding: 20px;
+  margin-left: 280px; /* Sol sidebar genişliği */
   margin-right: 0;
-  background: #000000;
+  background: ${props => props.theme.surface};
 
   @media (max-width: 1200px) {
     height: auto;
     overflow: visible;
     padding: 20px;
     width: 100%;
+    margin-left: 0;
+  }
+`;
+
+const LeftSidebar = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100vh;
+  background: ${props => props.theme.surface};
+  border-right: 1px solid #262626;
+  padding: 20px 0;
+  z-index: 1000;
+  overflow-y: auto;
+
+  @media (max-width: 1200px) {
+    display: none;
   }
 `;
 
@@ -61,11 +80,50 @@ const SidebarWrapper = styled.div`
   height: 100vh;
   z-index: 100;
   overflow-y: auto;
-  background: #000000;
+  background: ${props => props.theme.surface};
 
   @media (max-width: 1200px) {
     display: none;
   }
+`;
+
+const SidebarMenu = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  padding: 0 20px;
+`;
+
+const MenuItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: ${props => props.active ? '#FF6B35' : '#FFFFFF'};
+  background: ${props => props.active ? 'rgba(255, 107, 53, 0.1)' : 'transparent'};
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #FF6B35;
+  }
+`;
+
+const MenuIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  font-size: 10px;
+`;
+
+const MenuText = styled.span`
+  font-size: 16px;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 `;
 
 const HeroSection = styled.section`
@@ -98,7 +156,7 @@ const HeroContent = styled.div`
 const HeroTitle = styled.h1`
   font-size: 4rem;
   font-weight: 800;
-  color: white;
+  color: ${props => props.theme.text};
   margin-bottom: 24px;
   line-height: 1.1;
 
@@ -173,7 +231,7 @@ const StatsContainer = styled.div`
 
 const StatItem = styled.div`
   text-align: center;
-  color: white;
+  color: ${props => props.theme.text};
 `;
 
 const StatNumber = styled.div`
@@ -205,9 +263,9 @@ const SectionContainer = styled.div`
 const SectionHeader = styled.div`
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 940px;
   margin-bottom: 30px;
-  padding: 0 20px 0 500px;
+  padding: 0 20px 0 300px;
   
   h2, p {
     color: ${props => props.theme.text};
@@ -250,32 +308,41 @@ const ModernEyeIcon = styled(FiEye)`
 
 const FilterButtons = styled.div`
   display: flex;
-  gap: 8px;
+  gap: 12px;
   position: relative;
   z-index: 1000;
+  justify-content: flex-start;
+  margin-left: -40px;
   
   @media (max-width: 768px) {
-    gap: 6px;
+    gap: 8px;
+    margin-left: -20px;
   }
 `;
 
 const FilterButton = styled.button`
   padding: 8px 16px;
-  border: 1px solid #FF6B35;
-  border-radius: 20px;
-  background: ${props => props.active ? '#FF6B35' : 'transparent'};
-  color: ${props => props.active ? 'white' : '#FF6B35'};
-  font-size: 0.9rem;
-  font-weight: 500;
+  border: 2px solid ${props => props.active ? props.theme.primary : '#666666'};
+  border-radius: 6px;
+  background: ${props => props.active ? props.theme.primary : '#666666'};
+  color: ${props => props.active ? 'white' : 'white'};
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   position: relative;
   z-index: 1001;
+  letter-spacing: 0.3px;
   
   &:hover {
-    background: #FF6B35;
+    background: ${props => props.theme.primary};
     color: white;
-    border-color: #FF6B35;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  }
+  
+  &:active {
+    transform: translateY(0);
   }
   
   @media (max-width: 768px) {
@@ -292,32 +359,33 @@ const SectionSubtitle = styled.p`
 `;
 
 const WorksGrid = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 20px;
-  margin-bottom: 30px;
+  display: grid;
+  grid-template-columns: repeat(3, 420px);
+  gap: 6px;
+  margin-bottom: 0px;
   width: 100%;
   margin: 0 0 40px 0;
-  padding: 0 0 0 500px;
-  overflow: visible;
+  padding: 0 0 16px 300px;
+  overflow: hidden;
+  justify-content: start;
 
   @media (max-width: 1800px) {
-    gap: 20px;
+    gap: 6px;
     width: 100%;
     margin: 0 0 40px 0;
-    padding: 0 0 0 500px;
+    padding: 0 0 16px 300px;
   }
 
   @media (max-width: 768px) {
-    gap: 16px;
+    grid-template-columns: 1fr;
+    gap: 6px;
     width: 100%;
     margin: 0 0 40px 0;
-    padding: 0 20px;
+    padding: 0 0 12px 20px;
   }
 
   @media (max-width: 480px) {
-    gap: 12px;
+    gap: 6px;
   }
 `;
 
@@ -326,14 +394,14 @@ const ViewAllButton = styled.button`
   margin: 0 auto;
   padding: 16px 40px;
   background: #FF6B35;
-  color: white;
+  color: ${props => props.theme.text};
   border: none;
   border-radius: 50px;
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0px;
 
   &:hover {
     transform: translateY(-2px);
@@ -357,7 +425,7 @@ const HighlightsContainer = styled.div`
 const HighlightsHeader = styled.div`
   text-align: left;
   margin-bottom: 30px;
-  padding: 0 20px 0 500px;
+  padding: 0 20px 0 300px;
   display: flex;
   align-items: center;
   gap: 16px;
@@ -372,9 +440,13 @@ const HighlightsTitle = styled.h2`
   font-weight: 700;
   color: ${props => props.theme.text};
   margin-bottom: 0;
+  margin-left: -8px;
+  text-align: left;
 
   @media (max-width: 768px) {
     font-size: 1.2rem;
+    margin-left: 10px;
+    padding: 6px 12px;
   }
 `;
 
@@ -409,12 +481,10 @@ const HighlightsGrid = styled.div`
   display: flex;
   gap: 18px;
   margin-bottom: 0px;
-  padding: 0 0 16px 500px;
+  padding: 0 0 16px 300px;
   position: relative;
   width: 100%;
-  overflow: hidden; /* Turuncu çubuğu gizle */
-  mask: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
-  -webkit-mask: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  overflow: visible;
 
   @media (max-width: 768px) {
     gap: 16px;
@@ -424,13 +494,12 @@ const HighlightsGrid = styled.div`
 `;
 
 const HighlightCard = styled.div`
-  background: #000000;
-  border: 2px solid transparent;
+  border: none;
   border-radius: 20px;
   position: relative;
   overflow: hidden;
   cursor: pointer;
-  transition: none;
+  transition: all 0.3s ease;
   height: 200px;
   width: 247px;
   flex-shrink: 0;
@@ -444,9 +513,45 @@ const HighlightCard = styled.div`
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: scroll;
+  background-color: transparent;
   
   /* Düz Hizalama - Yamukluk Yok */
   transform: translateY(0);
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 
+      0 12px 35px rgba(255, 107, 53, 0.3),
+      0 6px 20px rgba(255, 107, 53, 0.2),
+      0 10px 30px rgba(0, 0, 0, 0.3);
+    background-size: 120% !important;
+    border-color: ${props => props.theme.primary};
+    
+    /* Dijital çerçeve animasyonu */
+    &::after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      border: 2px solid transparent;
+      border-radius: 22px;
+      background: linear-gradient(45deg, #ff6b35, #f7931e, #ff6b35, #f7931e);
+      background-size: 400% 400%;
+      animation: borderGlow 2s ease-in-out infinite;
+      z-index: 1;
+    }
+  }
+  
+  @keyframes borderGlow {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
   
   /* Modern Gölge Efekti */
   box-shadow: 
@@ -493,7 +598,7 @@ const HighlightIcon = styled.div`
   justify-content: center;
   margin-right: 12px;
   font-size: 1.2rem;
-  color: white;
+  color: ${props => props.theme.text};
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
 `;
@@ -607,7 +712,7 @@ const HighlightBadge = styled.div`
   top: 8px;
   right: 8px;
   background: ${props => props.theme.primary};
-  color: white;
+  color: ${props => props.theme.text};
   padding: 4px 8px;
   border-radius: 20px;
   font-size: 0.6rem;
@@ -625,7 +730,7 @@ const HighlightOverlay = styled.div`
   flex-direction: column;
   justify-content: flex-end;
   padding: 12px;
-  color: white;
+  color: ${props => props.theme.text};
 `;
 
 const HighlightInfo = styled.div`
@@ -637,16 +742,17 @@ const HighlightInfo = styled.div`
 const HighlightName = styled.h3`
   font-size: 0.9rem;
   font-weight: 700;
-  color: white;
+  color: ${props => props.theme.text};
   margin: 0;
   line-height: 1.2;
 `;
 
 const HighlightDescription = styled.p`
-  font-size: 0.6rem;
+  font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.9);
   margin: 0;
   line-height: 1.2;
+  font-weight: 600;
 `;
 
 const HighlightStats = styled.p`
@@ -658,7 +764,7 @@ const HighlightStats = styled.p`
 
 
 const Home = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  // const [searchQuery] = useState('');
   const [featuredWorks, setFeaturedWorks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
@@ -677,16 +783,6 @@ const Home = () => {
         viewCount: 980
       },
       {
-        _id: '2',
-        title: 'Doğanın Sessizliği',
-        description: 'Doğanın huzur veren sessizliği',
-        images: [{ url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop', isMain: true }],
-        author: { name: 'Mehmet Doğan', username: 'mehmet_nature', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop' },
-        category: { name: 'Fotoğraf', color: '#4CAF50' },
-        likeCount: 289,
-        viewCount: 1150
-      },
-      {
         _id: '3',
         title: 'Soyut Düşler',
         description: 'Renklerin dansı',
@@ -695,6 +791,36 @@ const Home = () => {
         category: { name: 'Dijital Sanat', color: '#2196F3' },
         likeCount: 312,
         viewCount: 1240
+      },
+      {
+        _id: '4',
+        title: 'Minimalist Düşünce',
+        description: 'Sadelikte güzellik',
+        images: [{ url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop', isMain: true }],
+        author: { name: 'Arda Minimal', username: 'arda_minimal', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop' },
+        category: { name: 'Dijital Sanat', color: '#607D8B' },
+        likeCount: 156,
+        viewCount: 720
+      },
+      {
+        _id: '5',
+        title: 'Gece Şehri',
+        description: 'Işıkların büyüsü',
+        images: [{ url: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&h=600&fit=crop', isMain: true }],
+        author: { name: 'Elif Gece', username: 'elif_night', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop' },
+        category: { name: 'Fotoğraf', color: '#9C27B0' },
+        likeCount: 198,
+        viewCount: 890
+      },
+      {
+        _id: '6',
+        title: 'Renkli Hayaller',
+        description: 'Hayal gücünün sınırları',
+        images: [{ url: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&h=600&fit=crop', isMain: true }],
+        author: { name: 'Deniz Renk', username: 'deniz_color', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop' },
+        category: { name: 'Resim', color: '#E91E63' },
+        likeCount: 267,
+        viewCount: 1020
       }
     ];
     
@@ -702,15 +828,54 @@ const Home = () => {
     setIsLoading(false);
   }, []);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      window.location.href = `/explore?search=${encodeURIComponent(searchQuery)}`;
-    }
-  };
+  // const handleSearch = (e) => {
+  //   e.preventDefault();
+  //   if (searchQuery.trim()) {
+  //     window.location.href = `/explore?search=${encodeURIComponent(searchQuery)}`;
+  //   }
+  // };
 
   return (
     <Container>
+      <LeftSidebar>
+        <SidebarMenu>
+          <MenuItem active={true}>
+            <MenuIcon>
+              <FiHome />
+            </MenuIcon>
+            <MenuText>Ana Sayfa</MenuText>
+          </MenuItem>
+          
+          <MenuItem>
+            <MenuIcon>
+              <FiEye />
+            </MenuIcon>
+            <MenuText>Keşfet</MenuText>
+          </MenuItem>
+          
+          <MenuItem>
+            <MenuIcon>
+              <FiBell />
+            </MenuIcon>
+            <MenuText>Bildirimler</MenuText>
+          </MenuItem>
+          
+          <MenuItem>
+            <MenuIcon>
+              <FiUser />
+            </MenuIcon>
+            <MenuText>Profil</MenuText>
+          </MenuItem>
+          
+          <MenuItem>
+            <MenuIcon>
+              <FiBookmark />
+            </MenuIcon>
+            <MenuText>Kaydedilenler</MenuText>
+          </MenuItem>
+        </SidebarMenu>
+      </LeftSidebar>
+      
       <MainLayout>
         <MainContent>
           <MonthlyHighlightsSection>
@@ -731,20 +896,18 @@ const Home = () => {
                            <HighlightInfo>
                              <HighlightDescription>⭐ Ayın Müzesi</HighlightDescription>
                              <HighlightName>İstanbul Modern</HighlightName>
-                             <HighlightDescription>Modern Sanat Koleksiyonu</HighlightDescription>
                              <HighlightStats>2.4K ziyaretçi</HighlightStats>
                            </HighlightInfo>
                          </HighlightOverlay>
                        </HighlightCard>
 
                        <HighlightCard
-                         backgroundImage="/ayın sanatçısı image/zeynep.jpg"
+                         backgroundImage="/zeynep.jpg"
                        >
                          <HighlightOverlay>
                            <HighlightInfo>
                              <HighlightDescription>⭐ Ayın Sanatçısı</HighlightDescription>
                              <HighlightName>Zeynep Esmer</HighlightName>
-                             <HighlightDescription>Dijital sanat ustası</HighlightDescription>
                              <HighlightStats>1.8K takipçi</HighlightStats>
                            </HighlightInfo>
                          </HighlightOverlay>
@@ -757,7 +920,6 @@ const Home = () => {
                 <HighlightInfo>
                   <HighlightDescription>⭐ Ayın Eseri</HighlightDescription>
                   <HighlightName>Günbatımında İstanbul</HighlightName>
-                  <HighlightDescription>En çok beğenilen eser</HighlightDescription>
                   <HighlightStats>3.2K beğeni</HighlightStats>
                 </HighlightInfo>
               </HighlightOverlay>
@@ -770,7 +932,6 @@ const Home = () => {
                 <HighlightInfo>
                   <HighlightDescription>⭐ Ayın Yorumu</HighlightDescription>
                   <HighlightName>"Bu eser bana huzur veriyor"</HighlightName>
-                  <HighlightDescription>En etkileyici yorum</HighlightDescription>
                   <HighlightStats>1.5K beğeni</HighlightStats>
                 </HighlightInfo>
               </HighlightOverlay>
@@ -783,7 +944,6 @@ const Home = () => {
                 <HighlightInfo>
                   <HighlightDescription>⭐ Ayın Koleksiyoneri</HighlightDescription>
                   <HighlightName>Mehmet Özkan</HighlightName>
-                  <HighlightDescription>En popüler koleksiyon</HighlightDescription>
                   <HighlightStats>2.8K takipçi</HighlightStats>
                 </HighlightInfo>
               </HighlightOverlay>

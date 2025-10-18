@@ -4,12 +4,9 @@ import { useQuery } from 'react-query';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { 
-  FiUser, 
   FiMapPin, 
   FiGlobe, 
-  FiHeart, 
   FiUsers, 
-  FiBookmark,
   FiSettings,
   FiPlus,
   FiGrid,

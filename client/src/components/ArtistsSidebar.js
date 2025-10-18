@@ -63,7 +63,7 @@ const AuthorAvatar = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: ${props => props.theme.text};
   font-weight: 600;
   font-size: 0.9rem;
   overflow: hidden;
@@ -118,7 +118,7 @@ const VerifiedBadge = styled.span`
   margin-left: 6px;
   box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
   font-size: 10px;
-  color: white;
+  color: ${props => props.theme.text};
   font-weight: bold;
   border: 2px solid ${props => props.theme.surface};
 `;
@@ -166,7 +166,7 @@ const StatItem = styled.div`
 
 const TrendingBadge = styled.div`
   background: ${props => props.theme.gradient};
-  color: white;
+  color: ${props => props.theme.text};
   padding: 4px 8px;
   border-radius: 6px;
   font-size: 0.7rem;
@@ -176,7 +176,7 @@ const TrendingBadge = styled.div`
   gap: 4px;
   position: absolute;
   right: 0;
-  top: 50%;
+  top: 20%;
   transform: translateY(-50%);
 `;
 
@@ -196,7 +196,7 @@ const ViewAllButton = styled(motion.button)`
   width: 100%;
   padding: 12px;
   background: ${props => props.theme.gradient};
-  color: white;
+  color: ${props => props.theme.text};
   border: none;
   border-radius: 8px;
   font-size: 0.9rem;
@@ -209,6 +209,51 @@ const ViewAllButton = styled(motion.button)`
   }
 `;
 
+// Müze kartları için CSS
+const MuseumsGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+`;
+
+const MuseumCard = styled(motion.div)`
+  background: ${props => props.theme.cardBackground};
+  border: 1px solid ${props => props.theme.border};
+  border-radius: 12px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px ${props => props.theme.shadow};
+  }
+`;
+
+const MuseumImage = styled.div`
+  width: 100%;
+  height: 80px;
+  border-radius: 8px;
+  background-image: url(${props => props.image});
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 8px;
+`;
+
+const MuseumName = styled.h4`
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: ${props => props.theme.text};
+  margin: 0 0 4px 0;
+`;
+
+const MuseumVisitors = styled.p`
+  font-size: 0.75rem;
+  color: ${props => props.theme.textSecondary};
+  margin: 0;
+`;
+
 
 
 const ArtistsSidebar = () => {
@@ -217,8 +262,8 @@ const ArtistsSidebar = () => {
     {
       id: 1,
       author: {
-        name: "Zeynep Kaya",
-        avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face&auto=format",
+        name: "Zeynep Esmer",
+        avatar: "/zeynep.jpg",
         isVerified: true
       },
       title: "Dijital Sanatta Yeni Dönem: AI ile Yaratıcılık",
@@ -245,8 +290,8 @@ const ArtistsSidebar = () => {
     {
       id: 3,
       author: {
-        name: "Ayşe Demir",
-        avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face&auto=format",
+        name: "Sude Esmer",
+        avatar: "/sude.jpg",
         isVerified: false
       },
       title: "Renk Teorisi ve Duygusal Tasarım",
@@ -272,8 +317,57 @@ const ArtistsSidebar = () => {
     }
   ];
 
+  // Ayın öne çıkan müzeleri
+  const featuredMuseums = [
+    {
+      id: 1,
+      name: "İstanbul Modern",
+      image: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=200&h=200&fit=crop",
+      visitors: "2.4K ziyaretçi"
+    },
+    {
+      id: 2,
+      name: "Pera Müzesi",
+      image: "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=200&h=200&fit=crop",
+      visitors: "1.8K ziyaretçi"
+    },
+    {
+      id: 3,
+      name: "Sakıp Sabancı Müzesi",
+      image: "https://images.unsplash.com/photo-1564399579883-451a5d44ec08?w=200&h=200&fit=crop",
+      visitors: "3.2K ziyaretçi"
+    },
+    {
+      id: 4,
+      name: "Rahmi Koç Müzesi",
+      image: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=200&h=200&fit=crop",
+      visitors: "1.5K ziyaretçi"
+    }
+  ];
+
   return (
     <SidebarContainer>
+      <SidebarTitle>
+        <FiTrendingUp size={20} />
+        Ayın Öne Çıkan Müzeleri
+      </SidebarTitle>
+
+      <MuseumsGrid>
+        {featuredMuseums.map((museum, index) => (
+          <MuseumCard
+            key={museum.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+            whileHover={{ scale: 1.02 }}
+          >
+            <MuseumImage image={museum.image} />
+            <MuseumName>{museum.name}</MuseumName>
+            <MuseumVisitors>{museum.visitors}</MuseumVisitors>
+          </MuseumCard>
+        ))}
+      </MuseumsGrid>
+
       <SidebarTitle>
         <FiTrendingUp size={20} />
         Sanatçı Köşe Yazıları
@@ -305,8 +399,8 @@ const ArtistsSidebar = () => {
               <AuthorInfo>
                 <AuthorName>
                   {article.author.name}
-                  <WaveIcon>👋</WaveIcon>
                   {article.author.isVerified && <VerifiedBadge>✓</VerifiedBadge>}
+                  <WaveIcon>👋</WaveIcon>
                 </AuthorName>
                 <ArticleDate>
                   <FiCalendar size={12} />
@@ -316,7 +410,6 @@ const ArtistsSidebar = () => {
               {article.isTrending && (
                 <TrendingBadge>
                   <FiTrendingUp size={10} />
-                  Trend
                 </TrendingBadge>
               )}
             </ArticleHeader>

@@ -8,7 +8,6 @@ import {
   FiHeart, 
   FiBookmark, 
   FiShare2, 
-  FiUser, 
   FiEye,
   FiCalendar,
   FiExternalLink,

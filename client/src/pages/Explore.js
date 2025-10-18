@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from 'react-query';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { FiSearch, FiFilter, FiGrid, FiList, FiChevronDown } from 'react-icons/fi';
+import { FiSearch, FiGrid, FiList } from 'react-icons/fi';
 import axios from 'axios';
 import WorkCard from '../components/WorkCard';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -43,7 +43,7 @@ const Subtitle = styled.p`
 const FiltersContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 32px;
   margin-bottom: 40px;
   align-items: center;
 
@@ -156,7 +156,7 @@ const ResultsHeader = styled.div`
 
   @media (max-width: 768px) {
     flex-direction: column;
-    gap: 16px;
+    gap: 32px;
     align-items: stretch;
   }
 `;
@@ -194,26 +194,28 @@ const LoadMoreButton = styled(motion.button)`
 const WorksGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 24px;
+  gap: 32px;
 
   @media (max-width: 1024px) {
     grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
   }
 
   @media (max-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: 24px;
   }
 
   @media (max-width: 480px) {
     grid-template-columns: 1fr;
+    gap: 8px;
   }
 `;
 
 const WorksList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px;
 `;
 
 const EmptyState = styled.div`

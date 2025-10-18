@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
-import { FiHeart, FiBookmark, FiEye, FiUser } from 'react-icons/fi';
+import { FiHeart, FiEye } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
-import toast from 'react-hot-toast';
+// import toast from 'react-hot-toast';
 
 const Card = styled.div`
-  background: #000000;
-  border: 1px solid #262626;
+  background: ${props => props.theme.surface};
+  border: none;
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
@@ -16,11 +14,11 @@ const Card = styled.div`
   height: auto;
   width: 420px;
   flex-shrink: 0;
-  margin-bottom: 20px;
+  margin: 0;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    transform: none;
+    box-shadow: none;
   }
 
   @media (max-width: 768px) {
@@ -78,7 +76,7 @@ const Overlay = styled.div`
 // Instagram benzeri post içeriği
 const PostContent = styled.div`
   padding: 12px 16px;
-  background: #000000;
+  background: ${props => props.theme.surface};
   border-top: 1px solid #262626;
 `;
 
@@ -97,7 +95,7 @@ const UserAvatar = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: ${props => props.theme.text};
   font-weight: 300;
   font-size: 10px;
   flex-shrink: 0;
@@ -116,7 +114,7 @@ const UserInfo = styled.div`
 
 const UserName = styled.div`
   font-weight: 600;
-  color: #ffffff;
+  color: ${props => props.theme.text};
   font-size: 14px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 `;
@@ -131,7 +129,7 @@ const PostActions = styled.div`
 const ActionButton = styled.button`
   background: none;
   border: none;
-  color: #ffffff;
+  color: ${props => props.theme.text};
   font-size: 17px;
   cursor: pointer;
   padding: 0;
@@ -147,7 +145,7 @@ const ActionButton = styled.button`
 
 const LikesCount = styled.div`
   font-weight: 600;
-  color: #ffffff;
+  color: ${props => props.theme.text};
   font-size: 13px;
   margin-bottom: 4px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -155,7 +153,7 @@ const LikesCount = styled.div`
 
 const PostTitle = styled.div`
   font-weight: 600;
-  color: #ffffff;
+  color: ${props => props.theme.text};
   font-size: 16px;
   line-height: 1.3;
   margin-bottom: 4px;
@@ -171,7 +169,7 @@ const PostDescription = styled.div`
 `;
 
 const PostCaption = styled.div`
-  color: #ffffff;
+  color: ${props => props.theme.text};
   font-size: 14px;
   line-height: 1.4;
   margin-bottom: 8px;
@@ -187,10 +185,10 @@ const PostTime = styled.div`
 const PostStats = styled.div`
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 16px;
   margin-top: 8px;
   padding-top: 8px;
-  border-top: 1px solid #262626;
 `;
 
 const StatItem = styled.div`
@@ -205,7 +203,7 @@ const StatItem = styled.div`
 const Title = styled.h3`
   font-size: 1.1rem;
   font-weight: 600;
-  color: white;
+  color: ${props => props.theme.text};
   margin-bottom: 6px;
   line-height: 1.2;
   display: -webkit-box;
@@ -229,9 +227,9 @@ const AuthorAvatar = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: ${props => props.theme.text};
   font-weight: 600;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
 `;
 
 const AuthorAvatarImg = styled.img`
@@ -247,7 +245,7 @@ const AuthorInfo = styled.div`
 
 const AuthorName = styled.div`
   font-weight: 500;
-  color: white;
+  color: ${props => props.theme.text};
   font-size: 0.8rem;
 `;
 
@@ -268,7 +266,7 @@ const Category = styled.div`
   display: inline-block;
   padding: 3px 8px;
   background: rgba(255, 255, 255, 0.2);
-  color: white;
+  color: ${props => props.theme.text};
   border-radius: 12px;
   font-size: 0.7rem;
   font-weight: 500;
@@ -277,49 +275,49 @@ const Category = styled.div`
 `;
 
 const WorkCard = ({ work }) => {
-  const { user, likeWork, saveWork } = useAuth();
-  const [isLiked, setIsLiked] = useState(work.likes?.includes(user?._id) || false);
-  const [isSaved, setIsSaved] = useState(user?.savedWorks?.includes(work._id) || false);
-  const [likeCount, setLikeCount] = useState(work.likeCount || work.likes?.length || 0);
+  const { user } = useAuth();
+  // const [isLiked, setIsLiked] = useState(work.likes?.includes(user?._id) || false);
+  // const [isSaved, setIsSaved] = useState(user?.savedWorks?.includes(work._id) || false);
+  const [likeCount] = useState(work.likeCount || work.likes?.length || 0);
 
-  const handleLike = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  // const handleLike = async (e) => {
+  //   e.preventDefault();
+  //   e.stopPropagation();
     
-    if (!user) {
-      toast.error('Beğenmek için giriş yapmalısınız');
-      return;
-    }
+  //   if (!user) {
+  //     toast.error('Beğenmek için giriş yapmalısınız');
+  //     return;
+  //   }
 
-    try {
-      const result = await likeWork(work._id);
-      if (result.success) {
-        setIsLiked(!isLiked);
-        setLikeCount(result.data.likeCount);
-      }
-    } catch (error) {
-      console.error('Like error:', error);
-    }
-  };
+  //   try {
+  //     const result = await likeWork(work._id);
+  //     if (result.success) {
+  //       setIsLiked(!isLiked);
+  //       setLikeCount(result.data.likeCount);
+  //     }
+  //   } catch (error) {
+  //     console.error('Like error:', error);
+  //   }
+  // };
 
-  const handleSave = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  // const handleSave = async (e) => {
+  //   e.preventDefault();
+  //   e.stopPropagation();
     
-    if (!user) {
-      toast.error('Kaydetmek için giriş yapmalısınız');
-      return;
-    }
+  //   if (!user) {
+  //     toast.error('Kaydetmek için giriş yapmalısınız');
+  //     return;
+  //   }
 
-    try {
-      const result = await saveWork(work._id);
-      if (result.success) {
-        setIsSaved(!isSaved);
-      }
-    } catch (error) {
-      console.error('Save error:', error);
-    }
-  };
+  //   try {
+  //     const result = await saveWork(work._id);
+  //     if (result.success) {
+  //       setIsSaved(!isSaved);
+  //     }
+  //   } catch (error) {
+  //     console.error('Save error:', error);
+  //   }
+  // };
 
   const mainImage = work.images?.find(img => img.isMain) || work.images?.[0];
 
@@ -332,9 +330,8 @@ const WorkCard = ({ work }) => {
 
   const mockCaption = work.description || `${work.title} - Bu eser bana ilham veriyor ✨`;
   const mockLikes = likeCount;
-  const mockComments = Math.floor(Math.random() * 50) + 10;
+  // const mockComments = Math.floor(Math.random() * 50) + 10;
   const mockViews = work.views || Math.floor(Math.random() * 1000) + 100;
-  const mockTime = '2 saat önce';
 
   return (
     <Card>
@@ -353,7 +350,7 @@ const WorkCard = ({ work }) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: 'white',
+            color: '#2C1810',
             fontSize: '2rem'
           }}>
             🎨
@@ -383,7 +380,6 @@ const WorkCard = ({ work }) => {
           {mockCaption}
         </PostCaption>
         
-        <PostTime>{mockTime}</PostTime>
         
         <PostStats>
           <StatItem>

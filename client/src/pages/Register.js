@@ -122,12 +122,12 @@ const LogoIcon = styled(motion.div)`
   }
 `;
 
-const LogoText = styled.h1`
-  font-size: 2rem;
-  font-weight: 800;
-  color: ${props => props.theme.primary};
-  margin-bottom: 8px;
-`;
+// const LogoText = styled.h1`
+//   font-size: 2rem;
+//   font-weight: 800;
+//   color: ${props => props.theme.primary};
+//   margin-bottom: 8px;
+// `;
 
 const LogoSubtext = styled.p`
   color: ${props => props.theme.textSecondary};

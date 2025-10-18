@@ -43,6 +43,7 @@ const NavContainer = styled.div`
   height: 80px;
   width: 100%;
   box-sizing: border-box;
+  position: relative;
 `;
 
 const Logo = styled(Link)`
@@ -73,37 +74,37 @@ const LogoIcon = styled.div`
   }
 `;
 
-const NavLinks = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 32px;
+// const NavLinks = styled.div`
+//   display: flex;
+//   align-items: center;
+//   gap: 32px;
 
-  @media (max-width: 768px) {
-    display: none;
-  }
-`;
+//   @media (max-width: 768px) {
+//     display: none;
+//   }
+// `;
 
-const NavLink = styled(Link)`
-  color: ${props => props.theme.text};
-  text-decoration: none;
-  font-weight: 500;
-  padding: 8px 16px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+// const NavLink = styled(Link)`
+//   color: ${props => props.theme.text};
+//   text-decoration: none;
+//   font-weight: 500;
+//   padding: 8px 16px;
+//   border-radius: 8px;
+//   transition: all 0.2s ease;
+//   display: flex;
+//   align-items: center;
+//   gap: 8px;
 
-  &:hover {
-    background: ${props => props.theme.surfaceHover};
-    color: ${props => props.theme.primary};
-  }
+//   &:hover {
+//     background: ${props => props.theme.surfaceHover};
+//     color: ${props => props.theme.primary};
+//   }
 
-  &.active {
-    background: ${props => props.theme.primaryLight};
-    color: ${props => props.theme.primary};
-  }
-`;
+//   &.active {
+//     background: ${props => props.theme.primaryLight};
+//     color: ${props => props.theme.primary};
+//   }
+// `;
 
 const NavActions = styled.div`
   display: flex;
@@ -123,25 +124,6 @@ const LeftNavActions = styled.div`
   padding-right: 0;
 `;
 
-const HamburgerButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border: none;
-  border-radius: 8px;
-  background: ${props => props.theme.glass};
-  color: ${props => props.theme.text};
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-right: 16px;
-
-  &:hover {
-    background: ${props => props.theme.primaryLight};
-    color: ${props => props.theme.primary};
-  }
-`;
 
 const MobileMenu = styled(motion.div)`
   position: fixed;
@@ -149,8 +131,8 @@ const MobileMenu = styled(motion.div)`
   left: 0;
   width: 280px;
   height: 100vh;
-  background: #000000;
-  border-right: 1px solid #262626;
+  background: ${props => props.theme.surface};
+  border-right: 1px solid ${props => props.theme.border};
   z-index: 9999;
   padding: 20px 0;
   overflow-y: auto;
@@ -159,52 +141,62 @@ const MobileMenu = styled(motion.div)`
 
 const MenuHeader = styled.div`
   padding: 0 24px 20px 24px;
-  border-bottom: 1px solid #262626;
+  border-bottom: 1px solid ${props => props.theme.border};
   margin-bottom: 20px;
 `;
 
 const MenuTitle = styled.h3`
   font-size: 20px;
   font-weight: 600;
-  color: #ffffff;
+  color: ${props => props.theme.text};
   margin: 0 0 4px 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 `;
 
 const MenuSubtitle = styled.p`
   font-size: 13px;
-  color: #8e8e8e;
+  color: ${props => props.theme.textSecondary};
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 `;
 
 const MenuItems = styled.div`
   padding: 0 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 `;
 
 const MenuItem = styled(Link)`
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
   padding: 12px 12px;
   margin-bottom: 4px;
   border-radius: 8px;
   text-decoration: none;
-  color: #ffffff;
+  color: ${props => props.theme.text};
   transition: all 0.2s ease;
-  font-weight: 400;
+  font-weight: 500;
   font-size: 16px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  opacity: 1;
+  width: 100%;
+  max-width: 200px;
 
   &:hover {
-    background: #262626;
-    color: #ffffff;
+    background: ${props => props.theme.surfaceHover};
+    color: ${props => props.theme.text};
+    opacity: 1;
   }
 
   &.active {
-    background: #262626;
-    color: #ffffff;
+    background: ${props => props.theme.surfaceHover};
+    color: ${props => props.theme.text};
     font-weight: 600;
+    opacity: 1;
   }
 `;
 
@@ -257,50 +249,89 @@ const Overlay = styled(motion.div)`
   z-index: 9998;
 `;
 
+const CenterSearch = styled.div`
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 500px;
+  z-index: 10;
+`;
+
 const SearchContainer = styled.div`
   position: relative;
-  flex: 1;
+  width: 100%;
   max-width: 500px;
-  margin: 0 auto;
   display: flex;
   align-items: center;
 `;
 
 const SearchInput = styled.input`
   width: 100%;
-  height: 40px;
-  padding: 0 16px 0 44px;
-  border: 1px solid ${props => props.theme.glassBorder};
-  border-radius: 20px;
-  background: ${props => props.theme.glass};
-  backdrop-filter: blur(20px);
+  height: 50px;
+  padding: 0 20px 0 50px;
+  border: 2px solid ${props => props.theme.border};
+  border-radius: 25px;
+  background: ${props => props.theme.surface};
   color: ${props => props.theme.text};
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: 500;
   transition: all 0.3s ease;
   cursor: pointer;
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(0);
 
   &::placeholder {
-    color: ${props => props.theme.textSecondary};
+    color: ${props => props.theme.textMuted};
+    font-weight: 400;
   }
 
   &:focus {
     outline: none;
     border-color: ${props => props.theme.primary};
-    box-shadow: 0 0 0 3px ${props => props.theme.primaryLight};
+    box-shadow: 
+      0 12px 35px rgba(255, 107, 53, 0.3),
+      0 6px 20px rgba(255, 107, 53, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
   }
 
   &:hover {
     border-color: ${props => props.theme.primary};
+    box-shadow: 
+      0 10px 30px rgba(0, 0, 0, 0.2),
+      0 5px 15px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
   }
 `;
 
 const SearchIcon = styled.div`
   position: absolute;
-  left: 14px;
+  left: 18px;
   top: 50%;
   transform: translateY(-50%);
-  color: ${props => props.theme.textSecondary};
+  color: ${props => props.theme.primary};
   pointer-events: none;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  
+  ${SearchInput}:focus + & {
+    color: ${props => props.theme.primary};
+    transform: translateY(-50%) scale(1.1);
+    filter: drop-shadow(0 4px 8px rgba(255, 107, 53, 0.3));
+  }
+  
+  ${SearchInput}:hover + & {
+    color: ${props => props.theme.primary};
+    transform: translateY(-50%) scale(1.05);
+  }
 `;
 
 const ThemeToggle = styled.button`
@@ -374,7 +405,7 @@ const UserButton = styled.button`
   border-radius: 50%;
   background: ${props => props.theme.gradient};
   border: none;
-  color: white;
+  color: ${props => props.theme.text};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -443,7 +474,7 @@ const AuthButton = styled(Link)`
 
   &.primary {
     background: ${props => props.theme.primary};
-    color: white;
+    color: ${props => props.theme.text};
 
     &:hover {
       background: ${props => props.theme.primaryHover};
@@ -494,6 +525,7 @@ const MobileNavLink = styled(Link)`
   text-decoration: none;
   font-weight: 500;
   border-bottom: 1px solid ${props => props.theme.border};
+  transition: color 0.3s ease, background-color 0.3s ease;
 
   &:last-child {
     border-bottom: none;
@@ -511,9 +543,8 @@ const Navbar = () => {
   const location = useLocation();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
-  const [currentTrack, setCurrentTrack] = useState(0);
+  const [currentTrack] = useState(0);
   const [audio, setAudio] = useState(null);
 
   // Sanatsal müzik dosyaları - Ücretsiz jazz müzik kaynakları
@@ -585,17 +616,9 @@ const Navbar = () => {
   const handleLogout = () => {
     logout();
     setShowUserMenu(false);
-    setShowHamburgerMenu(false);
     // navigate('/') removed - AuthContext handles redirect to /login
   };
 
-  const toggleHamburgerMenu = () => {
-    setShowHamburgerMenu(!showHamburgerMenu);
-  };
-
-  const closeHamburgerMenu = () => {
-    setShowHamburgerMenu(false);
-  };
 
   const isActive = (path) => {
     return location.pathname === path;
@@ -605,28 +628,44 @@ const Navbar = () => {
     <Nav>
       <NavContainer>
         <LeftNavActions>
-          <HamburgerButton onClick={toggleHamburgerMenu}>
-            <FiMenu size={20} />
-          </HamburgerButton>
           <Logo to="/">
             <LogoIcon>
               <img src="/images/feellink.logo.png" alt="Feellink Logo" />
             </LogoIcon>
           </Logo>
+          
+          <MenuItems>
+            {user && (
+              <>
+                <MenuItem to="/saved" className={isActive('/saved') ? 'active' : ''}>
+                  <MenuIcon>
+                    <FiBookmark size={20} />
+                  </MenuIcon>
+                  Kaydedilenler
+                </MenuItem>
+                <MenuItem to={`/profile/${user.username}`} className={isActive(`/profile/${user.username}`) ? 'active' : ''}>
+                  <MenuIcon>
+                    <FiUser size={20} />
+                  </MenuIcon>
+                  Profil
+                </MenuItem>
+              </>
+            )}
+          </MenuItems>
         </LeftNavActions>
 
-        {user && (
+        <CenterSearch>
           <SearchContainer>
             <SearchInput
               type="text"
-              placeholder="Eserler, sanatçılar, kategoriler ara..."
+              placeholder="Sanat eserleri, sanatçılar ara..."
               onClick={() => navigate('/explore')}
             />
             <SearchIcon>
               <FiSearch size={18} />
             </SearchIcon>
           </SearchContainer>
-        )}
+        </CenterSearch>
 
         <NavActions>
           <MusicToggle onClick={toggleMusic} isPlaying={isMusicPlaying}>
@@ -656,7 +695,7 @@ const Navbar = () => {
                     transition={{ duration: 0.2 }}
                   >
                     <DropdownItem onClick={() => navigate(`/profile/${user.username}`)}>
-                      <FiUser size={18} />
+                      <FiUser size={14} />
                       Profilim
                     </DropdownItem>
                     <DropdownItem onClick={() => navigate('/saved')}>
@@ -715,7 +754,7 @@ const Navbar = () => {
                   Kaydedilenler
                 </MobileNavLink>
                 <MobileNavLink to={`/profile/${user.username}`} onClick={() => setShowMobileMenu(false)}>
-                  <FiUser size={18} />
+                  <FiUser size={14} />
                   Profil
                 </MobileNavLink>
                 <MobileNavLink to="/settings" onClick={() => setShowMobileMenu(false)}>
@@ -742,81 +781,6 @@ const Navbar = () => {
         )}
       </AnimatePresence>
 
-      {/* Hamburger Menu */}
-      <AnimatePresence>
-        {showHamburgerMenu && (
-          <>
-            <Overlay
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              onClick={closeHamburgerMenu}
-            />
-            <MobileMenu
-              initial={{ x: -280 }}
-              animate={{ x: 0 }}
-              exit={{ x: -280 }}
-              transition={{ duration: 0.3, type: "spring", damping: 25 }}
-            >
-              <MenuHeader>
-                <MenuTitle>Feellink</MenuTitle>
-                <MenuSubtitle>Yaratıcılığını dünyayla paylaş</MenuSubtitle>
-              </MenuHeader>
-
-              <MenuItems>
-                <MenuItem 
-                  to="/" 
-                  className={isActive('/') ? 'active' : ''}
-                  onClick={closeHamburgerMenu}
-                >
-                  <MenuIcon>
-                    <FiHome size={18} />
-                  </MenuIcon>
-                  <MenuText>Ana Sayfa</MenuText>
-                </MenuItem>
-
-                {user && (
-                  <>
-                    <MenuItem 
-                      to="/saved" 
-                      className={isActive('/saved') ? 'active' : ''}
-                      onClick={closeHamburgerMenu}
-                    >
-                      <MenuIcon>
-                        <FiBookmark size={18} />
-                      </MenuIcon>
-                      <MenuText>Kaydedilenler</MenuText>
-                    </MenuItem>
-
-                    <MenuItem 
-                      to={`/profile/${user.username}`} 
-                      className={isActive(`/profile/${user.username}`) ? 'active' : ''}
-                      onClick={closeHamburgerMenu}
-                    >
-                      <MenuIcon>
-                        <FiUser size={18} />
-                      </MenuIcon>
-                      <MenuText>Profil</MenuText>
-                    </MenuItem>
-                  </>
-                )}
-              </MenuItems>
-
-              {user && (
-                <MenuFooter>
-                  <LogoutButton onClick={handleLogout}>
-                    <MenuIcon>
-                      <FiLogOut size={18} />
-                    </MenuIcon>
-                    <MenuText>Çıkış Yap</MenuText>
-                  </LogoutButton>
-                </MenuFooter>
-              )}
-            </MobileMenu>
-          </>
-        )}
-      </AnimatePresence>
     </Nav>
   );
 };
