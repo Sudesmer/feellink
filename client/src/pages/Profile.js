@@ -70,7 +70,7 @@ const Avatar = styled.div`
 
 const AvatarImg = styled.img`
   width: 15%;
-  height: 20%;
+  height: 35%;
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid ${props => props.theme.border};
@@ -84,14 +84,14 @@ const ProfileInfo = styled.div`
 const ProfileTop = styled.div`
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 12px;
   margin-bottom: 20px;
   flex-wrap: wrap;
 
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
   }
 `;
 
