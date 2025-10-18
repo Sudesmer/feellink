@@ -9,7 +9,9 @@ import {
   FiTrendingUp,
   FiClock,
   FiMoreHorizontal,
-  FiCheck
+  FiCheck,
+  FiBell,
+  FiUser
 } from 'react-icons/fi';
 
 const Container = styled.div`
