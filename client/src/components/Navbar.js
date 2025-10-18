@@ -40,10 +40,55 @@ const NavContainer = styled.div`
   padding: 0 20px 0 20px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   height: 80px;
   width: 100%;
   box-sizing: border-box;
+  position: relative;
+`;
+
+const SearchContainer = styled.div`
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  max-width: 90%;
+`;
+
+const SearchInput = styled.input`
+  width: 100%;
+  padding: 10px 16px 10px 40px;
+  border: 2px solid ${props => props.theme.border};
+  border-radius: 25px;
+  background: ${props => props.theme.surface};
+  color: ${props => props.theme.text};
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: #FF6B35;
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: ${props => props.theme.primary};
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+  }
+
+  &::placeholder {
+    color: ${props => props.theme.textSecondary};
+  }
+`;
+
+const SearchIcon = styled.div`
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: ${props => props.theme.textSecondary};
+  pointer-events: none;
 `;
 
 const Logo = styled(Link)`
@@ -108,12 +153,85 @@ const NavLink = styled(Link)`
 `;
 
 const NavActions = styled.div`
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-left: auto;
-  margin-right: 20px;
-  padding-right: 0;
+`;
+
+const UserMenu = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+`;
+
+const UserIcon = styled.button`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: ${props => props.theme.surface};
+  border: 2px solid ${props => props.theme.border};
+  color: ${props => props.theme.text};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: ${props => props.theme.surfaceHover};
+    border-color: ${props => props.theme.primary};
+    transform: scale(1.05);
+  }
+`;
+
+const UserDropdown = styled(motion.div)`
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: ${props => props.theme.surface};
+  border: 1px solid ${props => props.theme.border};
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(20px);
+  min-width: 180px;
+  z-index: 1000;
+  overflow: hidden;
+`;
+
+const DropdownItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: ${props => props.theme.text};
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+
+  &:hover {
+    background: ${props => props.theme.surfaceHover};
+    color: ${props => props.theme.primary};
+  }
+
+  &:first-child {
+    border-radius: 12px 12px 0 0;
+  }
+
+  &:last-child {
+    border-radius: 0 0 12px 12px;
+  }
+`;
+
+const DropdownDivider = styled.div`
+  height: 1px;
+  background: ${props => props.theme.border};
+  margin: 4px 0;
 `;
 
 const LeftNavActions = styled.div`
@@ -243,51 +361,6 @@ const Overlay = styled(motion.div)`
   z-index: 9998;
 `;
 
-const SearchContainer = styled.div`
-  position: relative;
-  flex: 1;
-  max-width: 500px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-`;
-
-const SearchInput = styled.input`
-  width: 100%;
-  height: 40px;
-  padding: 0 16px 0 44px;
-  border: 1px solid ${props => props.theme.glassBorder};
-  border-radius: 20px;
-  background: ${props => props.theme.glass};
-  backdrop-filter: blur(20px);
-  color: ${props => props.theme.text};
-  font-size: 14px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-
-  &::placeholder {
-    color: ${props => props.theme.textSecondary};
-  }
-
-  &:focus {
-    outline: none;
-    border-color: ${props => props.theme.primary};
-    box-shadow: 0 0 0 3px ${props => props.theme.primaryLight};
-  }
-
-  &:hover {
-    border-color: ${props => props.theme.primary};
-  }
-`;
-
-const SearchIcon = styled.div`
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: ${props => props.theme.textSecondary};
-  pointer-events: none;
-`;
 
 const ThemeToggle = styled.button`
   width: 40px;
@@ -350,66 +423,6 @@ const MusicToggle = styled.button`
   }
 `;
 
-const UserMenu = styled.div`
-  position: relative;
-`;
-
-const UserButton = styled.button`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: ${props => props.theme.gradient};
-  border: none;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s ease;
-
-  &:hover {
-    transform: scale(1.05);
-  }
-`;
-
-const UserAvatar = styled.img`
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-`;
-
-const Dropdown = styled(motion.div)`
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 8px;
-  background: ${props => props.theme.surface};
-  border: 1px solid ${props => props.theme.border};
-  border-radius: 12px;
-  box-shadow: 0 10px 40px ${props => props.theme.shadow};
-  min-width: 200px;
-  overflow: hidden;
-`;
-
-const DropdownItem = styled.button`
-  width: 100%;
-  padding: 12px 16px;
-  background: none;
-  border: none;
-  color: ${props => props.theme.text};
-  text-align: left;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: ${props => props.theme.surfaceHover};
-  }
-`;
 
 const AuthButtons = styled.div`
   display: flex;
@@ -497,9 +510,11 @@ const Navbar = () => {
   const location = useLocation();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(0);
   const [audio, setAudio] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Sanatsal müzik dosyaları - Ücretsiz jazz müzik kaynakları
   const musicTracks = [
@@ -573,34 +588,39 @@ const Navbar = () => {
     // navigate('/') removed - AuthContext handles redirect to /login
   };
 
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigate(`/explore?search=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
+
 
   const isActive = (path) => {
     return location.pathname === path;
   };
 
   return (
-    <Nav style={{ 
-      position: 'fixed', 
-      top: '20px', 
-      right: '20px', 
-      zIndex: 1000,
-      background: 'transparent',
-      border: 'none',
-      backdropFilter: 'none',
-      width: 'auto',
-      height: 'auto'
-    }}>
-      <NavContainer style={{ 
-        padding: '0',
-        height: 'auto',
-        justifyContent: 'flex-end',
-        width: 'auto'
-      }}>
-        <NavActions style={{ 
-          display: 'flex', 
-          gap: '12px',
-          alignItems: 'center'
-        }}>
+    <Nav>
+      <NavContainer>
+        <SearchContainer>
+          <SearchInput
+            type="text"
+            placeholder="Keşfet..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                handleSearch();
+              }
+            }}
+          />
+          <SearchIcon>
+            <FiSearch size={18} />
+          </SearchIcon>
+        </SearchContainer>
+        
+        <NavActions>
           <MusicToggle onClick={toggleMusic} isPlaying={isMusicPlaying}>
             {isMusicPlaying ? <FiVolume2 size={20} /> : <FiVolumeX size={20} />}
           </MusicToggle>
@@ -608,6 +628,43 @@ const Navbar = () => {
           <ThemeToggle onClick={toggleTheme}>
             {isDark ? <FiSun size={20} /> : <FiMoon size={20} />}
           </ThemeToggle>
+          
+          {user && (
+            <UserMenu>
+              <UserIcon onClick={() => setShowUserDropdown(!showUserDropdown)}>
+                <FiUser size={20} />
+              </UserIcon>
+              
+              <AnimatePresence>
+                {showUserDropdown && (
+                  <UserDropdown
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <DropdownItem onClick={() => navigate('/profile')}>
+                      <FiUser size={16} />
+                      Profil
+                    </DropdownItem>
+                    <DropdownItem onClick={() => navigate('/saved')}>
+                      <FiBookmark size={16} />
+                      Kaydedilenler
+                    </DropdownItem>
+                    <DropdownItem onClick={() => navigate('/notifications')}>
+                      <FiBell size={16} />
+                      Bildirimler
+                    </DropdownItem>
+                    <DropdownDivider />
+                    <DropdownItem onClick={handleLogout}>
+                      <FiLogOut size={16} />
+                      Çıkış Yap
+                    </DropdownItem>
+                  </UserDropdown>
+                )}
+              </AnimatePresence>
+            </UserMenu>
+          )}
         </NavActions>
       </NavContainer>
 

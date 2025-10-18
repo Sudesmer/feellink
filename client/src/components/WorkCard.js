@@ -95,15 +95,15 @@ const UserAvatar = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${props => props.theme.text};
+  color: white;
   font-weight: 300;
-  font-size: 10px;
+  font-size: 12px;
   flex-shrink: 0;
 `;
 
 const UserAvatarImg = styled.img`
-  width: 15%;
-  height: 100%;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   object-fit: cover;
 `;
@@ -220,8 +220,8 @@ const Author = styled.div`
 `;
 
 const AuthorAvatar = styled.div`
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: ${props => props.theme.gradient};
   display: flex;
@@ -229,8 +229,8 @@ const AuthorAvatar = styled.div`
   justify-content: center;
   color: ${props => props.theme.text};
   font-weight: 600;
-  font-size: 0.25rem;
-  border: 1px solid red;
+  font-size: 0.2rem;
+  border: none;
 `;
 
 const AuthorAvatarImg = styled.img`

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
+import { useTheme } from '../contexts/ThemeContext';
 import { FiSearch, FiEye, FiAward as FiBadge, FiHome, FiBell, FiUser, FiBookmark } from 'react-icons/fi';
 import WorkCard from '../components/WorkCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ArtistsSidebar from '../components/ArtistsSidebar';
+import Navbar from '../components/Navbar';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -36,6 +38,7 @@ const Container = styled.div`
     100% { background-position: 0% 50%; }
   }
 `;
+
 
 const MainLayout = styled.div`
   display: flex;
@@ -85,13 +88,13 @@ const LeftSidebar = styled.div`
   left: 0;
   width: 280px;
   height: 100vh;
-  background: linear-gradient(180deg, rgba(255, 107, 53, 0.95) 0%, rgba(247, 147, 30, 0.9) 50%, rgba(255, 255, 255, 0.95) 100%);
+  background: ${props => props.theme.surface};
   backdrop-filter: blur(20px);
-  border-right: 2px solid rgba(255, 107, 53, 0.3);
+  border-right: 2px solid ${props => props.theme.border};
   padding: 20px 0;
   z-index: 1000;
   overflow-y: auto;
-  box-shadow: 4px 0 20px rgba(255, 107, 53, 0.2);
+  box-shadow: 4px 0 20px ${props => props.theme.shadow};
 
   @media (max-width: 1200px) {
     display: none;
@@ -128,17 +131,17 @@ const MenuItem = styled.div`
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: ${props => props.active ? '#FFFFFF' : '#2C1810'};
-  background: ${props => props.active ? 'linear-gradient(135deg, #FF6B35, #F7931E)' : 'transparent'};
+  color: ${props => props.active ? '#FFFFFF' : props.theme.text};
+  background: ${props => props.active ? props.theme.gradient : 'transparent'};
   margin: 4px 12px;
-  box-shadow: ${props => props.active ? '0 4px 15px rgba(255, 107, 53, 0.3)' : 'none'};
+  box-shadow: ${props => props.active ? `0 4px 15px ${props.theme.shadow}` : 'none'};
   transform: ${props => props.active ? 'translateX(8px)' : 'translateX(0)'};
 
   &:hover {
-    background: linear-gradient(135deg, rgba(255, 107, 53, 0.8), rgba(247, 147, 30, 0.8));
+    background: ${props => props.theme.primary};
     color: #FFFFFF;
     transform: translateX(8px);
-    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+    box-shadow: 0 6px 20px ${props => props.theme.shadow};
   }
 `;
 
@@ -155,6 +158,7 @@ const MenuText = styled.span`
   font-size: 18px;
   font-weight: 600;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: inherit;
 `;
 
 const HeroSection = styled.section`
@@ -210,42 +214,6 @@ const HeroSubtitle = styled.p`
   }
 `;
 
-const SearchContainer = styled.div`
-  max-width: 600px;
-  margin: 0 auto 60px;
-  position: relative;
-`;
-
-const SearchInput = styled.input`
-  width: 100%;
-  padding: 16px 24px 16px 56px;
-  border: none;
-  border-radius: 50px;
-  background: rgba(255, 255, 255, 0.95);
-  font-size: 16px;
-  color: ${props => props.theme.text};
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-
-  &:focus {
-    outline: none;
-    background: white;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-  }
-
-  &::placeholder {
-    color: ${props => props.theme.textMuted};
-  }
-`;
-
-const SearchIcon = styled(FiSearch)`
-  position: absolute;
-  left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: ${props => props.theme.textMuted};
-  font-size: 20px;
-`;
 
 const StatsContainer = styled.div`
   display: grid;
@@ -392,7 +360,7 @@ const SectionSubtitle = styled.p`
 const WorksGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 420px);
-  gap: 6px;
+  gap: 12px;
   margin-bottom: 0px;
   width: 100%;
   margin: 0 0 40px 0;
@@ -797,6 +765,7 @@ const HighlightStats = styled.p`
 const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { theme } = useTheme();
   // const [searchQuery] = useState('');
   const [featuredWorks, setFeaturedWorks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -809,7 +778,7 @@ const Home = () => {
         _id: '1',
         title: 'Günbatımında İstanbul',
         description: 'Boğaz\'ın büyüleyici günbatımı manzarası',
-        images: [{ url: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&h=600&fit=crop', isMain: true }],
+        images: [{ url: '/t1.jpg', isMain: true }],
         author: { name: 'Ahmet Yılmaz', username: 'ahmet_art', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop' },
         category: { name: 'Resim', color: '#FF6B35' },
         likeCount: 245,
@@ -819,7 +788,7 @@ const Home = () => {
         _id: '3',
         title: 'Soyut Düşler',
         description: 'Renklerin dansı',
-        images: [{ url: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&h=600&fit=crop', isMain: true }],
+        images: [{ url: '/t2.webp', isMain: true }],
         author: { name: 'Can Soyut', username: 'can_abstract', avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop' },
         category: { name: 'Dijital Sanat', color: '#2196F3' },
         likeCount: 312,
@@ -829,7 +798,7 @@ const Home = () => {
         _id: '4',
         title: 'Minimalist Düşünce',
         description: 'Sadelikte güzellik',
-        images: [{ url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop', isMain: true }],
+        images: [{ url: '/t11.jpeg', isMain: true }],
         author: { name: 'Arda Minimal', username: 'arda_minimal', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop' },
         category: { name: 'Dijital Sanat', color: '#607D8B' },
         likeCount: 156,
@@ -839,7 +808,7 @@ const Home = () => {
         _id: '5',
         title: 'Gece Şehri',
         description: 'Işıkların büyüsü',
-        images: [{ url: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&h=600&fit=crop', isMain: true }],
+        images: [{ url: '/t4.jpg', isMain: true }],
         author: { name: 'Elif Gece', username: 'elif_night', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop' },
         category: { name: 'Fotoğraf', color: '#9C27B0' },
         likeCount: 198,
@@ -849,11 +818,71 @@ const Home = () => {
         _id: '6',
         title: 'Renkli Hayaller',
         description: 'Hayal gücünün sınırları',
-        images: [{ url: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&h=600&fit=crop', isMain: true }],
+        images: [{ url: '/t6.jpg', isMain: true }],
         author: { name: 'Deniz Renk', username: 'deniz_color', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop' },
         category: { name: 'Resim', color: '#E91E63' },
         likeCount: 267,
         viewCount: 1020
+      },
+      {
+        _id: '7',
+        title: 'Dijital Rüyalar',
+        description: 'Teknoloji ve sanatın buluşması',
+        images: [{ url: '/leo1.jpg', isMain: true }],
+        author: { name: 'Tekin Dijital', username: 'tekin_digital', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop' },
+        category: { name: 'Dijital Sanat', color: '#00BCD4' },
+        likeCount: 189,
+        viewCount: 756
+      },
+      {
+        _id: '8',
+        title: 'Doğanın Sesi',
+        description: 'Tabiatın büyüleyici güzelliği',
+        images: [{ url: '/t12.jpeg', isMain: true }],
+        author: { name: 'Ayşe Doğa', username: 'ayse_nature', avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop' },
+        category: { name: 'Fotoğraf', color: '#4CAF50' },
+        likeCount: 234,
+        viewCount: 923
+      },
+      {
+        _id: '9',
+        title: 'Geometrik Düşler',
+        description: 'Matematik ve sanatın uyumu',
+        images: [{ url: '/leo2.jpeg', isMain: true }],
+        author: { name: 'Matematik Sanat', username: 'math_art', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop' },
+        category: { name: 'Dijital Sanat', color: '#FF9800' },
+        likeCount: 156,
+        viewCount: 678
+      },
+      {
+        _id: '10',
+        title: 'Şehir Işıkları',
+        description: 'Metropolün gece manzarası',
+        images: [{ url: '/t10.jpg', isMain: true }],
+        author: { name: 'Şehir Fotoğrafçısı', username: 'city_photo', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop' },
+        category: { name: 'Fotoğraf', color: '#9C27B0' },
+        likeCount: 298,
+        viewCount: 1156
+      },
+      {
+        _id: '11',
+        title: 'Soyut Duygular',
+        description: 'İç dünyanın dışa vurumu',
+        images: [{ url: '/picasso.webp', isMain: true }],
+        author: { name: 'Duygu Sanat', username: 'emotion_art', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop' },
+        category: { name: 'Resim', color: '#F44336' },
+        likeCount: 187,
+        viewCount: 834
+      },
+      {
+        _id: '12',
+        title: 'Minimalist Yaşam',
+        description: 'Sadelikte güzellik',
+        images: [{ url: '/t3.jpg', isMain: true }],
+        author: { name: 'Minimal Yaşam', username: 'minimal_life', avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop' },
+        category: { name: 'Dijital Sanat', color: '#607D8B' },
+        likeCount: 145,
+        viewCount: 612
       }
     ];
     
@@ -870,37 +899,37 @@ const Home = () => {
 
   return (
     <Container>
-      <LeftSidebar>
+      <LeftSidebar theme={theme}>
         <SidebarMenu>
-          <MenuItem active={location.pathname === '/'} onClick={() => navigate('/')}>
+          <MenuItem theme={theme} active={location.pathname === '/'} onClick={() => navigate('/')}>
             <MenuIcon>
               <FiHome />
             </MenuIcon>
             <MenuText>Ana Sayfa</MenuText>
           </MenuItem>
           
-          <MenuItem active={location.pathname === '/explore'} onClick={() => navigate('/explore')}>
+          <MenuItem theme={theme} active={location.pathname === '/explore'} onClick={() => navigate('/explore')}>
             <MenuIcon>
               <FiEye />
             </MenuIcon>
             <MenuText>Keşfet</MenuText>
           </MenuItem>
           
-          <MenuItem onClick={() => navigate('/notifications')}>
+          <MenuItem theme={theme} onClick={() => navigate('/notifications')}>
             <MenuIcon>
               <FiBell />
             </MenuIcon>
             <MenuText>Bildirimler</MenuText>
           </MenuItem>
           
-          <MenuItem onClick={() => navigate('/profile')}>
+          <MenuItem theme={theme} onClick={() => navigate('/profile')}>
             <MenuIcon>
               <FiUser />
             </MenuIcon>
             <MenuText>Profil</MenuText>
           </MenuItem>
           
-          <MenuItem onClick={() => navigate('/saved')}>
+          <MenuItem theme={theme} onClick={() => navigate('/saved')}>
             <MenuIcon>
               <FiBookmark />
             </MenuIcon>
