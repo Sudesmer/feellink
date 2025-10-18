@@ -9,7 +9,9 @@ import {
   FiMoreHorizontal,
   FiBookmark,
   FiUserPlus,
-  FiUserMinus
+  FiUserMinus,
+  FiEdit3,
+  FiPlus
 } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 
