@@ -194,6 +194,7 @@ const BioText = styled.span`
   margin: 0;
   font-size: 0.95rem;
   display: inline;
+  white-space: nowrap;
 `;
 
 const BioLink = styled.a`
