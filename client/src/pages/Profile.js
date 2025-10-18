@@ -190,9 +190,10 @@ const Bio = styled.div`
   margin-bottom: 12px;
 `;
 
-const BioText = styled.p`
+const BioText = styled.span`
   margin: 0;
   font-size: 0.95rem;
+  display: inline;
 `;
 
 const BioLink = styled.a`
