@@ -92,12 +92,15 @@ const ProfileInfo = styled.div`
 
 const ProfileTop = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  gap: 20px;
   margin-bottom: 20px;
+  flex-wrap: wrap;
 
   @media (max-width: 768px) {
+    flex-direction: column;
     align-items: center;
+    gap: 12px;
   }
 `;
 
@@ -118,7 +121,6 @@ const ActionButtons = styled.div`
   gap: 8px;
   align-items: center;
   flex-wrap: wrap;
-  margin-top: 8px;
 `;
 
 const ActionButton = styled.button`
