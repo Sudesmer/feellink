@@ -1,27 +1,16 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
 import { useTheme } from '../contexts/ThemeContext';
 import { 
-  FiMapPin, 
-  FiGlobe, 
-  FiUsers, 
-  FiSettings,
-  FiPlus,
   FiGrid,
-  FiList,
   FiHeart,
   FiMessageCircle,
-  FiShare2,
   FiMoreHorizontal,
-  FiEdit3,
   FiBookmark,
   FiUserPlus,
   FiUserMinus
 } from 'react-icons/fi';
-import WorkCard from '../components/WorkCard';
-import LoadingSpinner from '../components/LoadingSpinner';
 import { useAuth } from '../contexts/AuthContext';
 
 const Container = styled.div`
