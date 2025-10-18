@@ -105,7 +105,7 @@ const SidebarWrapper = styled.div`
   position: fixed;
   top: 0px;
   right: 0;
-  width: 400px;
+  width: 480px;
   height: 100vh;
   z-index: 100;
   overflow-y: auto;
