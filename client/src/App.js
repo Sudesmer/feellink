@@ -16,6 +16,7 @@ import Home from './pages/Home';
 import Explore from './pages/Explore';
 import Profile from './pages/Profile';
 import Saved from './pages/Saved';
+import Notifications from './pages/Notifications';
 import WorkDetail from './pages/WorkDetail';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -143,6 +144,20 @@ function App() {
                       transition={pageTransition}
                     >
                       <Saved />
+                    </motion.div>
+                  } 
+                />
+                <Route 
+                  path="/notifications" 
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                    >
+                      <Notifications />
                     </motion.div>
                   } 
                 />
