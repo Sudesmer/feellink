@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { FiSearch, FiEye, FiAward as FiBadge, FiHome, FiBell, FiUser, FiBookmark } from 'react-icons/fi';
 import WorkCard from '../components/WorkCard';
@@ -115,14 +116,14 @@ const MenuIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 14px;
-  height: 14px;
-  font-size: 10px;
+  width: 24px;
+  height: 24px;
+  font-size: 20px;
 `;
 
 const MenuText = styled.span`
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 18px;
+  font-weight: 600;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 `;
 
@@ -764,6 +765,8 @@ const HighlightStats = styled.p`
 
 
 const Home = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   // const [searchQuery] = useState('');
   const [featuredWorks, setFeaturedWorks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -839,35 +842,35 @@ const Home = () => {
     <Container>
       <LeftSidebar>
         <SidebarMenu>
-          <MenuItem active={true}>
+          <MenuItem active={location.pathname === '/'} onClick={() => navigate('/')}>
             <MenuIcon>
               <FiHome />
             </MenuIcon>
             <MenuText>Ana Sayfa</MenuText>
           </MenuItem>
           
-          <MenuItem>
+          <MenuItem active={location.pathname === '/explore'} onClick={() => navigate('/explore')}>
             <MenuIcon>
               <FiEye />
             </MenuIcon>
             <MenuText>Keşfet</MenuText>
           </MenuItem>
           
-          <MenuItem>
+          <MenuItem onClick={() => navigate('/notifications')}>
             <MenuIcon>
               <FiBell />
             </MenuIcon>
             <MenuText>Bildirimler</MenuText>
           </MenuItem>
           
-          <MenuItem>
+          <MenuItem onClick={() => navigate('/profile')}>
             <MenuIcon>
               <FiUser />
             </MenuIcon>
             <MenuText>Profil</MenuText>
           </MenuItem>
           
-          <MenuItem>
+          <MenuItem onClick={() => navigate('/saved')}>
             <MenuIcon>
               <FiBookmark />
             </MenuIcon>

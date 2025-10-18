@@ -220,8 +220,8 @@ const Author = styled.div`
 `;
 
 const AuthorAvatar = styled.div`
-  width: 24px;
-  height: 24px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: ${props => props.theme.gradient};
   display: flex;
@@ -229,7 +229,8 @@ const AuthorAvatar = styled.div`
   justify-content: center;
   color: ${props => props.theme.text};
   font-weight: 600;
-  font-size: 0.7rem;
+  font-size: 0.25rem;
+  border: 1px solid red;
 `;
 
 const AuthorAvatarImg = styled.img`

@@ -16,7 +16,8 @@ import {
   FiLogOut,
   FiSettings,
   FiVolume2,
-  FiVolumeX
+  FiVolumeX,
+  FiBell
 } from 'react-icons/fi';
 
 const Nav = styled.nav`
@@ -43,7 +44,6 @@ const NavContainer = styled.div`
   height: 80px;
   width: 100%;
   box-sizing: border-box;
-  position: relative;
 `;
 
 const Logo = styled(Link)`
@@ -61,50 +61,50 @@ const Logo = styled(Link)`
 `;
 
 const LogoIcon = styled.div`
-  width: 120px;
-  height: 40px;
+  width: 100px;
+  height: 90px;
   display: flex;
   align-items: center;
   justify-content: center;
   
   img {
-    width: 100%;
-    height: 100%;
+    width: 1000%;
+    height: 1000%;
     object-fit: contain;
   }
 `;
 
-// const NavLinks = styled.div`
-//   display: flex;
-//   align-items: center;
-//   gap: 32px;
+const NavLinks = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 32px;
 
-//   @media (max-width: 768px) {
-//     display: none;
-//   }
-// `;
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
 
-// const NavLink = styled(Link)`
-//   color: ${props => props.theme.text};
-//   text-decoration: none;
-//   font-weight: 500;
-//   padding: 8px 16px;
-//   border-radius: 8px;
-//   transition: all 0.2s ease;
-//   display: flex;
-//   align-items: center;
-//   gap: 8px;
+const NavLink = styled(Link)`
+  color: ${props => props.theme.text};
+  text-decoration: none;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
-//   &:hover {
-//     background: ${props => props.theme.surfaceHover};
-//     color: ${props => props.theme.primary};
-//   }
+  &:hover {
+    background: ${props => props.theme.surfaceHover};
+    color: ${props => props.theme.primary};
+  }
 
-//   &.active {
-//     background: ${props => props.theme.primaryLight};
-//     color: ${props => props.theme.primary};
-//   }
-// `;
+  &.active {
+    background: ${props => props.theme.primaryLight};
+    color: ${props => props.theme.primary};
+  }
+`;
 
 const NavActions = styled.div`
   display: flex;
@@ -118,10 +118,12 @@ const NavActions = styled.div`
 const LeftNavActions = styled.div`
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
   margin-left: 0;
   margin-right: auto;
   padding-right: 0;
+  min-width: 280px;
+  padding-left: 20px;
 `;
 
 
@@ -131,8 +133,8 @@ const MobileMenu = styled(motion.div)`
   left: 0;
   width: 280px;
   height: 100vh;
-  background: ${props => props.theme.surface};
-  border-right: 1px solid ${props => props.theme.border};
+  background: #000000;
+  border-right: 1px solid #262626;
   z-index: 9999;
   padding: 20px 0;
   overflow-y: auto;
@@ -141,62 +143,53 @@ const MobileMenu = styled(motion.div)`
 
 const MenuHeader = styled.div`
   padding: 0 24px 20px 24px;
-  border-bottom: 1px solid ${props => props.theme.border};
+  border-bottom: 1px solid #262626;
   margin-bottom: 20px;
 `;
 
 const MenuTitle = styled.h3`
   font-size: 20px;
   font-weight: 600;
-  color: ${props => props.theme.text};
+  color: #ffffff;
   margin: 0 0 4px 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 `;
 
 const MenuSubtitle = styled.p`
   font-size: 13px;
-  color: ${props => props.theme.textSecondary};
+  color: #8e8e8e;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 `;
 
 const MenuItems = styled.div`
-  padding: 0 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  padding: 0 20px;
   width: 100%;
 `;
 
 const MenuItem = styled(Link)`
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 16px;
   padding: 12px 12px;
   margin-bottom: 4px;
   border-radius: 8px;
   text-decoration: none;
-  color: ${props => props.theme.text};
+  color: #ffffff;
   transition: all 0.2s ease;
-  font-weight: 500;
+  font-weight: 400;
   font-size: 16px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  opacity: 1;
-  width: 100%;
-  max-width: 200px;
 
   &:hover {
-    background: ${props => props.theme.surfaceHover};
-    color: ${props => props.theme.text};
-    opacity: 1;
+    background: #262626;
+    color: #ffffff;
   }
 
   &.active {
-    background: ${props => props.theme.surfaceHover};
-    color: ${props => props.theme.text};
+    background: #262626;
+    color: #ffffff;
     font-weight: 600;
-    opacity: 1;
   }
 `;
 
@@ -249,89 +242,50 @@ const Overlay = styled(motion.div)`
   z-index: 9998;
 `;
 
-const CenterSearch = styled.div`
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 500px;
-  z-index: 10;
-`;
-
 const SearchContainer = styled.div`
   position: relative;
-  width: 100%;
+  flex: 1;
   max-width: 500px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
 `;
 
 const SearchInput = styled.input`
   width: 100%;
-  height: 50px;
-  padding: 0 20px 0 50px;
-  border: 2px solid ${props => props.theme.border};
-  border-radius: 25px;
-  background: ${props => props.theme.surface};
+  height: 40px;
+  padding: 0 16px 0 44px;
+  border: 1px solid ${props => props.theme.glassBorder};
+  border-radius: 20px;
+  background: ${props => props.theme.glass};
+  backdrop-filter: blur(20px);
   color: ${props => props.theme.text};
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 14px;
   transition: all 0.3s ease;
   cursor: pointer;
-  box-shadow: 
-    0 8px 25px rgba(0, 0, 0, 0.15),
-    0 4px 12px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transform: translateY(0);
 
   &::placeholder {
-    color: ${props => props.theme.textMuted};
-    font-weight: 400;
+    color: ${props => props.theme.textSecondary};
   }
 
   &:focus {
     outline: none;
     border-color: ${props => props.theme.primary};
-    box-shadow: 
-      0 12px 35px rgba(255, 107, 53, 0.3),
-      0 6px 20px rgba(255, 107, 53, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
+    box-shadow: 0 0 0 3px ${props => props.theme.primaryLight};
   }
 
   &:hover {
     border-color: ${props => props.theme.primary};
-    box-shadow: 
-      0 10px 30px rgba(0, 0, 0, 0.2),
-      0 5px 15px rgba(0, 0, 0, 0.15),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
-    transform: translateY(-1px);
   }
 `;
 
 const SearchIcon = styled.div`
   position: absolute;
-  left: 18px;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
-  color: ${props => props.theme.primary};
+  color: ${props => props.theme.textSecondary};
   pointer-events: none;
-  transition: all 0.3s ease;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-  
-  ${SearchInput}:focus + & {
-    color: ${props => props.theme.primary};
-    transform: translateY(-50%) scale(1.1);
-    filter: drop-shadow(0 4px 8px rgba(255, 107, 53, 0.3));
-  }
-  
-  ${SearchInput}:hover + & {
-    color: ${props => props.theme.primary};
-    transform: translateY(-50%) scale(1.05);
-  }
 `;
 
 const ThemeToggle = styled.button`
@@ -405,7 +359,7 @@ const UserButton = styled.button`
   border-radius: 50%;
   background: ${props => props.theme.gradient};
   border: none;
-  color: ${props => props.theme.text};
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -474,7 +428,7 @@ const AuthButton = styled(Link)`
 
   &.primary {
     background: ${props => props.theme.primary};
-    color: ${props => props.theme.text};
+    color: white;
 
     &:hover {
       background: ${props => props.theme.primaryHover};
@@ -525,7 +479,6 @@ const MobileNavLink = styled(Link)`
   text-decoration: none;
   font-weight: 500;
   border-bottom: 1px solid ${props => props.theme.border};
-  transition: color 0.3s ease, background-color 0.3s ease;
 
   &:last-child {
     border-bottom: none;
@@ -544,7 +497,7 @@ const Navbar = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
-  const [currentTrack] = useState(0);
+  const [currentTrack, setCurrentTrack] = useState(0);
   const [audio, setAudio] = useState(null);
 
   // Sanatsal müzik dosyaları - Ücretsiz jazz müzik kaynakları
@@ -634,38 +587,18 @@ const Navbar = () => {
             </LogoIcon>
           </Logo>
           
-          <MenuItems>
-            {user && (
-              <>
-                <MenuItem to="/saved" className={isActive('/saved') ? 'active' : ''}>
-                  <MenuIcon>
-                    <FiBookmark size={20} />
-                  </MenuIcon>
-                  Kaydedilenler
-                </MenuItem>
-                <MenuItem to={`/profile/${user.username}`} className={isActive(`/profile/${user.username}`) ? 'active' : ''}>
-                  <MenuIcon>
-                    <FiUser size={20} />
-                  </MenuIcon>
-                  Profil
-                </MenuItem>
-              </>
-            )}
-          </MenuItems>
         </LeftNavActions>
 
-        <CenterSearch>
-          <SearchContainer>
-            <SearchInput
-              type="text"
-              placeholder="Sanat eserleri, sanatçılar ara..."
-              onClick={() => navigate('/explore')}
-            />
-            <SearchIcon>
-              <FiSearch size={18} />
-            </SearchIcon>
-          </SearchContainer>
-        </CenterSearch>
+        <SearchContainer>
+          <SearchInput
+            type="text"
+            placeholder="Eserler, sanatçılar, kategoriler ara..."
+            onClick={() => navigate('/explore')}
+          />
+          <SearchIcon>
+            <FiSearch size={18} />
+          </SearchIcon>
+        </SearchContainer>
 
         <NavActions>
           <MusicToggle onClick={toggleMusic} isPlaying={isMusicPlaying}>
@@ -695,7 +628,7 @@ const Navbar = () => {
                     transition={{ duration: 0.2 }}
                   >
                     <DropdownItem onClick={() => navigate(`/profile/${user.username}`)}>
-                      <FiUser size={14} />
+                      <FiUser size={18} />
                       Profilim
                     </DropdownItem>
                     <DropdownItem onClick={() => navigate('/saved')}>
@@ -739,34 +672,6 @@ const Navbar = () => {
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <MobileNavLink to="/" onClick={() => setShowMobileMenu(false)}>
-              <FiHome size={18} />
-              Ana Sayfa
-            </MobileNavLink>
-            <MobileNavLink to="/explore" onClick={() => setShowMobileMenu(false)}>
-              <FiSearch size={18} />
-              Keşfet
-            </MobileNavLink>
-            {user && (
-              <>
-                <MobileNavLink to="/saved" onClick={() => setShowMobileMenu(false)}>
-                  <FiBookmark size={18} />
-                  Kaydedilenler
-                </MobileNavLink>
-                <MobileNavLink to={`/profile/${user.username}`} onClick={() => setShowMobileMenu(false)}>
-                  <FiUser size={14} />
-                  Profil
-                </MobileNavLink>
-                <MobileNavLink to="/settings" onClick={() => setShowMobileMenu(false)}>
-                  <FiSettings size={18} />
-                  Ayarlar
-                </MobileNavLink>
-                <MobileNavLink to="#" onClick={handleLogout}>
-                  <FiLogOut size={18} />
-                  Çıkış Yap
-                </MobileNavLink>
-              </>
-            )}
             {!user && (
               <>
                 <MobileNavLink to="/login" onClick={() => setShowMobileMenu(false)}>
