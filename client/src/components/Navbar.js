@@ -61,16 +61,17 @@ const Logo = styled(Link)`
 `;
 
 const LogoIcon = styled.div`
-  width: 100px;
-  height: 90px;
+  width: 150px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
   
   img {
-    width: 1000%;
-    height: 1000%;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
+    background: transparent;
   }
 `;
 
@@ -500,6 +501,17 @@ const Navbar = () => {
   const [currentTrack, setCurrentTrack] = useState(0);
   const [audio, setAudio] = useState(null);
 
+  // Test için mock user - gerçek giriş yapıldığında kaldırılacak
+  const mockUser = {
+    _id: '1',
+    username: 'testuser',
+    email: 'test@example.com',
+    name: 'Test User'
+  };
+  
+  // Geçici olarak mock user kullan
+  const currentUser = user || mockUser;
+
   // Sanatsal müzik dosyaları - Ücretsiz jazz müzik kaynakları
   const musicTracks = [
     {
@@ -583,7 +595,28 @@ const Navbar = () => {
         <LeftNavActions>
           <Logo to="/">
             <LogoIcon>
-              <img src="/images/feellink.logo.png" alt="Feellink Logo" />
+              <img 
+                src="/images/feellink.logo.png" 
+                alt="Feellink Logo" 
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  const fallback = e.target.parentNode.querySelector('.logo-fallback');
+                  if (fallback) fallback.style.display = 'block';
+                }} 
+              />
+              <div 
+                className="logo-fallback"
+                style={{
+                  display: 'none', 
+                  fontSize: '24px', 
+                  fontWeight: 'bold', 
+                  background: 'linear-gradient(45deg, #FF6B35, #8B5CF6, #3B82F6)', 
+                  WebkitBackgroundClip: 'text', 
+                  WebkitTextFillColor: 'transparent'
+                }}
+              >
+                feellink
+              </div>
             </LogoIcon>
           </Logo>
           
@@ -609,13 +642,15 @@ const Navbar = () => {
             {isDark ? <FiSun size={20} /> : <FiMoon size={20} />}
           </ThemeToggle>
 
-          {user ? (
+          {currentUser ? (
             <UserMenu>
               <UserButton onClick={() => setShowUserMenu(!showUserMenu)}>
-                {user.avatar ? (
-                  <UserAvatar src={user.avatar} alt={user.fullName} />
+                {currentUser.avatar ? (
+                  <UserAvatar src={currentUser.avatar} alt={currentUser.name} />
                 ) : (
-                  user.fullName.charAt(0).toUpperCase()
+                  <UserAvatar>
+                    {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
+                  </UserAvatar>
                 )}
               </UserButton>
 
@@ -627,7 +662,7 @@ const Navbar = () => {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <DropdownItem onClick={() => navigate(`/profile/${user.username}`)}>
+                    <DropdownItem onClick={() => navigate(`/profile/${currentUser.username}`)}>
                       <FiUser size={18} />
                       Profilim
                     </DropdownItem>
