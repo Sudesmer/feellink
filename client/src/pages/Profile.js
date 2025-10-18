@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from 'react-query';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import { useTheme } from '../contexts/ThemeContext';
 import { 
   FiMapPin, 
   FiGlobe, 
@@ -10,75 +10,71 @@ import {
   FiSettings,
   FiPlus,
   FiGrid,
-  FiList
+  FiList,
+  FiHeart,
+  FiMessageCircle,
+  FiShare2,
+  FiMoreHorizontal,
+  FiEdit3,
+  FiBookmark,
+  FiUserPlus,
+  FiUserMinus
 } from 'react-icons/fi';
-import axios from 'axios';
 import WorkCard from '../components/WorkCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useAuth } from '../contexts/AuthContext';
-import toast from 'react-hot-toast';
 
 const Container = styled.div`
   min-height: 100vh;
   background: ${props => props.theme.background};
+  padding-top: 80px;
 `;
 
-const Header = styled.div`
-  background: ${props => props.theme.gradient};
-  padding: 120px 0 60px;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-    opacity: 0.3;
-  }
-`;
-
-const HeaderContent = styled.div`
-  max-width: 1200px;
+const ProfileContainer = styled.div`
+  max-width: 935px;
   margin: 0 auto;
-  padding: 0 20px;
-  position: relative;
-  z-index: 1;
+  padding: 30px 20px;
 `;
 
-const ProfileInfo = styled.div`
+const ProfileHeader = styled.div`
   display: flex;
-  gap: 40px;
-  align-items: flex-end;
+  gap: 30px;
+  margin-bottom: 44px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid ${props => props.theme.border};
 
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 24px;
+    gap: 20px;
   }
 `;
 
-const AvatarContainer = styled.div`
-  position: relative;
+const AvatarSection = styled.div`
+  display: flex;
+  justify-content: center;
 `;
 
 const Avatar = styled.div`
-  width: 120px;
-  height: 120px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   background: ${props => props.theme.gradient};
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 3rem;
+  font-size: 4rem;
   font-weight: 700;
-  border: 4px solid white;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  border: 3px solid ${props => props.theme.border};
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    width: 120px;
+    height: 120px;
+    font-size: 3rem;
+  }
 `;
 
 const AvatarImg = styled.img`
@@ -86,453 +82,459 @@ const AvatarImg = styled.img`
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid white;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  border: 3px solid ${props => props.theme.border};
 `;
 
-const ProfileDetails = styled.div`
+const ProfileInfo = styled.div`
   flex: 1;
-  color: white;
+  min-width: 0;
 `;
 
-const Name = styled.h1`
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 8px;
+const ProfileTop = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
 
   @media (max-width: 768px) {
-    font-size: 2rem;
+    justify-content: center;
   }
 `;
 
-const Username = styled.p`
-  font-size: 1.2rem;
-  opacity: 0.9;
-  margin-bottom: 16px;
+const Username = styled.h1`
+  font-size: 1.75rem;
+  font-weight: 300;
+  color: ${props => props.theme.text};
+  margin: 0;
+  line-height: 1.2;
+
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
 `;
 
-const Bio = styled.p`
-  font-size: 1.1rem;
-  opacity: 0.9;
-  margin-bottom: 24px;
-  line-height: 1.6;
-  max-width: 600px;
+const ActionButtons = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center;
 `;
 
-const Location = styled.div`
+const ActionButton = styled.button`
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid ${props => props.theme.border};
+  background: ${props => props.primary ? props.theme.primary : props.theme.surface};
+  color: ${props => props.primary ? 'white' : props.theme.text};
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  opacity: 0.9;
-`;
-
-const Website = styled.a`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: white;
-  text-decoration: none;
-  opacity: 0.9;
-  transition: opacity 0.3s ease;
+  gap: 6px;
 
   &:hover {
-    opacity: 1;
+    background: ${props => props.primary ? props.theme.primaryHover : props.theme.surfaceHover};
+  }
+`;
+
+const MoreButton = styled.button`
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid ${props => props.theme.border};
+  background: ${props => props.theme.surface};
+  color: ${props => props.theme.text};
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: ${props => props.theme.surfaceHover};
   }
 `;
 
 const Stats = styled.div`
   display: flex;
   gap: 40px;
-  margin-top: 32px;
+  margin-bottom: 20px;
 
   @media (max-width: 768px) {
     justify-content: center;
+    gap: 30px;
   }
 `;
 
 const StatItem = styled.div`
-  text-align: center;
+  text-align: left;
+
+  @media (max-width: 768px) {
+    text-align: center;
+  }
 `;
 
 const StatNumber = styled.div`
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 4px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: ${props => props.theme.text};
+  margin-bottom: 2px;
 `;
 
 const StatLabel = styled.div`
   font-size: 0.9rem;
-  opacity: 0.8;
+  color: ${props => props.theme.textSecondary};
 `;
 
-const Actions = styled.div`
-  display: flex;
-  gap: 16px;
-  margin-top: 32px;
-
-  @media (max-width: 768px) {
-    justify-content: center;
-  }
+const Bio = styled.div`
+  color: ${props => props.theme.text};
+  line-height: 1.5;
+  margin-bottom: 12px;
 `;
 
-const ActionButton = styled.button`
-  padding: 12px 24px;
-  border-radius: 50px;
-  border: 2px solid white;
-  background: ${props => props.primary ? 'white' : 'transparent'};
-  color: ${props => props.primary ? props.theme.primary : 'white'};
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+const BioText = styled.p`
+  margin: 0 0 8px 0;
+  font-size: 0.95rem;
+`;
+
+const BioLink = styled.a`
+  color: ${props => props.theme.primary};
+  text-decoration: none;
+  font-weight: 500;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    text-decoration: underline;
   }
 `;
 
-const Content = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px 20px;
-`;
-
-const Tabs = styled.div`
+const ProfileTabs = styled.div`
   display: flex;
-  gap: 32px;
-  margin-bottom: 40px;
-  border-bottom: 1px solid ${props => props.theme.border};
-
-  @media (max-width: 768px) {
-    gap: 16px;
-    overflow-x: auto;
-    padding-bottom: 16px;
-  }
+  justify-content: center;
+  border-top: 1px solid ${props => props.theme.border};
+  margin-top: 0;
 `;
 
 const Tab = styled.button`
-  padding: 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 0;
   background: none;
   border: none;
-  color: ${props => props.active ? props.theme.primary : props.theme.textSecondary};
+  color: ${props => props.active ? props.theme.text : props.theme.textSecondary};
   font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
-  border-bottom: 2px solid ${props => props.active ? props.theme.primary : 'transparent'};
+  border-top: 1px solid ${props => props.active ? props.theme.text : 'transparent'};
   transition: all 0.3s ease;
-  white-space: nowrap;
+  margin-right: 60px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &:last-child {
+    margin-right: 0;
+  }
 
   &:hover {
-    color: ${props => props.theme.primary};
-  }
-`;
-
-const ViewControls = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 32px;
-  justify-content: space-between;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: stretch;
-  }
-`;
-
-const ViewToggle = styled.div`
-  display: flex;
-  border: 1px solid ${props => props.theme.border};
-  border-radius: 12px;
-  overflow: hidden;
-`;
-
-const ViewButton = styled.button`
-  padding: 8px 16px;
-  background: ${props => props.active ? props.theme.primary : props.theme.surface};
-  color: ${props => props.active ? 'white' : props.theme.text};
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  &:hover {
-    background: ${props => props.active ? props.theme.primaryHover : props.theme.surfaceHover};
+    color: ${props => props.theme.text};
   }
 `;
 
 const WorksGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 24px;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  margin-top: 0;
 
   @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr;
+    gap: 2px;
   }
 `;
 
-const WorksList = styled.div`
+const WorkItem = styled.div`
+  aspect-ratio: 1;
+  background: ${props => props.theme.surface};
+  border: 1px solid ${props => props.theme.border};
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.02);
+    z-index: 10;
+    box-shadow: 0 8px 25px ${props => props.theme.shadow};
+  }
+`;
+
+const WorkImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: all 0.3s ease;
+
+  ${WorkItem}:hover & {
+    transform: scale(1.1);
+  }
+`;
+
+const WorkOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
-  flex-direction: column;
-  gap: 24px;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  opacity: 0;
+  transition: all 0.3s ease;
+
+  ${WorkItem}:hover & {
+    opacity: 1;
+  }
+`;
+
+const OverlayIcon = styled.div`
+  color: white;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  font-size: 0.9rem;
 `;
 
 const EmptyState = styled.div`
   text-align: center;
-  padding: 80px 20px;
+  padding: 60px 20px;
   color: ${props => props.theme.textSecondary};
 `;
 
 const EmptyIcon = styled.div`
-  font-size: 4rem;
-  margin-bottom: 24px;
+  font-size: 3rem;
+  margin-bottom: 16px;
 `;
 
 const EmptyTitle = styled.h3`
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   color: ${props => props.theme.text};
 `;
 
 const EmptyDescription = styled.p`
-  font-size: 1rem;
-  max-width: 400px;
+  font-size: 0.9rem;
+  max-width: 300px;
   margin: 0 auto;
+  line-height: 1.4;
 `;
+
+// Mock data for Instagram-like profile
+const mockProfile = {
+  username: 'zeynep_esmer',
+  fullName: 'Zeynep Esmer',
+  bio: '🎨 Sanatçı & Tasarımcı\n📍 İstanbul, Türkiye\n✨ Dijital sanat ve geleneksel tekniklerin buluştuğu nokta',
+  website: 'zeynepesmer.com',
+  location: 'İstanbul, Türkiye',
+  avatar: '/zeynep.jpg',
+  followers: 2847,
+  following: 156,
+  posts: 42,
+  isFollowing: false,
+  isOwnProfile: false
+};
+
+const mockWorks = [
+  { id: 1, image: '/t1.jpg', likes: 234, comments: 12 },
+  { id: 2, image: '/t2.webp', likes: 189, comments: 8 },
+  { id: 3, image: '/t3.jpg', likes: 156, comments: 5 },
+  { id: 4, image: '/t4.jpg', likes: 298, comments: 18 },
+  { id: 5, image: '/t6.jpg', likes: 167, comments: 9 },
+  { id: 6, image: '/t7.webp', likes: 223, comments: 14 },
+  { id: 7, image: '/t8.jpg', likes: 145, comments: 7 },
+  { id: 8, image: '/t10.jpg', likes: 189, comments: 11 },
+  { id: 9, image: '/t11.jpeg', likes: 134, comments: 6 },
+  { id: 10, image: '/t12.jpeg', likes: 267, comments: 16 },
+  { id: 11, image: '/leo1.jpg', likes: 312, comments: 22 },
+  { id: 12, image: '/leo2.jpeg', likes: 198, comments: 13 },
+  { id: 13, image: '/picasso.webp', likes: 245, comments: 19 },
+  { id: 14, image: '/can.jpg', likes: 178, comments: 8 },
+  { id: 15, image: '/sude.jpg', likes: 156, comments: 4 }
+];
 
 const Profile = () => {
   const { username } = useParams();
   const navigate = useNavigate();
-  const { user: currentUser, followUser, unfollowUser } = useAuth();
-  const [activeTab, setActiveTab] = useState('works');
-  const [viewMode, setViewMode] = useState('grid');
-  const [isFollowing, setIsFollowing] = useState(false);
+  const { theme } = useTheme();
+  const { user: currentUser } = useAuth();
+  const [activeTab, setActiveTab] = useState('posts');
+  const [isFollowing, setIsFollowing] = useState(mockProfile.isFollowing);
 
-  // Fetch profile data
-  const { data: profileData, isLoading } = useQuery(
-    ['profile', username],
-    async () => {
-      const response = await axios.get(`/api/users/profile/${username}`);
-      return response.data;
-    },
-    {
-      enabled: !!username,
-    }
-  );
-
-  const profile = profileData?.user;
-  const works = profileData?.works || [];
-
-  const handleFollow = async () => {
-    if (!currentUser) {
-      toast.error('Takip etmek için giriş yapmalısınız');
-      return;
-    }
-
-    if (isFollowing) {
-      const result = await unfollowUser(profile._id);
-      if (result.success) {
-        setIsFollowing(false);
-      }
-    } else {
-      const result = await followUser(profile._id);
-      if (result.success) {
-        setIsFollowing(true);
-      }
-    }
-  };
-
+  const profile = mockProfile;
+  const works = mockWorks;
   const isOwnProfile = currentUser && currentUser.username === username;
 
-  if (isLoading) {
-    return <LoadingSpinner text="Profil yükleniyor..." />;
-  }
+  const handleFollow = () => {
+    setIsFollowing(!isFollowing);
+  };
 
-  if (!profile) {
-    return (
-      <Container>
-        <Content>
-          <EmptyState>
-            <EmptyIcon>👤</EmptyIcon>
-            <EmptyTitle>Kullanıcı bulunamadı</EmptyTitle>
-            <EmptyDescription>
-              Aradığınız kullanıcı bulunamadı veya hesabı silinmiş olabilir.
-            </EmptyDescription>
-          </EmptyState>
-        </Content>
-      </Container>
-    );
-  }
+  const handleWorkClick = (workId) => {
+    navigate(`/work/${workId}`);
+  };
 
   return (
-    <Container>
-      <Header>
-        <HeaderContent>
+    <Container theme={theme}>
+      <ProfileContainer theme={theme}>
+        <ProfileHeader theme={theme}>
+          <AvatarSection>
+            {profile.avatar ? (
+              <AvatarImg src={profile.avatar} alt={profile.fullName} theme={theme} />
+            ) : (
+              <Avatar theme={theme}>
+                {profile.fullName.charAt(0).toUpperCase()}
+              </Avatar>
+            )}
+          </AvatarSection>
+
           <ProfileInfo>
-            <AvatarContainer>
-              {profile.avatar ? (
-                <AvatarImg src={profile.avatar} alt={profile.fullName} />
-              ) : (
-                <Avatar>
-                  {profile.fullName.charAt(0).toUpperCase()}
-                </Avatar>
-              )}
-            </AvatarContainer>
-
-            <ProfileDetails>
-              <Name>{profile.fullName}</Name>
-              <Username>@{profile.username}</Username>
-              
-              {profile.bio && <Bio>{profile.bio}</Bio>}
-              
-              {profile.location && (
-                <Location>
-                  <FiMapPin size={18} />
-                  {profile.location}
-                </Location>
-              )}
-              
-              {profile.website && (
-                <Website href={profile.website} target="_blank" rel="noopener noreferrer">
-                  <FiGlobe size={18} />
-                  {profile.website}
-                </Website>
-              )}
-
-              <Stats>
-                <StatItem>
-                  <StatNumber>{works.length}</StatNumber>
-                  <StatLabel>Eser</StatLabel>
-                </StatItem>
-                <StatItem>
-                  <StatNumber>{profile.followers}</StatNumber>
-                  <StatLabel>Takipçi</StatLabel>
-                </StatItem>
-                <StatItem>
-                  <StatNumber>{profile.following}</StatNumber>
-                  <StatLabel>Takip</StatLabel>
-                </StatItem>
-              </Stats>
-
-              <Actions>
+            <ProfileTop>
+              <Username theme={theme}>{profile.username}</Username>
+              <ActionButtons>
                 {isOwnProfile ? (
                   <>
-                    <ActionButton onClick={() => navigate('/settings')}>
-                      <FiSettings size={18} />
-                      Ayarlar
+                    <ActionButton theme={theme} onClick={() => navigate('/settings')}>
+                      <FiEdit3 size={14} />
+                      Profili Düzenle
                     </ActionButton>
-                    <ActionButton primary>
-                      <FiPlus size={18} />
+                    <ActionButton theme={theme} primary>
+                      <FiPlus size={14} />
                       Eser Ekle
                     </ActionButton>
+                    <MoreButton theme={theme}>
+                      <FiMoreHorizontal size={16} />
+                    </MoreButton>
                   </>
                 ) : (
-                  <ActionButton
-                    primary={!isFollowing}
-                    onClick={handleFollow}
-                  >
-                    <FiUsers size={18} />
-                    {isFollowing ? 'Takibi Bırak' : 'Takip Et'}
-                  </ActionButton>
+                  <>
+                    <ActionButton 
+                      theme={theme} 
+                      primary={!isFollowing}
+                      onClick={handleFollow}
+                    >
+                      {isFollowing ? (
+                        <>
+                          <FiUserMinus size={14} />
+                          Takibi Bırak
+                        </>
+                      ) : (
+                        <>
+                          <FiUserPlus size={14} />
+                          Takip Et
+                        </>
+                      )}
+                    </ActionButton>
+                    <ActionButton theme={theme}>
+                      <FiMessageCircle size={14} />
+                      Mesaj
+                    </ActionButton>
+                    <MoreButton theme={theme}>
+                      <FiMoreHorizontal size={16} />
+                    </MoreButton>
+                  </>
                 )}
-              </Actions>
-            </ProfileDetails>
-          </ProfileInfo>
-        </HeaderContent>
-      </Header>
+              </ActionButtons>
+            </ProfileTop>
 
-      <Content>
-        <Tabs>
-          <Tab
-            active={activeTab === 'works'}
-            onClick={() => setActiveTab('works')}
+            <Stats>
+              <StatItem>
+                <StatNumber theme={theme}>{profile.posts}</StatNumber>
+                <StatLabel theme={theme}>eser</StatLabel>
+              </StatItem>
+              <StatItem>
+                <StatNumber theme={theme}>{profile.followers.toLocaleString()}</StatNumber>
+                <StatLabel theme={theme}>takipçi</StatLabel>
+              </StatItem>
+              <StatItem>
+                <StatNumber theme={theme}>{profile.following}</StatNumber>
+                <StatLabel theme={theme}>takip</StatLabel>
+              </StatItem>
+            </Stats>
+
+            <Bio theme={theme}>
+              <BioText theme={theme}>
+                {profile.fullName}
+              </BioText>
+              {profile.bio && (
+                <BioText theme={theme}>
+                  {profile.bio.split('\n').map((line, index) => (
+                    <span key={index}>
+                      {line}
+                      {index < profile.bio.split('\n').length - 1 && <br />}
+                    </span>
+                  ))}
+                </BioText>
+              )}
+              {profile.website && (
+                <BioLink theme={theme} href={profile.website} target="_blank" rel="noopener noreferrer">
+                  {profile.website}
+                </BioLink>
+              )}
+            </Bio>
+          </ProfileInfo>
+        </ProfileHeader>
+
+        <ProfileTabs theme={theme}>
+          <Tab 
+            theme={theme} 
+            active={activeTab === 'posts'}
+            onClick={() => setActiveTab('posts')}
           >
-            Eserler ({works.length})
+            <FiGrid size={16} />
+            Eserler
           </Tab>
-          <Tab
+          <Tab 
+            theme={theme} 
             active={activeTab === 'saved'}
             onClick={() => setActiveTab('saved')}
           >
+            <FiBookmark size={16} />
             Kaydedilenler
           </Tab>
-          <Tab
-            active={activeTab === 'liked'}
-            onClick={() => setActiveTab('liked')}
-          >
-            Beğenilenler
-          </Tab>
-        </Tabs>
+        </ProfileTabs>
 
-        {activeTab === 'works' && (
+        {activeTab === 'posts' && (
           <>
-            <ViewControls>
-              <div></div>
-              <ViewToggle>
-                <ViewButton
-                  active={viewMode === 'grid'}
-                  onClick={() => setViewMode('grid')}
-                >
-                  <FiGrid size={18} />
-                  Grid
-                </ViewButton>
-                <ViewButton
-                  active={viewMode === 'list'}
-                  onClick={() => setViewMode('list')}
-                >
-                  <FiList size={18} />
-                  Liste
-                </ViewButton>
-              </ViewToggle>
-            </ViewControls>
-
             {works.length > 0 ? (
-              viewMode === 'grid' ? (
-                <WorksGrid>
-                  {works.map((work, index) => (
-                    <motion.div
-                      key={work._id}
-                      initial={{ opacity: 0, y: 30 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: index * 0.05 }}
-                    >
-                      <WorkCard work={work} />
-                    </motion.div>
-                  ))}
-                </WorksGrid>
-              ) : (
-                <WorksList>
-                  {works.map((work, index) => (
-                    <motion.div
-                      key={work._id}
-                      initial={{ opacity: 0, x: -30 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.6, delay: index * 0.05 }}
-                    >
-                      <WorkCard work={work} />
-                    </motion.div>
-                  ))}
-                </WorksList>
-              )
+              <WorksGrid>
+                {works.map((work) => (
+                  <WorkItem 
+                    key={work.id} 
+                    theme={theme}
+                    onClick={() => handleWorkClick(work.id)}
+                  >
+                    <WorkImage src={work.image} alt={`Eser ${work.id}`} />
+                    <WorkOverlay>
+                      <OverlayIcon>
+                        <FiHeart size={16} />
+                        {work.likes}
+                      </OverlayIcon>
+                      <OverlayIcon>
+                        <FiMessageCircle size={16} />
+                        {work.comments}
+                      </OverlayIcon>
+                    </WorkOverlay>
+                  </WorkItem>
+                ))}
+              </WorksGrid>
             ) : (
-              <EmptyState>
-                <EmptyIcon>🎨</EmptyIcon>
-                <EmptyTitle>Henüz eser yok</EmptyTitle>
-                <EmptyDescription>
+              <EmptyState theme={theme}>
+                <EmptyIcon>📷</EmptyIcon>
+                <EmptyTitle theme={theme}>Henüz eser yok</EmptyTitle>
+                <EmptyDescription theme={theme}>
                   {isOwnProfile 
                     ? 'İlk eserinizi paylaşmaya ne dersiniz?'
                     : 'Bu kullanıcı henüz eser paylaşmamış.'
@@ -544,25 +546,15 @@ const Profile = () => {
         )}
 
         {activeTab === 'saved' && (
-          <EmptyState>
+          <EmptyState theme={theme}>
             <EmptyIcon>🔖</EmptyIcon>
-            <EmptyTitle>Kaydedilen eserler</EmptyTitle>
-            <EmptyDescription>
-              Bu özellik yakında eklenecek.
+            <EmptyTitle theme={theme}>Kaydedilen eserler</EmptyTitle>
+            <EmptyDescription theme={theme}>
+              Kaydettiğiniz eserler burada görünecek.
             </EmptyDescription>
           </EmptyState>
         )}
-
-        {activeTab === 'liked' && (
-          <EmptyState>
-            <EmptyIcon>❤️</EmptyIcon>
-            <EmptyTitle>Beğenilen eserler</EmptyTitle>
-            <EmptyDescription>
-              Bu özellik yakında eklenecek.
-            </EmptyDescription>
-          </EmptyState>
-        )}
-      </Content>
+      </ProfileContainer>
     </Container>
   );
 };
