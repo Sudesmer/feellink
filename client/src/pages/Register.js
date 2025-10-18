@@ -108,17 +108,18 @@ const Logo = styled.div`
 `;
 
 const LogoIcon = styled(motion.div)`
-  width: 60px;
-  height: 60px;
-  background: ${props => props.theme.gradient};
-  border-radius: 16px;
+  width: 200px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-size: 2rem;
-  font-weight: bold;
   margin: 0 auto 16px;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
 `;
 
 const LogoText = styled.h1`
@@ -434,9 +435,8 @@ const Register = () => {
                 ease: "easeInOut"
               }}
             >
-              F
+              <img src="/images/feellink.logo.png" alt="Feellink Logo" />
             </LogoIcon>
-            <LogoText>Feellink</LogoText>
             <LogoSubtext>Hesap oluşturun</LogoSubtext>
           </Logo>
 

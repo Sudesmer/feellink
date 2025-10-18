@@ -52,6 +52,7 @@ const ArticleHeader = styled.div`
   align-items: center;
   gap: 12px;
   margin-bottom: 12px;
+  position: relative;
 `;
 
 const AuthorAvatar = styled.div`
@@ -85,6 +86,41 @@ const AuthorName = styled.h4`
   font-weight: 600;
   color: ${props => props.theme.text};
   margin: 0 0 2px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const WaveIcon = styled.span`
+  font-size: 1.2rem;
+  animation: wave 2s ease-in-out infinite;
+  transform-origin: 70% 70%;
+  
+  @keyframes wave {
+    0%, 100% { transform: rotate(0deg); }
+    10%, 30% { transform: rotate(14deg); }
+    20% { transform: rotate(-8deg); }
+    40% { transform: rotate(14deg); }
+    50% { transform: rotate(-4deg); }
+    60% { transform: rotate(10deg); }
+    70% { transform: rotate(0deg); }
+  }
+`;
+
+const VerifiedBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 50%;
+  margin-left: 6px;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  font-size: 10px;
+  color: white;
+  font-weight: bold;
+  border: 2px solid ${props => props.theme.surface};
 `;
 
 const ArticleDate = styled.span`
@@ -138,7 +174,10 @@ const TrendingBadge = styled.div`
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-left: auto;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
 `;
 
 const ContentArea = styled.div`
@@ -266,7 +305,8 @@ const ArtistsSidebar = () => {
               <AuthorInfo>
                 <AuthorName>
                   {article.author.name}
-                  {article.author.isVerified && " ✓"}
+                  <WaveIcon>👋</WaveIcon>
+                  {article.author.isVerified && <VerifiedBadge>✓</VerifiedBadge>}
                 </AuthorName>
                 <ArticleDate>
                   <FiCalendar size={12} />

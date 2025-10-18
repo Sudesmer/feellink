@@ -10,87 +10,11 @@ const Container = styled.div`
   background: ${props => props.theme.background};
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 20px 200px 20px 20px;
-  position: relative;
-  overflow: hidden;
-`;
-
-const LeafContainer = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1;
-`;
-
-const Leaf = styled(motion.div)`
-  position: absolute;
-  width: ${props => props.size}px;
-  height: ${props => props.size}px;
-  background: ${props => props.color};
-  border-radius: 0 100% 0 100%;
-  opacity: 0.8;
-  top: -10px;
-  left: ${props => props.left}%;
-`;
-
-const LeftSection = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   justify-content: center;
-  align-items: center;
-  padding-right: 60px;
-  height: 100vh;
+  padding: 20px;
+  position: relative;
 `;
 
-const ArtworkTitle = styled.h1`
-  font-size: 3.5rem;
-  font-weight: 900;
-  color: #000000;
-  margin-bottom: 20px;
-  text-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
-  animation: pulse 2s ease-in-out infinite;
-  
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); filter: brightness(1); }
-    50% { transform: scale(1.05); filter: brightness(1.2); }
-  }
-`;
-
-const ArtworkSubtitle = styled.p`
-  font-size: 1.2rem;
-  color: #FFFFFF;
-  margin-bottom: 40px;
-  line-height: 1.6;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-`;
-
-const ArtworkContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  max-width: 400px;
-`;
-
-const FloatingElement = styled(motion.div)`
-  width: 80px;
-  height: 80px;
-  background: ${props => props.gradient};
-  border-radius: 20px;
-  filter: blur(1px);
-  opacity: 0.8;
-`;
-
-const RightSection = styled.div`
-  flex: 0 0 400px;
-  display: flex;
-  align-items: flex-start;
-  padding-top: 0px;
-`;
 
 const LoginCard = styled(motion.div)`
   background: #1a1a1a;
@@ -107,26 +31,22 @@ const Logo = styled.div`
   margin-bottom: 40px;
 `;
 
-const LogoIcon = styled(motion.div)`
-  width: 60px;
-  height: 60px;
-  background: ${props => props.theme.gradient};
-  border-radius: 16px;
+const LogoIcon = styled.div`
+  width: 600px;
+  height: 240px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-size: 2rem;
-  font-weight: bold;
   margin: 0 auto 16px;
+  transform: translateX(-150px);
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
 `;
 
-const LogoText = styled.h1`
-  font-size: 2rem;
-  font-weight: 800;
-  color: ${props => props.theme.primary};
-  margin-bottom: 8px;
-`;
 
 const LogoSubtext = styled.p`
   color: ${props => props.theme.textSecondary};
@@ -330,113 +250,15 @@ const Login = () => {
 
   return (
     <Container>
-      <LeafContainer>
-        {[...Array(15)].map((_, i) => (
-          <Leaf
-            key={i}
-            size={Math.random() * 20 + 10}
-            color={`hsl(${Math.random() * 40 + 20}, 80%, 60%)`}
-            left={Math.random() * 100}
-            initial={{ y: -50, rotate: 0 }}
-            animate={{
-              y: [0, window.innerHeight + 50],
-              rotate: [0, 360, 720],
-              x: [0, Math.random() * 100 - 50, Math.random() * 100 - 50]
-            }}
-            transition={{
-              duration: Math.random() * 10 + 10,
-              delay: Math.random() * 5,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-          />
-        ))}
-      </LeafContainer>
-      
-      <LeftSection>
-        <ArtworkTitle>3D Sanat Dünyası</ArtworkTitle>
-        <ArtworkSubtitle>
-          Yaratıcılığınızı dijital dünyada hayata geçirin. 
-          Üç boyutlu sanat eserlerinizi dünyayla paylaşın.
-        </ArtworkSubtitle>
-        
-        <ArtworkContainer>
-          <FloatingElement
-            gradient="linear-gradient(135deg, #FF8C42, #FF6B35)"
-            initial={{ y: 0, rotate: 0 }}
-            animate={{ 
-              y: [-10, 10, -10],
-              rotate: [0, 5, -5, 0]
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          <FloatingElement
-            gradient="linear-gradient(135deg, #D2691E, #CD853F)"
-            initial={{ y: 0, rotate: 0 }}
-            animate={{ 
-              y: [10, -10, 10],
-              rotate: [0, -3, 3, 0]
-            }}
-            transition={{
-              duration: 5,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          <FloatingElement
-            gradient="linear-gradient(135deg, #CD853F, #DEB887)"
-            initial={{ y: 0, rotate: 0 }}
-            animate={{ 
-              y: [-5, 15, -5],
-              rotate: [0, 2, -2, 0]
-            }}
-            transition={{
-              duration: 6,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          <FloatingElement
-            gradient="linear-gradient(135deg, #FF6B35, #FF8C42)"
-            initial={{ y: 0, rotate: 0 }}
-            animate={{ 
-              y: [15, -5, 15],
-              rotate: [0, -4, 4, 0]
-            }}
-            transition={{
-              duration: 7,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-        </ArtworkContainer>
-      </LeftSection>
-
-      <RightSection>
         <LoginCard
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
           <Logo>
-            <LogoIcon
-              animate={{ 
-                scale: [1, 1.1, 1],
-                rotate: [0, 5, -5, 0]
-              }}
-              transition={{ 
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            >
-              F
+            <LogoIcon>
+              <img src="/images/feellink.logo.png" alt="Feellink Logo" />
             </LogoIcon>
-            <LogoText>Feellink</LogoText>
             <LogoSubtext>Hesabınıza giriş yapın</LogoSubtext>
           </Logo>
 
@@ -498,7 +320,6 @@ const Login = () => {
             <Link to="/register">Kayıt olun</Link>
           </SignupLink>
         </LoginCard>
-      </RightSection>
     </Container>
   );
 };

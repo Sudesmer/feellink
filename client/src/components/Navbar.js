@@ -60,15 +60,17 @@ const Logo = styled(Link)`
 `;
 
 const LogoIcon = styled.div`
-  width: 32px;
-  height: 32px;
-  background: ${props => props.theme.gradient};
-  border-radius: 8px;
+  width: 120px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-weight: bold;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
 `;
 
 const NavLinks = styled.div`
@@ -106,9 +108,9 @@ const NavLink = styled(Link)`
 const NavActions = styled.div`
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   margin-left: auto;
-  margin-right: 0px;
+  margin-right: 20px;
   padding-right: 0;
 `;
 
@@ -147,62 +149,67 @@ const MobileMenu = styled(motion.div)`
   left: 0;
   width: 280px;
   height: 100vh;
-  background: ${props => props.theme.glass};
-  backdrop-filter: blur(20px);
-  border-right: 1px solid ${props => props.theme.glassBorder};
+  background: #000000;
+  border-right: 1px solid #262626;
   z-index: 9999;
-  padding: 80px 0 20px 0;
+  padding: 20px 0;
   overflow-y: auto;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
 `;
 
 const MenuHeader = styled.div`
-  padding: 0 24px 24px 24px;
-  border-bottom: 1px solid ${props => props.theme.glassBorder};
-  margin-bottom: 24px;
+  padding: 0 24px 20px 24px;
+  border-bottom: 1px solid #262626;
+  margin-bottom: 20px;
 `;
 
 const MenuTitle = styled.h3`
-  font-size: 18px;
-  font-weight: 700;
-  color: ${props => props.theme.text};
-  margin: 0 0 8px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 4px 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 `;
 
 const MenuSubtitle = styled.p`
-  font-size: 14px;
-  color: ${props => props.theme.textSecondary};
+  font-size: 13px;
+  color: #8e8e8e;
   margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 `;
 
 const MenuItems = styled.div`
-  padding: 0 24px;
+  padding: 0 12px;
 `;
 
 const MenuItem = styled(Link)`
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  margin-bottom: 8px;
+  gap: 16px;
+  padding: 12px 12px;
+  margin-bottom: 4px;
   border-radius: 8px;
   text-decoration: none;
-  color: ${props => props.theme.text};
-  transition: all 0.3s ease;
-  font-weight: 500;
+  color: #ffffff;
+  transition: all 0.2s ease;
+  font-weight: 400;
+  font-size: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   &:hover {
-    background: ${props => props.theme.primaryLight};
-    color: ${props => props.theme.primary};
+    background: #262626;
+    color: #ffffff;
   }
 
   &.active {
-    background: ${props => props.theme.primary};
-    color: white;
+    background: #262626;
+    color: #ffffff;
+    font-weight: 600;
   }
 `;
 
 const MenuIcon = styled.div`
-  font-size: 18px;
+  font-size: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -210,12 +217,13 @@ const MenuIcon = styled.div`
 
 const MenuText = styled.span`
   font-size: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 `;
 
 const MenuFooter = styled.div`
-  padding: 24px;
-  border-top: 1px solid ${props => props.theme.glassBorder};
-  margin-top: 24px;
+  padding: 20px 24px;
+  border-top: 1px solid #262626;
+  margin-top: 20px;
 `;
 
 const LogoutButton = styled.button`
@@ -326,7 +334,6 @@ const MusicToggle = styled.button`
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-right: 8px;
   position: relative;
 
   &:hover {
@@ -602,8 +609,9 @@ const Navbar = () => {
             <FiMenu size={20} />
           </HamburgerButton>
           <Logo to="/">
-            <LogoIcon>F</LogoIcon>
-            Feellink
+            <LogoIcon>
+              <img src="/images/feellink.logo.png" alt="Feellink Logo" />
+            </LogoIcon>
           </Logo>
         </LeftNavActions>
 

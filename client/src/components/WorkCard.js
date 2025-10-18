@@ -6,29 +6,38 @@ import { FiHeart, FiBookmark, FiEye, FiUser } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 
-const Card = styled(motion.div)`
-  background: ${props => props.theme.surface};
-  border: 1px solid ${props => props.theme.border};
-  border-radius: 8px;
+const Card = styled.div`
+  background: #000000;
+  border: 1px solid #262626;
+  border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.3s ease;
   position: relative;
-  aspect-ratio: 1;
+  height: auto;
+  width: 420px;
+  flex-shrink: 0;
+  margin-bottom: 20px;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px ${props => props.theme.shadow};
-    border-color: ${props => props.theme.primary};
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  }
+
+  @media (max-width: 768px) {
+    width: 340px;
+  }
+
+  @media (max-width: 480px) {
+    width: 320px;
   }
 `;
 
 const ImageContainer = styled.div`
   position: relative;
   width: 100%;
-  height: 100%;
+  height: 250px;
   overflow: hidden;
-  background: ${props => props.theme.surfaceHover};
+  background: #1a1a1a;
 `;
 
 const WorkImage = styled.img`
@@ -65,59 +74,142 @@ const Overlay = styled.div`
   }
 `;
 
-const ActionButton = styled.button`
-  width: 40px;
-  height: 40px;
+
+// Instagram benzeri post içeriği
+const PostContent = styled.div`
+  padding: 12px 16px;
+  background: #000000;
+  border-top: 1px solid #262626;
+`;
+
+const PostHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+`;
+
+const UserAvatar = styled.div`
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  color: ${props => props.theme.text};
+  background: #FF6B35;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: white;
+  font-weight: 300;
+  font-size: 10px;
+  flex-shrink: 0;
+`;
+
+const UserAvatarImg = styled.img`
+  width: 15%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+`;
+
+const UserInfo = styled.div`
+  flex: 1;
+`;
+
+const UserName = styled.div`
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+`;
+
+const PostActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1px;
+`;
+
+const ActionButton = styled.button`
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 17px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  backdrop-filter: blur(10px);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
 
   &:hover {
-    background: white;
-    transform: scale(1.1);
-  }
-
-  &.liked {
-    background: ${props => props.theme.error};
-    color: white;
-  }
-
-  &.saved {
-    background: ${props => props.theme.primary};
-    color: white;
+    color: #FF6B35;
   }
 `;
 
-const Content = styled.div`
-  padding: 20px;
+const LikesCount = styled.div`
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 13px;
+  margin-bottom: 4px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+`;
+
+const PostTitle = styled.div`
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 1.3;
+  margin-bottom: 4px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+`;
+
+const PostDescription = styled.div`
+  color: #8e8e8e;
+  font-size: 14px;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+`;
+
+const PostCaption = styled.div`
+  color: #ffffff;
+  font-size: 14px;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+`;
+
+const PostTime = styled.div`
+  color: #8e8e8e;
+  font-size: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+`;
+
+const PostStats = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #262626;
+`;
+
+const StatItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #8e8e8e;
+  font-size: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 `;
 
 const Title = styled.h3`
   font-size: 1.1rem;
   font-weight: 600;
-  color: ${props => props.theme.text};
-  margin-bottom: 8px;
-  line-height: 1.4;
+  color: white;
+  margin-bottom: 6px;
+  line-height: 1.2;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-`;
-
-const Description = styled.p`
-  color: ${props => props.theme.textSecondary};
-  font-size: 0.9rem;
-  line-height: 1.5;
-  margin-bottom: 16px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 `;
@@ -125,13 +217,13 @@ const Description = styled.p`
 const Author = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 8px;
 `;
 
 const AuthorAvatar = styled.div`
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: ${props => props.theme.gradient};
   display: flex;
@@ -139,7 +231,7 @@ const AuthorAvatar = styled.div`
   justify-content: center;
   color: white;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 `;
 
 const AuthorAvatarImg = styled.img`
@@ -155,40 +247,33 @@ const AuthorInfo = styled.div`
 
 const AuthorName = styled.div`
   font-weight: 500;
-  color: ${props => props.theme.text};
-  font-size: 0.9rem;
+  color: white;
+  font-size: 0.8rem;
 `;
 
 const AuthorUsername = styled.div`
-  color: ${props => props.theme.textSecondary};
-  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.7rem;
 `;
 
 const Stats = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding-top: 16px;
-  border-top: 1px solid ${props => props.theme.border};
+  gap: 12px;
+  margin-top: 8px;
 `;
 
-const StatItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: ${props => props.theme.textSecondary};
-  font-size: 0.9rem;
-`;
 
 const Category = styled.div`
   display: inline-block;
-  padding: 4px 12px;
-  background: ${props => props.color || props.theme.primaryLight};
-  color: ${props => props.theme.primary};
-  border-radius: 20px;
-  font-size: 0.8rem;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border-radius: 12px;
+  font-size: 0.7rem;
   font-weight: 500;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+  backdrop-filter: blur(10px);
 `;
 
 const WorkCard = ({ work }) => {
@@ -238,15 +323,21 @@ const WorkCard = ({ work }) => {
 
   const mainImage = work.images?.find(img => img.isMain) || work.images?.[0];
 
+  // Instagram benzeri mock veriler
+  const mockUser = {
+    name: work.author?.name || 'Sanatçı',
+    username: work.author?.username || 'sanatci',
+    avatar: work.author?.avatar || null
+  };
+
+  const mockCaption = work.description || `${work.title} - Bu eser bana ilham veriyor ✨`;
+  const mockLikes = likeCount;
+  const mockComments = Math.floor(Math.random() * 50) + 10;
+  const mockViews = work.views || Math.floor(Math.random() * 1000) + 100;
+  const mockTime = '2 saat önce';
+
   return (
-    <Card
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      onClick={() => {
-        // Eser detay sayfasına git
-        window.location.href = `/work/${work._id}`;
-      }}
-    >
+    <Card>
       <ImageContainer>
         {mainImage ? (
           <WorkImage 
@@ -268,25 +359,43 @@ const WorkCard = ({ work }) => {
             🎨
           </div>
         )}
-        
-        <Overlay>
-          <ActionButton
-            className={isLiked ? 'liked' : ''}
-            onClick={handleLike}
-            title="Beğen"
-          >
-            <FiHeart size={18} fill={isLiked ? 'currentColor' : 'none'} />
-          </ActionButton>
-          
-          <ActionButton
-            className={isSaved ? 'saved' : ''}
-            onClick={handleSave}
-            title="Kaydet"
-          >
-            <FiBookmark size={18} fill={isSaved ? 'currentColor' : 'none'} />
-          </ActionButton>
-        </Overlay>
       </ImageContainer>
+      
+      <PostContent>
+        <PostHeader>
+          {mockUser.avatar ? (
+            <UserAvatarImg src={mockUser.avatar} alt={mockUser.name} />
+          ) : (
+            <UserAvatar>
+              {mockUser.name.charAt(0)}
+            </UserAvatar>
+          )}
+          <UserInfo>
+            <UserName>{mockUser.name}</UserName>
+          </UserInfo>
+        </PostHeader>
+        
+        <PostTitle>
+          {work.title}
+        </PostTitle>
+        
+        <PostCaption>
+          {mockCaption}
+        </PostCaption>
+        
+        <PostTime>{mockTime}</PostTime>
+        
+        <PostStats>
+          <StatItem>
+            <FiHeart size={12} />
+            {mockLikes}
+          </StatItem>
+          <StatItem>
+            <FiEye size={12} />
+            {mockViews}
+          </StatItem>
+        </PostStats>
+      </PostContent>
     </Card>
   );
 };
