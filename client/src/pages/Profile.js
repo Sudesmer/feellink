@@ -101,6 +101,7 @@ const Username = styled.h1`
   color: ${props => props.theme.text};
   margin: 0;
   line-height: 1.2;
+  flex-shrink: 0;
 
   @media (max-width: 768px) {
     font-size: 1.5rem;
@@ -112,6 +113,7 @@ const ActionButtons = styled.div`
   gap: 8px;
   align-items: center;
   flex-wrap: wrap;
+  flex-shrink: 0;
 `;
 
 const ActionButton = styled.button`
