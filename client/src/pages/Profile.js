@@ -29,10 +29,11 @@ const ProfileContainer = styled.div`
 
 const ProfileHeader = styled.div`
   display: flex;
-  gap: 15px;
+  gap: 30px;
   margin-bottom: 44px;
   padding-bottom: 30px;
   border-bottom: 1px solid ${props => props.theme.border};
+  align-items: flex-start;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -44,42 +45,43 @@ const ProfileHeader = styled.div`
 
 const AvatarSection = styled.div`
   display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
 `;
 
 const Avatar = styled.div`
-  width: 40px;
-  height: 40px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   background: ${props => props.theme.gradient};
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 1.2rem;
+  font-size: 3rem;
   font-weight: 700;
-  border: 1px solid ${props => props.theme.border};
+  border: 3px solid ${props => props.theme.border};
   flex-shrink: 0;
 
   @media (max-width: 768px) {
-    width: 35px;
-    height: 35px;
-    font-size: 1rem;
+    width: 120px;
+    height: 120px;
+    font-size: 2.5rem;
   }
 `;
 
 const AvatarImg = styled.img`
-  width: 40px;
-  height: 40px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid ${props => props.theme.border};
+  border: 3px solid ${props => props.theme.border};
   flex-shrink: 0;
 
   @media (max-width: 768px) {
-    width: 35px;
-    height: 35px;
+    width: 120px;
+    height: 120px;
   }
 `;
 
@@ -91,14 +93,14 @@ const ProfileInfo = styled.div`
 const ProfileTop = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 20px;
   margin-bottom: 20px;
   flex-wrap: wrap;
 
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
   }
 `;
 
@@ -124,13 +126,13 @@ const ActionButtons = styled.div`
 `;
 
 const ActionButton = styled.button`
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
   border: 1px solid ${props => props.theme.border};
   background: ${props => props.primary ? props.theme.primary : props.theme.surface};
   color: ${props => props.primary ? 'white' : props.theme.text};
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
@@ -193,15 +195,17 @@ const StatLabel = styled.div`
 
 const Bio = styled.div`
   color: ${props => props.theme.text};
-  line-height: 1.5;
-  margin-bottom: 12px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+  font-size: 0.95rem;
 `;
 
 const BioText = styled.span`
   margin: 0;
   font-size: 0.95rem;
   display: inline;
-  white-space: nowrap;
+  white-space: normal;
+  line-height: 1.6;
 `;
 
 const BioLink = styled.a`
@@ -224,7 +228,7 @@ const ProfileTabs = styled.div`
 const Tab = styled.button`
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   padding: 16px 0;
   background: none;
   border: none;
@@ -250,11 +254,11 @@ const Tab = styled.button`
 const WorksGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 3px;
+  gap: 28px;
   margin-top: 0;
 
   @media (max-width: 768px) {
-    gap: 2px;
+    gap: 3px;
   }
 `;
 
@@ -266,6 +270,7 @@ const WorkItem = styled.div`
   cursor: pointer;
   overflow: hidden;
   transition: all 0.3s ease;
+  border-radius: 8px;
 
   &:hover {
     transform: scale(1.02);
