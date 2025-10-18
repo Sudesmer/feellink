@@ -57,23 +57,23 @@ const AvatarSection = styled.div`
 `;
 
 const Avatar = styled.div`
-  width: 150px;
-  height: 150px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background: ${props => props.theme.gradient};
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 4rem;
+  font-size: 1.8rem;
   font-weight: 700;
-  border: 3px solid ${props => props.theme.border};
+  border: 1px solid ${props => props.theme.border};
   flex-shrink: 0;
 
   @media (max-width: 768px) {
-    width: 120px;
-    height: 120px;
-    font-size: 3rem;
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
   }
 `;
 
@@ -82,7 +82,7 @@ const AvatarImg = styled.img`
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid ${props => props.theme.border};
+  border: 1px solid ${props => props.theme.border};
 `;
 
 const ProfileInfo = styled.div`
@@ -493,7 +493,7 @@ const Profile = () => {
             active={activeTab === 'posts'}
             onClick={() => setActiveTab('posts')}
           >
-            <FiGrid size={16} />
+            <FiGrid size={12} />
             Eserler
           </Tab>
           <Tab 
@@ -501,7 +501,7 @@ const Profile = () => {
             active={activeTab === 'saved'}
             onClick={() => setActiveTab('saved')}
           >
-            <FiBookmark size={16} />
+            <FiBookmark size={12} />
             Kaydedilenler
           </Tab>
         </ProfileTabs>
