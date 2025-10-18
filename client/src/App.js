@@ -120,6 +120,20 @@ function App() {
                   } 
                 />
                 <Route 
+                  path="/profile" 
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                    >
+                      <Profile />
+                    </motion.div>
+                  } 
+                />
+                <Route 
                   path="/profile/:username" 
                   element={
                     <motion.div
