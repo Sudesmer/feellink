@@ -29,7 +29,7 @@ const ProfileContainer = styled.div`
 
 const ProfileHeader = styled.div`
   display: flex;
-  gap: 30px;
+  gap: 15px;
   margin-bottom: 44px;
   padding-bottom: 30px;
   border-bottom: 1px solid ${props => props.theme.border};
@@ -44,7 +44,8 @@ const ProfileHeader = styled.div`
 
 const AvatarSection = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
+  align-items: flex-start;
 `;
 
 const Avatar = styled.div`
@@ -69,11 +70,17 @@ const Avatar = styled.div`
 `;
 
 const AvatarImg = styled.img`
-  width: 15%;
-  height: 35%;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid ${props => props.theme.border};
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    width: 35px;
+    height: 35px;
+  }
 `;
 
 const ProfileInfo = styled.div`
