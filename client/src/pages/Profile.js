@@ -57,29 +57,29 @@ const AvatarSection = styled.div`
 `;
 
 const Avatar = styled.div`
-  width: 60px;
-  height: 60px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: ${props => props.theme.gradient};
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 1.8rem;
+  font-size: 1.2rem;
   font-weight: 700;
   border: 1px solid ${props => props.theme.border};
   flex-shrink: 0;
 
   @media (max-width: 768px) {
-    width: 50px;
-    height: 50px;
-    font-size: 1.5rem;
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
   }
 `;
 
 const AvatarImg = styled.img`
-  width: 100%;
-  height: 100%;
+  width: 15%;
+  height: 20%;
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid ${props => props.theme.border};
@@ -92,13 +92,12 @@ const ProfileInfo = styled.div`
 
 const ProfileTop = styled.div`
   display: flex;
-  align-items: center;
-  gap: 20px;
+  flex-direction: column;
+  gap: 12px;
   margin-bottom: 20px;
-  flex-wrap: wrap;
 
   @media (max-width: 768px) {
-    justify-content: center;
+    align-items: center;
   }
 `;
 
@@ -118,21 +117,24 @@ const ActionButtons = styled.div`
   display: flex;
   gap: 8px;
   align-items: center;
+  flex-wrap: wrap;
+  margin-top: 8px;
 `;
 
 const ActionButton = styled.button`
-  padding: 8px 16px;
-  border-radius: 8px;
+  padding: 6px 12px;
+  border-radius: 6px;
   border: 1px solid ${props => props.theme.border};
   background: ${props => props.primary ? props.theme.primary : props.theme.surface};
   color: ${props => props.primary ? 'white' : props.theme.text};
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  white-space: nowrap;
 
   &:hover {
     background: ${props => props.primary ? props.theme.primaryHover : props.theme.surfaceHover};
