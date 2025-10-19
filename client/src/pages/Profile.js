@@ -1591,6 +1591,12 @@ const Profile = () => {
         const updatedWorks = works.filter(work => work._id !== workId);
         setWorks(updatedWorks);
         
+        // Eğer silinen eser modal'da açık olan eserse, modal'ı kapat
+        if (selectedWork && (selectedWork._id === workId || selectedWork.id === workId)) {
+          setIsModalOpen(false);
+          setSelectedWork(null);
+        }
+        
         // localStorage'dan da sil
         try {
           localStorage.setItem('userWorks', JSON.stringify(updatedWorks));
