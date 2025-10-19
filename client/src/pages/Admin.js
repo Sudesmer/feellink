@@ -22,7 +22,9 @@ import {
   FiUserCheck,
   FiAward,
   FiShield,
-  FiStar
+  FiStar,
+  FiSun,
+  FiMoon
 } from 'react-icons/fi';
 
 const AdminContainer = styled.div`
@@ -68,6 +70,25 @@ const BackButton = styled.button`
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+  }
+`;
+
+const ThemeToggleButton = styled.button`
+  background: none;
+  border: none;
+  color: ${props => props.theme === 'dark' ? '#fff' : '#333'};
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: ${props => props.theme === 'dark' ? '#333' : '#f0f0f0'};
+    color: #FF6B35;
   }
 `;
 
@@ -628,7 +649,7 @@ const ModalButton = styled.button`
 
 const Admin = () => {
   const { user, logout } = useAuth();
-  const { theme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('stats');
   const [stats, setStats] = useState({
@@ -869,6 +890,10 @@ const Admin = () => {
           <AdminTitle>Admin Paneli</AdminTitle>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <ThemeToggleButton theme={theme} onClick={toggleTheme}>
+            {theme === 'dark' ? <FiSun size={20} /> : <FiMoon size={20} />}
+            {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+          </ThemeToggleButton>
           <span>Hoş geldiniz, {user?.username || user?.email}</span>
           <ActionButton onClick={handleAdminLogout}>
             <FiLogOut />
