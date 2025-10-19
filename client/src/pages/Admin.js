@@ -29,14 +29,14 @@ import {
 
 const AdminContainer = styled.div`
   min-height: 100vh;
-  background: ${props => props.theme === 'dark' ? '#000' : '#f8f9fa'};
-  color: ${props => props.theme === 'dark' ? '#fff' : '#333'};
+  background: ${props => props.theme ? '#000' : '#f8f9fa'};
+  color: ${props => props.theme ? '#fff' : '#333'};
   transition: all 0.3s ease;
 `;
 
 const AdminHeader = styled.div`
-  background: ${props => props.theme === 'dark' ? '#1a1a1a' : '#fff'};
-  border-bottom: 1px solid ${props => props.theme === 'dark' ? '#333' : '#e0e0e0'};
+  background: ${props => props.theme ? '#1a1a1a' : '#fff'};
+  border-bottom: 1px solid ${props => props.theme ? '#333' : '#e0e0e0'};
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
@@ -76,7 +76,7 @@ const BackButton = styled.button`
 const ThemeToggleButton = styled.button`
   background: none;
   border: none;
-  color: ${props => props.theme === 'dark' ? '#fff' : '#333'};
+  color: ${props => props.theme ? '#fff' : '#333'};
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 6px;
@@ -87,7 +87,7 @@ const ThemeToggleButton = styled.button`
   transition: all 0.2s ease;
   
   &:hover {
-    background: ${props => props.theme === 'dark' ? '#333' : '#f0f0f0'};
+    background: ${props => props.theme ? '#333' : '#f0f0f0'};
     color: #FF6B35;
   }
 `;
@@ -106,8 +106,8 @@ const StatsGrid = styled.div`
 `;
 
 const StatCard = styled.div`
-  background: ${props => props.theme === 'dark' ? '#1a1a1a' : '#fff'};
-  border: 1px solid ${props => props.theme === 'dark' ? '#333' : '#e0e0e0'};
+  background: ${props => props.theme ? '#1a1a1a' : '#fff'};
+  border: 1px solid ${props => props.theme ? '#333' : '#e0e0e0'};
   border-radius: 12px;
   padding: 1.5rem;
   text-align: center;
@@ -135,12 +135,12 @@ const StatIcon = styled.div`
 const StatNumber = styled.div`
   font-size: 2rem;
   font-weight: 700;
-  color: ${props => props.theme === 'dark' ? '#fff' : '#333'};
+  color: ${props => props.theme ? '#fff' : '#333'};
   margin-bottom: 0.5rem;
 `;
 
 const StatLabel = styled.div`
-  color: ${props => props.theme === 'dark' ? '#ccc' : '#666'};
+  color: ${props => props.theme ? '#ccc' : '#666'};
   font-size: 0.9rem;
 `;
 
@@ -148,7 +148,7 @@ const AdminTabs = styled.div`
   display: flex;
   gap: 1rem;
   margin-bottom: 2rem;
-  border-bottom: 1px solid ${props => props.theme === 'dark' ? '#333' : '#e0e0e0'};
+  border-bottom: 1px solid ${props => props.theme ? '#333' : '#e0e0e0'};
 `;
 
 const TabButton = styled.button`
@@ -158,7 +158,7 @@ const TabButton = styled.button`
   cursor: pointer;
   font-size: 1rem;
   font-weight: 500;
-  color: ${props => props.active ? '#FF6B35' : (props.theme === 'dark' ? '#ccc' : '#666')};
+  color: ${props => props.active ? '#FF6B35' : (props.theme ? '#ccc' : '#666')};
   border-bottom: 2px solid ${props => props.active ? '#FF6B35' : 'transparent'};
   transition: all 0.3s ease;
 
@@ -168,8 +168,8 @@ const TabButton = styled.button`
 `;
 
 const TabContent = styled.div`
-  background: ${props => props.theme === 'dark' ? '#1a1a1a' : '#fff'};
-  border: 1px solid ${props => props.theme === 'dark' ? '#333' : '#e0e0e0'};
+  background: ${props => props.theme ? '#1a1a1a' : '#fff'};
+  border: 1px solid ${props => props.theme ? '#333' : '#e0e0e0'};
   border-radius: 12px;
   padding: 1.5rem;
 `;
@@ -182,15 +182,15 @@ const Table = styled.table`
 const TableHeader = styled.th`
   text-align: left;
   padding: 1rem;
-  border-bottom: 1px solid ${props => props.theme === 'dark' ? '#333' : '#e0e0e0'};
+  border-bottom: 1px solid ${props => props.theme ? '#333' : '#e0e0e0'};
   font-weight: 600;
-  color: ${props => props.theme === 'dark' ? '#fff' : '#333'};
+  color: ${props => props.theme ? '#fff' : '#333'};
 `;
 
 const TableCell = styled.td`
   padding: 1rem;
-  border-bottom: 1px solid ${props => props.theme === 'dark' ? '#333' : '#e0e0e0'};
-  color: ${props => props.theme === 'dark' ? '#ccc' : '#666'};
+  border-bottom: 1px solid ${props => props.theme ? '#333' : '#e0e0e0'};
+  color: ${props => props.theme ? '#ccc' : '#666'};
 `;
 
 const ActionButton = styled.button`
@@ -239,8 +239,8 @@ const CommentsList = styled.div`
 `;
 
 const CommentCard = styled.div`
-  background: ${props => props.theme === 'dark' ? '#1a1a1a' : '#fff'};
-  border: 1px solid ${props => props.theme === 'dark' ? '#333' : '#e0e0e0'};
+  background: ${props => props.theme ? '#1a1a1a' : '#fff'};
+  border: 1px solid ${props => props.theme ? '#333' : '#e0e0e0'};
   border-radius: 12px;
   padding: 1rem;
   transition: all 0.2s ease;
@@ -285,12 +285,12 @@ const CommentInfo = styled.div`
 
 const CommentUsername = styled.span`
   font-weight: 600;
-  color: ${props => props.theme === 'dark' ? '#fff' : '#333'};
+  color: ${props => props.theme ? '#fff' : '#333'};
   font-size: 0.9rem;
 `;
 
 const CommentTime = styled.span`
-  color: ${props => props.theme === 'dark' ? '#888' : '#666'};
+  color: ${props => props.theme ? '#888' : '#666'};
   font-size: 0.8rem;
 `;
 
@@ -304,7 +304,7 @@ const CommentStatus = styled.span`
 `;
 
 const CommentContent = styled.p`
-  color: ${props => props.theme === 'dark' ? '#ccc' : '#555'};
+  color: ${props => props.theme ? '#ccc' : '#555'};
   line-height: 1.5;
   margin: 0.5rem 0;
 `;
@@ -360,16 +360,16 @@ const CommentStats = styled.div`
   gap: 1rem;
   margin-top: 0.5rem;
   font-size: 0.8rem;
-  color: ${props => props.theme === 'dark' ? '#888' : '#666'};
+  color: ${props => props.theme ? '#888' : '#666'};
 `;
 
 const CommentWorkInfo = styled.div`
-  background: ${props => props.theme === 'dark' ? '#2a2a2a' : '#f8f9fa'};
+  background: ${props => props.theme ? '#2a2a2a' : '#f8f9fa'};
   padding: 0.5rem;
   border-radius: 6px;
   margin-top: 0.5rem;
   font-size: 0.8rem;
-  color: ${props => props.theme === 'dark' ? '#aaa' : '#666'};
+  color: ${props => props.theme ? '#aaa' : '#666'};
 `;
 
 // Sanatçı Yetki Yönetimi Styled Components
@@ -380,8 +380,8 @@ const ArtistPermissionsList = styled.div`
 `;
 
 const ArtistPermissionCard = styled.div`
-  background: ${props => props.theme === 'dark' ? '#1a1a1a' : '#fff'};
-  border: 1px solid ${props => props.theme === 'dark' ? '#333' : '#e0e0e0'};
+  background: ${props => props.theme ? '#1a1a1a' : '#fff'};
+  border: 1px solid ${props => props.theme ? '#333' : '#e0e0e0'};
   border-radius: 12px;
   padding: 1.5rem;
   transition: all 0.2s ease;
@@ -403,13 +403,13 @@ const ArtistAvatar = styled.div`
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: ${props => props.theme === 'dark' ? '#333' : '#f0f0f0'};
+  background: ${props => props.theme ? '#333' : '#f0f0f0'};
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.2rem;
   font-weight: bold;
-  color: ${props => props.theme === 'dark' ? '#fff' : '#333'};
+  color: ${props => props.theme ? '#fff' : '#333'};
   flex-shrink: 0;
 `;
 
@@ -427,18 +427,18 @@ const ArtistInfo = styled.div`
 const ArtistName = styled.h3`
   margin: 0 0 0.25rem 0;
   font-size: 1.1rem;
-  color: ${props => props.theme === 'dark' ? '#fff' : '#333'};
+  color: ${props => props.theme ? '#fff' : '#333'};
 `;
 
 const ArtistUsername = styled.p`
   margin: 0 0 0.25rem 0;
-  color: ${props => props.theme === 'dark' ? '#888' : '#666'};
+  color: ${props => props.theme ? '#888' : '#666'};
   font-size: 0.9rem;
 `;
 
 const ArtistEmail = styled.p`
   margin: 0;
-  color: ${props => props.theme === 'dark' ? '#666' : '#999'};
+  color: ${props => props.theme ? '#666' : '#999'};
   font-size: 0.8rem;
 `;
 
@@ -462,7 +462,7 @@ const PermissionsSection = styled.div`
 const PermissionsTitle = styled.h4`
   margin: 0 0 0.75rem 0;
   font-size: 1rem;
-  color: ${props => props.theme === 'dark' ? '#fff' : '#333'};
+  color: ${props => props.theme ? '#fff' : '#333'};
 `;
 
 const PermissionsList = styled.div`
@@ -528,12 +528,12 @@ const PermissionButton = styled.button`
 `;
 
 const ArtistNotes = styled.div`
-  background: ${props => props.theme === 'dark' ? '#2a2a2a' : '#f8f9fa'};
+  background: ${props => props.theme ? '#2a2a2a' : '#f8f9fa'};
   padding: 0.75rem;
   border-radius: 6px;
   margin-top: 1rem;
   font-size: 0.9rem;
-  color: ${props => props.theme === 'dark' ? '#aaa' : '#666'};
+  color: ${props => props.theme ? '#aaa' : '#666'};
   font-style: italic;
 `;
 
@@ -551,7 +551,7 @@ const AddPermissionModal = styled.div`
 `;
 
 const ModalContent = styled.div`
-  background: ${props => props.theme === 'dark' ? '#1a1a1a' : '#fff'};
+  background: ${props => props.theme ? '#1a1a1a' : '#fff'};
   border-radius: 12px;
   padding: 2rem;
   width: 90%;
@@ -562,7 +562,7 @@ const ModalContent = styled.div`
 
 const ModalTitle = styled.h2`
   margin: 0 0 1.5rem 0;
-  color: ${props => props.theme === 'dark' ? '#fff' : '#333'};
+  color: ${props => props.theme ? '#fff' : '#333'};
 `;
 
 const FormGroup = styled.div`
@@ -573,26 +573,26 @@ const FormLabel = styled.label`
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: ${props => props.theme === 'dark' ? '#fff' : '#333'};
+  color: ${props => props.theme ? '#fff' : '#333'};
 `;
 
 const FormInput = styled.input`
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid ${props => props.theme === 'dark' ? '#333' : '#ddd'};
+  border: 1px solid ${props => props.theme ? '#333' : '#ddd'};
   border-radius: 6px;
-  background: ${props => props.theme === 'dark' ? '#2a2a2a' : '#fff'};
-  color: ${props => props.theme === 'dark' ? '#fff' : '#333'};
+  background: ${props => props.theme ? '#2a2a2a' : '#fff'};
+  color: ${props => props.theme ? '#fff' : '#333'};
   font-size: 0.9rem;
 `;
 
 const FormTextarea = styled.textarea`
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid ${props => props.theme === 'dark' ? '#333' : '#ddd'};
+  border: 1px solid ${props => props.theme ? '#333' : '#ddd'};
   border-radius: 6px;
-  background: ${props => props.theme === 'dark' ? '#2a2a2a' : '#fff'};
-  color: ${props => props.theme === 'dark' ? '#fff' : '#333'};
+  background: ${props => props.theme ? '#2a2a2a' : '#fff'};
+  color: ${props => props.theme ? '#fff' : '#333'};
   font-size: 0.9rem;
   min-height: 80px;
   resize: vertical;
@@ -609,7 +609,7 @@ const CheckboxItem = styled.label`
   align-items: center;
   gap: 0.5rem;
   cursor: pointer;
-  color: ${props => props.theme === 'dark' ? '#fff' : '#333'};
+  color: ${props => props.theme ? '#fff' : '#333'};
 `;
 
 const ModalActions = styled.div`
