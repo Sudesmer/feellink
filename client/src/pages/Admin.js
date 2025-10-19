@@ -649,7 +649,7 @@ const ModalButton = styled.button`
 
 const Admin = () => {
   const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('stats');
   const [stats, setStats] = useState({
@@ -880,8 +880,8 @@ const Admin = () => {
   };
 
   return (
-    <AdminContainer theme={theme}>
-      <AdminHeader theme={theme}>
+    <AdminContainer theme={isDark}>
+      <AdminHeader theme={isDark}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <BackButton onClick={handleBackToHome}>
             <FiArrowLeft />
@@ -890,9 +890,8 @@ const Admin = () => {
           <AdminTitle>Admin Paneli</AdminTitle>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <ThemeToggleButton theme={theme} onClick={toggleTheme}>
-            {theme === 'dark' ? <FiSun size={20} /> : <FiMoon size={20} />}
-            {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+          <ThemeToggleButton theme={isDark} onClick={toggleTheme}>
+            {isDark ? <FiSun size={20} /> : <FiMoon size={20} />}
           </ThemeToggleButton>
           <span>Hoş geldiniz, {user?.username || user?.email}</span>
           <ActionButton onClick={handleAdminLogout}>
@@ -904,44 +903,44 @@ const Admin = () => {
 
       <AdminContent>
         <StatsGrid>
-          <StatCard theme={theme}>
+          <StatCard theme={isDark}>
             <StatIcon>
               <FiUsers />
             </StatIcon>
-            <StatNumber theme={theme}>{stats.totalUsers.toLocaleString()}</StatNumber>
-            <StatLabel theme={theme}>Toplam Kullanıcı</StatLabel>
+            <StatNumber theme={isDark}>{stats.totalUsers.toLocaleString()}</StatNumber>
+            <StatLabel theme={isDark}>Toplam Kullanıcı</StatLabel>
           </StatCard>
 
-          <StatCard theme={theme}>
+          <StatCard theme={isDark}>
             <StatIcon>
               <FiImage />
             </StatIcon>
-            <StatNumber theme={theme}>{stats.totalWorks.toLocaleString()}</StatNumber>
-            <StatLabel theme={theme}>Toplam Eser</StatLabel>
+            <StatNumber theme={isDark}>{stats.totalWorks.toLocaleString()}</StatNumber>
+            <StatLabel theme={isDark}>Toplam Eser</StatLabel>
           </StatCard>
 
-          <StatCard theme={theme}>
+          <StatCard theme={isDark}>
             <StatIcon>
               <FiHeart />
             </StatIcon>
-            <StatNumber theme={theme}>{stats.totalLikes.toLocaleString()}</StatNumber>
-            <StatLabel theme={theme}>Toplam Beğeni</StatLabel>
+            <StatNumber theme={isDark}>{stats.totalLikes.toLocaleString()}</StatNumber>
+            <StatLabel theme={isDark}>Toplam Beğeni</StatLabel>
           </StatCard>
 
-          <StatCard theme={theme}>
+          <StatCard theme={isDark}>
             <StatIcon>
               <FiEye />
             </StatIcon>
-            <StatNumber theme={theme}>{stats.totalViews.toLocaleString()}</StatNumber>
-            <StatLabel theme={theme}>Toplam Görüntülenme</StatLabel>
+            <StatNumber theme={isDark}>{stats.totalViews.toLocaleString()}</StatNumber>
+            <StatLabel theme={isDark}>Toplam Görüntülenme</StatLabel>
           </StatCard>
         </StatsGrid>
 
-        <AdminTabs theme={theme}>
+        <AdminTabs theme={isDark}>
           <TabButton 
             active={activeTab === 'stats'} 
             onClick={() => setActiveTab('stats')}
-            theme={theme}
+            theme={isDark}
           >
             <FiBarChart style={{ marginRight: '0.5rem' }} />
             İstatistikler
@@ -949,7 +948,7 @@ const Admin = () => {
           <TabButton 
             active={activeTab === 'works'} 
             onClick={() => setActiveTab('works')}
-            theme={theme}
+            theme={isDark}
           >
             <FiImage style={{ marginRight: '0.5rem' }} />
             Eser Yönetimi
@@ -957,7 +956,7 @@ const Admin = () => {
           <TabButton 
             active={activeTab === 'users'} 
             onClick={() => setActiveTab('users')}
-            theme={theme}
+            theme={isDark}
           >
             <FiUsers style={{ marginRight: '0.5rem' }} />
             Kullanıcı Yönetimi
@@ -965,7 +964,7 @@ const Admin = () => {
           <TabButton 
             active={activeTab === 'comments'} 
             onClick={() => setActiveTab('comments')}
-            theme={theme}
+            theme={isDark}
           >
             <FiMessageSquare style={{ marginRight: '0.5rem' }} />
             Yorumlar ({comments && comments.filter ? comments.filter(c => !c.isApproved).length : 0})
@@ -973,7 +972,7 @@ const Admin = () => {
           <TabButton 
             active={activeTab === 'artist-permissions'} 
             onClick={() => setActiveTab('artist-permissions')}
-            theme={theme}
+            theme={isDark}
           >
             <FiUserCheck style={{ marginRight: '0.5rem' }} />
             Sanatçı Yetkileri ({artistPermissions && artistPermissions.length ? artistPermissions.length : 0})
@@ -981,14 +980,14 @@ const Admin = () => {
           <TabButton 
             active={activeTab === 'settings'} 
             onClick={() => setActiveTab('settings')}
-            theme={theme}
+            theme={isDark}
           >
             <FiSettings style={{ marginRight: '0.5rem' }} />
             Ayarlar
           </TabButton>
         </AdminTabs>
 
-        <TabContent theme={theme}>
+        <TabContent theme={isDark}>
           {activeTab === 'stats' && (
             <div>
               <h3>Platform İstatistikleri</h3>
@@ -1005,19 +1004,19 @@ const Admin = () => {
               <Table>
                 <thead>
                   <tr>
-                    <TableHeader theme={theme}>Eser</TableHeader>
-                    <TableHeader theme={theme}>Sanatçı</TableHeader>
-                    <TableHeader theme={theme}>Beğeni</TableHeader>
-                    <TableHeader theme={theme}>Görüntülenme</TableHeader>
-                    <TableHeader theme={theme}>İşlemler</TableHeader>
+                    <TableHeader theme={isDark}>Eser</TableHeader>
+                    <TableHeader theme={isDark}>Sanatçı</TableHeader>
+                    <TableHeader theme={isDark}>Beğeni</TableHeader>
+                    <TableHeader theme={isDark}>Görüntülenme</TableHeader>
+                    <TableHeader theme={isDark}>İşlemler</TableHeader>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <TableCell theme={theme}>Dijital Rüyalar</TableCell>
-                    <TableCell theme={theme}>Zeynep Esmer</TableCell>
-                    <TableCell theme={theme}>156</TableCell>
-                    <TableCell theme={theme}>1,234</TableCell>
+                    <TableCell theme={isDark}>Dijital Rüyalar</TableCell>
+                    <TableCell theme={isDark}>Zeynep Esmer</TableCell>
+                    <TableCell theme={isDark}>156</TableCell>
+                    <TableCell theme={isDark}>1,234</TableCell>
                     <TableCell>
                       <ActionButton>
                         <FiEdit />
@@ -1037,19 +1036,19 @@ const Admin = () => {
               <Table>
                 <thead>
                   <tr>
-                    <TableHeader theme={theme}>Kullanıcı</TableHeader>
-                    <TableHeader theme={theme}>Email</TableHeader>
-                    <TableHeader theme={theme}>Kayıt Tarihi</TableHeader>
-                    <TableHeader theme={theme}>Eser Sayısı</TableHeader>
-                    <TableHeader theme={theme}>İşlemler</TableHeader>
+                    <TableHeader theme={isDark}>Kullanıcı</TableHeader>
+                    <TableHeader theme={isDark}>Email</TableHeader>
+                    <TableHeader theme={isDark}>Kayıt Tarihi</TableHeader>
+                    <TableHeader theme={isDark}>Eser Sayısı</TableHeader>
+                    <TableHeader theme={isDark}>İşlemler</TableHeader>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <TableCell theme={theme}>Zeynep Esmer</TableCell>
-                    <TableCell theme={theme}>zeynep@example.com</TableCell>
-                    <TableCell theme={theme}>2024-01-15</TableCell>
-                    <TableCell theme={theme}>12</TableCell>
+                    <TableCell theme={isDark}>Zeynep Esmer</TableCell>
+                    <TableCell theme={isDark}>zeynep@example.com</TableCell>
+                    <TableCell theme={isDark}>2024-01-15</TableCell>
+                    <TableCell theme={isDark}>12</TableCell>
                     <TableCell>
                       <ActionButton>
                         <FiEdit />
@@ -1075,15 +1074,15 @@ const Admin = () => {
                   .map(comment => {
                     const workInfo = getWorkInfo(comment.workId);
                     return (
-                      <CommentCard key={comment._id} theme={theme} isApproved={comment.isApproved}>
+                      <CommentCard key={comment._id} theme={isDark} isApproved={comment.isApproved}>
                         <CommentHeader>
                           <CommentUser>
                             <CommentAvatar>
                               {comment.username.charAt(0).toUpperCase()}
                             </CommentAvatar>
                             <CommentInfo>
-                              <CommentUsername theme={theme}>{comment.username}</CommentUsername>
-                              <CommentTime theme={theme}>{formatTimeAgo(comment.createdAt)}</CommentTime>
+                              <CommentUsername theme={isDark}>{comment.username}</CommentUsername>
+                              <CommentTime theme={isDark}>{formatTimeAgo(comment.createdAt)}</CommentTime>
                             </CommentInfo>
                           </CommentUser>
                           <CommentStatus isApproved={comment.isApproved}>
@@ -1091,15 +1090,15 @@ const Admin = () => {
                           </CommentStatus>
                         </CommentHeader>
                         
-                        <CommentContent theme={theme}>{comment.content}</CommentContent>
+                        <CommentContent theme={isDark}>{comment.content}</CommentContent>
                         
                         {workInfo && (
-                          <CommentWorkInfo theme={theme}>
+                          <CommentWorkInfo theme={isDark}>
                             <strong>Eser:</strong> {workInfo.title} - {workInfo.author?.username || workInfo.author?.fullName || workInfo.author || 'Bilinmeyen Sanatçı'}
                           </CommentWorkInfo>
                         )}
                         
-                        <CommentStats theme={theme}>
+                        <CommentStats theme={isDark}>
                           <span>❤️ {comment.likes} beğeni</span>
                         </CommentStats>
                         
@@ -1155,19 +1154,19 @@ const Admin = () => {
               
               <ArtistPermissionsList>
                 {artistPermissions.map(artist => (
-                  <ArtistPermissionCard key={artist._id} theme={theme}>
+                  <ArtistPermissionCard key={artist._id} theme={isDark}>
                     <ArtistHeader>
                       {artist.avatar ? (
                         <ArtistAvatarImg src={artist.avatar} alt={artist.fullName} />
                       ) : (
-                        <ArtistAvatar theme={theme}>
+                        <ArtistAvatar theme={isDark}>
                           {artist.fullName.charAt(0).toUpperCase()}
                         </ArtistAvatar>
                       )}
                       <ArtistInfo>
-                        <ArtistName theme={theme}>{artist.fullName}</ArtistName>
-                        <ArtistUsername theme={theme}>@{artist.username}</ArtistUsername>
-                        <ArtistEmail theme={theme}>{artist.email}</ArtistEmail>
+                        <ArtistName theme={isDark}>{artist.fullName}</ArtistName>
+                        <ArtistUsername theme={isDark}>@{artist.username}</ArtistUsername>
+                        <ArtistEmail theme={isDark}>{artist.email}</ArtistEmail>
                       </ArtistInfo>
                       <ArtistStatus status={artist.status}>
                         {artist.status === 'active' ? 'Aktif' : 
@@ -1176,7 +1175,7 @@ const Admin = () => {
                     </ArtistHeader>
                     
                     <PermissionsSection>
-                      <PermissionsTitle theme={theme}>Mevcut Yetkiler</PermissionsTitle>
+                      <PermissionsTitle theme={isDark}>Mevcut Yetkiler</PermissionsTitle>
                       <PermissionsList>
                         {artist.permissions.map(permissionId => {
                           const permission = getPermissionInfo(permissionId);
@@ -1194,7 +1193,7 @@ const Admin = () => {
                         )}
                       </PermissionsList>
                       
-                      <PermissionsTitle theme={theme}>Yetki İşlemleri</PermissionsTitle>
+                      <PermissionsTitle theme={isDark}>Yetki İşlemleri</PermissionsTitle>
                       <PermissionsList>
                         {artistPermissionTypes.map(permission => (
                           <PermissionBadge 
@@ -1223,7 +1222,7 @@ const Admin = () => {
                     </PermissionsSection>
                     
                     {artist.notes && (
-                      <ArtistNotes theme={theme}>
+                      <ArtistNotes theme={isDark}>
                         <strong>Notlar:</strong> {artist.notes}
                       </ArtistNotes>
                     )}
@@ -1255,8 +1254,8 @@ const Admin = () => {
       {/* Yeni Sanatçı Ekleme Modal */}
       {showAddPermissionModal && (
         <AddPermissionModal>
-          <ModalContent theme={theme}>
-            <ModalTitle theme={theme}>Yeni Sanatçı Yetkisi Ekle</ModalTitle>
+          <ModalContent theme={isDark}>
+            <ModalTitle theme={isDark}>Yeni Sanatçı Yetkisi Ekle</ModalTitle>
             
             <form onSubmit={(e) => {
               e.preventDefault();
@@ -1273,7 +1272,7 @@ const Admin = () => {
               handleAddNewArtist(artistData);
             }}>
               <FormGroup>
-                <FormLabel theme={theme}>Kullanıcı ID</FormLabel>
+                <FormLabel theme={isDark}>Kullanıcı ID</FormLabel>
                 <FormInput 
                   type="text" 
                   name="userId" 
@@ -1283,7 +1282,7 @@ const Admin = () => {
               </FormGroup>
               
               <FormGroup>
-                <FormLabel theme={theme}>Kullanıcı Adı</FormLabel>
+                <FormLabel theme={isDark}>Kullanıcı Adı</FormLabel>
                 <FormInput 
                   type="text" 
                   name="username" 
@@ -1293,7 +1292,7 @@ const Admin = () => {
               </FormGroup>
               
               <FormGroup>
-                <FormLabel theme={theme}>Tam Ad</FormLabel>
+                <FormLabel theme={isDark}>Tam Ad</FormLabel>
                 <FormInput 
                   type="text" 
                   name="fullName" 
@@ -1303,7 +1302,7 @@ const Admin = () => {
               </FormGroup>
               
               <FormGroup>
-                <FormLabel theme={theme}>Email</FormLabel>
+                <FormLabel theme={isDark}>Email</FormLabel>
                 <FormInput 
                   type="email" 
                   name="email" 
@@ -1313,7 +1312,7 @@ const Admin = () => {
               </FormGroup>
               
               <FormGroup>
-                <FormLabel theme={theme}>Avatar URL (Opsiyonel)</FormLabel>
+                <FormLabel theme={isDark}>Avatar URL (Opsiyonel)</FormLabel>
                 <FormInput 
                   type="url" 
                   name="avatar" 
@@ -1322,10 +1321,10 @@ const Admin = () => {
               </FormGroup>
               
               <FormGroup>
-                <FormLabel theme={theme}>Yetkiler</FormLabel>
+                <FormLabel theme={isDark}>Yetkiler</FormLabel>
                 <CheckboxGroup>
                   {artistPermissionTypes.map(permission => (
-                    <CheckboxItem key={permission.id} theme={theme}>
+                    <CheckboxItem key={permission.id} theme={isDark}>
                       <input 
                         type="checkbox" 
                         name="permissions" 
@@ -1347,7 +1346,7 @@ const Admin = () => {
               </FormGroup>
               
               <FormGroup>
-                <FormLabel theme={theme}>Notlar (Opsiyonel)</FormLabel>
+                <FormLabel theme={isDark}>Notlar (Opsiyonel)</FormLabel>
                 <FormTextarea 
                   name="notes" 
                   placeholder="Sanatçı hakkında notlar..."
