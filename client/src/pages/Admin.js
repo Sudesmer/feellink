@@ -893,7 +893,6 @@ const Admin = () => {
           <ThemeToggleButton theme={isDark} onClick={toggleTheme}>
             {isDark ? <FiSun size={20} /> : <FiMoon size={20} />}
           </ThemeToggleButton>
-          <span>Hoş geldiniz, {user?.username || user?.email}</span>
           <ActionButton onClick={handleAdminLogout}>
             <FiLogOut />
             Admin Çıkışı
