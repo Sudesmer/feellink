@@ -706,6 +706,32 @@ const HoverReactionDropdown = styled.div`
   `}
 `;
 
+const BadgeVotingDropdown = styled.div`
+  position: absolute;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 16px 20px;
+  display: ${props => props.show ? 'flex' : 'none'};
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  opacity: 0;
+  transform: translateX(-50%) translateY(10px) scale(0.9);
+  transition: all 0.3s ease;
+  min-width: 200px;
+
+  ${props => props.show && `
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  `}
+`;
+
 const ReactionEmoji = styled.button`
   background: none;
   border: none;
@@ -750,6 +776,46 @@ const HoverReactionEmoji = styled.button`
   &:active {
     transform: scale(0.9);
   }
+`;
+
+const BadgeVoteButton = styled.button`
+  background: ${props => props.isVoted ? 'rgba(255, 107, 53, 0.1)' : 'transparent'};
+  border: 1px solid ${props => props.isVoted ? '#FF6B35' : '#e0e0e0'};
+  border-radius: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: ${props => props.isVoted ? '#FF6B35' : '#333'};
+  width: 100%;
+  
+  &:hover {
+    background: rgba(255, 107, 53, 0.05);
+    border-color: #FF6B35;
+    transform: translateY(-1px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+const BadgeVoteIcon = styled.span`
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+`;
+
+const BadgeVoteText = styled.span`
+  flex: 1;
+  text-align: left;
 `;
 
 const ReactionDisplay = styled.div`
@@ -845,6 +911,16 @@ const WorkCard = ({ work }) => {
     }
   };
   
+  const getStoredBadgeVotes = () => {
+    try {
+      const stored = localStorage.getItem(`badgeVotes_${work._id}`);
+      return stored ? JSON.parse(stored) : {};
+    } catch (error) {
+      console.error('Rozet oylama durumu okuma hatası:', error);
+      return {};
+    }
+  };
+  
   // Yorum state'leri
   const [newComment, setNewComment] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
@@ -855,6 +931,10 @@ const WorkCard = ({ work }) => {
   const [reactions, setReactions] = useState(getStoredReactions());
   const [showReactions, setShowReactions] = useState(false);
   const [showHoverReactions, setShowHoverReactions] = useState(false);
+  
+  // Rozet oylama state'leri
+  const [badgeVotes, setBadgeVotes] = useState(getStoredBadgeVotes());
+  const [showBadgeVoting, setShowBadgeVoting] = useState(false);
 
   // Modal açıldığında yorumları yükle
   useEffect(() => {
@@ -922,6 +1002,12 @@ const WorkCard = ({ work }) => {
   const handleTrendLeave = () => {
     setShowBadgeDetails(false);
     setVisibleBadges([]);
+  };
+  
+  // Trend ikonuna tıklama fonksiyonu
+  const handleTrendClick = (e) => {
+    e.stopPropagation();
+    setShowBadgeVoting(!showBadgeVoting);
   };
 
   // Yorum gönderme fonksiyonu
@@ -1017,6 +1103,19 @@ const WorkCard = ({ work }) => {
     setReactions(newReactions);
     localStorage.setItem(`reactions_${work._id}`, JSON.stringify(newReactions));
     setShowHoverReactions(false);
+  };
+  
+  // Rozet oylama fonksiyonu
+  const handleBadgeVote = (badgeKey) => {
+    const newBadgeVotes = { ...badgeVotes };
+    if (newBadgeVotes[badgeKey]) {
+      delete newBadgeVotes[badgeKey];
+    } else {
+      newBadgeVotes[badgeKey] = true;
+    }
+    setBadgeVotes(newBadgeVotes);
+    localStorage.setItem(`badgeVotes_${work._id}`, JSON.stringify(newBadgeVotes));
+    setShowBadgeVoting(false);
   };
 
   // Beğeni fonksiyonu
@@ -1232,8 +1331,20 @@ const WorkCard = ({ work }) => {
             onMouseEnter={handleTrendHover}
             onMouseLeave={handleTrendLeave}
           >
-            <TrendIcon>
+            <TrendIcon onClick={handleTrendClick}>
               <FiTrendingUp />
+              <BadgeVotingDropdown show={showBadgeVoting}>
+                {Object.entries(badgeTypes).map(([key, badge]) => (
+                  <BadgeVoteButton
+                    key={key}
+                    isVoted={badgeVotes[key]}
+                    onClick={() => handleBadgeVote(key)}
+                  >
+                    <BadgeVoteIcon>{badge.emoji}</BadgeVoteIcon>
+                    <BadgeVoteText>{badge.name}</BadgeVoteText>
+                  </BadgeVoteButton>
+                ))}
+              </BadgeVotingDropdown>
             </TrendIcon>
             
             <BadgeDetails 
