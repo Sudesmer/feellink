@@ -770,6 +770,7 @@ const Home = () => {
   const [featuredWorks, setFeaturedWorks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
+  const [filteredWorks, setFilteredWorks] = useState([]);
 
   useEffect(() => {
     // Mock data for featured works
@@ -782,7 +783,9 @@ const Home = () => {
         author: { name: 'Ahmet Yılmaz', username: 'ahmet_art', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop' },
         category: { name: 'Resim', color: '#FF6B35' },
         likeCount: 245,
-        viewCount: 980
+        viewCount: 980,
+        isTrending: true,
+        createdAt: new Date('2024-01-15')
       },
       {
         _id: '3',
@@ -792,7 +795,9 @@ const Home = () => {
         author: { name: 'Can Soyut', username: 'can_abstract', avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop' },
         category: { name: 'Dijital Sanat', color: '#2196F3' },
         likeCount: 312,
-        viewCount: 1240
+        viewCount: 1240,
+        isTrending: true,
+        createdAt: new Date('2024-01-10')
       },
       {
         _id: '4',
@@ -802,7 +807,9 @@ const Home = () => {
         author: { name: 'Arda Minimal', username: 'arda_minimal', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop' },
         category: { name: 'Dijital Sanat', color: '#607D8B' },
         likeCount: 156,
-        viewCount: 720
+        viewCount: 720,
+        isTrending: false,
+        createdAt: new Date('2024-01-20')
       },
       {
         _id: '5',
@@ -812,7 +819,9 @@ const Home = () => {
         author: { name: 'Elif Gece', username: 'elif_night', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop' },
         category: { name: 'Fotoğraf', color: '#9C27B0' },
         likeCount: 198,
-        viewCount: 890
+        viewCount: 890,
+        isTrending: false,
+        createdAt: new Date('2024-01-18')
       },
       {
         _id: '6',
@@ -822,7 +831,9 @@ const Home = () => {
         author: { name: 'Deniz Renk', username: 'deniz_color', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop' },
         category: { name: 'Resim', color: '#E91E63' },
         likeCount: 267,
-        viewCount: 1020
+        viewCount: 1020,
+        isTrending: false,
+        createdAt: new Date('2024-01-16')
       },
       {
         _id: '7',
@@ -832,7 +843,9 @@ const Home = () => {
         author: { name: 'Tekin Dijital', username: 'tekin_digital', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop' },
         category: { name: 'Dijital Sanat', color: '#00BCD4' },
         likeCount: 189,
-        viewCount: 756
+        viewCount: 756,
+        isTrending: false,
+        createdAt: new Date('2024-01-14')
       },
       {
         _id: '8',
@@ -842,7 +855,9 @@ const Home = () => {
         author: { name: 'Ayşe Doğa', username: 'ayse_nature', avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop' },
         category: { name: 'Fotoğraf', color: '#4CAF50' },
         likeCount: 234,
-        viewCount: 923
+        viewCount: 923,
+        isTrending: false,
+        createdAt: new Date('2024-01-12')
       },
       {
         _id: '9',
@@ -852,7 +867,9 @@ const Home = () => {
         author: { name: 'Matematik Sanat', username: 'math_art', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop' },
         category: { name: 'Dijital Sanat', color: '#FF9800' },
         likeCount: 156,
-        viewCount: 678
+        viewCount: 678,
+        isTrending: false,
+        createdAt: new Date('2024-01-08')
       },
       {
         _id: '10',
@@ -862,7 +879,9 @@ const Home = () => {
         author: { name: 'Şehir Fotoğrafçısı', username: 'city_photo', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop' },
         category: { name: 'Fotoğraf', color: '#9C27B0' },
         likeCount: 298,
-        viewCount: 1156
+        viewCount: 1156,
+        isTrending: false,
+        createdAt: new Date('2024-01-06')
       },
       {
         _id: '11',
@@ -872,7 +891,9 @@ const Home = () => {
         author: { name: 'Duygu Sanat', username: 'emotion_art', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop' },
         category: { name: 'Resim', color: '#F44336' },
         likeCount: 187,
-        viewCount: 834
+        viewCount: 834,
+        isTrending: false,
+        createdAt: new Date('2024-01-04')
       },
       {
         _id: '12',
@@ -882,13 +903,41 @@ const Home = () => {
         author: { name: 'Minimal Yaşam', username: 'minimal_life', avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop' },
         category: { name: 'Dijital Sanat', color: '#607D8B' },
         likeCount: 145,
-        viewCount: 612
+        viewCount: 612,
+        isTrending: false,
+        createdAt: new Date('2024-01-02')
       }
     ];
     
     setFeaturedWorks(mockWorks);
+    setFilteredWorks(mockWorks);
     setIsLoading(false);
   }, []);
+
+  // Filtreleme mantığı
+  useEffect(() => {
+    let filtered = [...featuredWorks];
+    
+    switch (activeFilter) {
+      case 'popular':
+        // Trend ikonu olan eserleri göster (isTrending: true)
+        filtered = featuredWorks.filter(work => work.isTrending === true);
+        break;
+      case 'new':
+        // En yeni eserleri göster (createdAt'e göre sırala)
+        filtered = featuredWorks
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .slice(0, 12); // En yeni 12 eser
+        break;
+      case 'all':
+      default:
+        // Tüm eserleri göster
+        filtered = featuredWorks;
+        break;
+    }
+    
+    setFilteredWorks(filtered);
+  }, [activeFilter, featuredWorks]);
 
   // const handleSearch = (e) => {
   //   e.preventDefault();
@@ -1049,7 +1098,7 @@ const Home = () => {
           ) : (
             <>
               <WorksGrid>
-                {featuredWorks?.slice(0, 25).map((work, index) => (
+                {filteredWorks?.map((work, index) => (
                   <WorkCard key={work._id} work={work} />
                 ))}
               </WorksGrid>
