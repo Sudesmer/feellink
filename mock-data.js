@@ -1093,8 +1093,179 @@ const mockWorks = [
   }
 ];
 
+// Mock yorum verisi
+const mockComments = [
+  {
+    _id: '1',
+    workId: '1',
+    userId: '1',
+    username: 'testuser',
+    avatar: '/sude.jpg',
+    content: 'Harika bir çalışma! Renkler çok güzel uyum sağlamış.',
+    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 saat önce
+    isApproved: true,
+    likes: 5
+  },
+  {
+    _id: '2',
+    workId: '1',
+    userId: '3',
+    username: 'designer',
+    avatar: '/leo1.jpg',
+    content: 'Çok yaratıcı bir tasarım. Bu tarzda daha fazla eser görmek isterim.',
+    createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1 saat önce
+    isApproved: true,
+    likes: 3
+  },
+  {
+    _id: '3',
+    workId: '2',
+    userId: '1',
+    username: 'testuser',
+    avatar: '/sude.jpg',
+    content: 'Bu eser gerçekten etkileyici. Sanatçının yeteneği belli oluyor.',
+    createdAt: new Date(Date.now() - 30 * 60 * 1000), // 30 dakika önce
+    isApproved: true,
+    likes: 0
+  },
+  {
+    _id: '4',
+    workId: '3',
+    userId: '2',
+    username: 'admin',
+    avatar: '/can.jpg',
+    content: 'Mükemmel bir kompozisyon. Detaylar çok dikkatli işlenmiş.',
+    createdAt: new Date(Date.now() - 15 * 60 * 1000), // 15 dakika önce
+    isApproved: true,
+    likes: 8
+  },
+  {
+    _id: '5',
+    workId: '4',
+    userId: '3',
+    username: 'designer',
+    avatar: '/leo1.jpg',
+    content: 'Bu renk paleti çok hoşuma gitti. Hangi program kullandınız?',
+    createdAt: new Date(Date.now() - 10 * 60 * 1000), // 10 dakika önce
+    isApproved: true,
+    likes: 1
+  },
+  {
+    _id: '6',
+    workId: '5',
+    userId: '1',
+    username: 'testuser',
+    avatar: '/sude.jpg',
+    content: 'Gerçekten etkileyici bir çalışma. Sanatçıyı tebrik ederim!',
+    createdAt: new Date(Date.now() - 5 * 60 * 1000), // 5 dakika önce
+    isApproved: true,
+    likes: 2
+  },
+  {
+    _id: '7',
+    workId: '6',
+    userId: '2',
+    username: 'admin',
+    avatar: '/can.jpg',
+    content: 'Bu eser platformumuzda öne çıkan çalışmalardan biri olabilir.',
+    createdAt: new Date(Date.now() - 3 * 60 * 1000), // 3 dakika önce
+    isApproved: true,
+    likes: 4
+  },
+  {
+    _id: '8',
+    workId: '7',
+    userId: '3',
+    username: 'designer',
+    avatar: '/leo1.jpg',
+    content: 'Çok profesyonel bir iş. Bu tarzda daha fazla eser bekliyorum.',
+    createdAt: new Date(Date.now() - 1 * 60 * 1000), // 1 dakika önce
+    isApproved: true,
+    likes: 0
+  },
+  // Yeni yorumlar - daha fazla çeşitlilik için
+  {
+    _id: '9',
+    workId: '1',
+    userId: '4',
+    username: 'artlover',
+    avatar: '/leo2.jpeg',
+    content: 'Bu eser bana huzur veriyor. Teşekkürler sanatçı!',
+    createdAt: new Date(Date.now() - 45 * 60 * 1000), // 45 dakika önce
+    isApproved: true,
+    likes: 7
+  },
+  {
+    _id: '10',
+    workId: '2',
+    userId: '5',
+    username: 'creative_mind',
+    avatar: '/picasso.webp',
+    content: 'Renklerin uyumu mükemmel. Bu tarzda daha fazla eser görmek isterim.',
+    createdAt: new Date(Date.now() - 20 * 60 * 1000), // 20 dakika önce
+    isApproved: true,
+    likes: 0
+  },
+  {
+    _id: '11',
+    workId: '3',
+    userId: '6',
+    username: 'art_critic',
+    avatar: '/t1.jpg',
+    content: 'Kompozisyon çok güçlü. Sanatçının tekniği gerçekten etkileyici.',
+    createdAt: new Date(Date.now() - 12 * 60 * 1000), // 12 dakika önce
+    isApproved: true,
+    likes: 3
+  },
+  {
+    _id: '12',
+    workId: '4',
+    userId: '7',
+    username: 'design_enthusiast',
+    avatar: '/t2.webp',
+    content: 'Bu eser beni çok etkiledi. Sanatçıya teşekkürler!',
+    createdAt: new Date(Date.now() - 8 * 60 * 1000), // 8 dakika önce
+    isApproved: true,
+    likes: 0
+  },
+  {
+    _id: '13',
+    workId: '5',
+    userId: '8',
+    username: 'modern_art_fan',
+    avatar: '/t3.jpg',
+    content: 'Çok yaratıcı bir yaklaşım. Bu tarzda daha fazla eser bekliyorum.',
+    createdAt: new Date(Date.now() - 6 * 60 * 1000), // 6 dakika önce
+    isApproved: true,
+    likes: 5
+  },
+  {
+    _id: '14',
+    workId: '6',
+    userId: '9',
+    username: 'art_collector',
+    avatar: '/t4.jpg',
+    content: 'Bu eser koleksiyonumda olmasını isterdim. Harika bir çalışma!',
+    createdAt: new Date(Date.now() - 4 * 60 * 1000), // 4 dakika önce
+    isApproved: true,
+    likes: 0
+  },
+  {
+    _id: '15',
+    workId: '7',
+    userId: '10',
+    username: 'digital_artist',
+    avatar: '/t6.jpg',
+    content: 'Dijital sanatın gücünü çok güzel yansıtmış. Tebrikler!',
+    createdAt: new Date(Date.now() - 2 * 60 * 1000), // 2 dakika önce
+    isApproved: true,
+    likes: 6
+  }
+];
+
 module.exports = {
   mockUsers,
   mockCategories,
-  mockWorks
+  mockWorks,
+  mockComments
 };

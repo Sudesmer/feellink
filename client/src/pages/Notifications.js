@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import { 
   FiHeart, 
@@ -11,7 +12,10 @@ import {
   FiMoreHorizontal,
   FiCheck,
   FiBell,
-  FiUser
+  FiUser,
+  FiHome,
+  FiEye,
+  FiBookmark
 } from 'react-icons/fi';
 
 const Container = styled.div`
@@ -19,6 +23,122 @@ const Container = styled.div`
   background: ${props => props.theme.background};
   padding: 0;
   margin: 0;
+`;
+
+const MainLayout = styled.div`
+  display: flex;
+  width: 100vw;
+  margin: 0;
+  gap: 0;
+  padding: 0;
+  align-items: flex-start;
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+
+  @media (max-width: 1200px) {
+    flex-direction: column;
+    gap: 0;
+    height: auto;
+    overflow: visible;
+    width: 100vw;
+    margin: 0;
+    padding: 0 20px;
+  }
+`;
+
+const LeftSidebar = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100vh;
+  background: ${props => props.theme.surface};
+  backdrop-filter: blur(20px);
+  border-right: 2px solid ${props => props.theme.border};
+  padding: 20px 0;
+  z-index: 1000;
+  overflow-y: auto;
+  box-shadow: 4px 0 20px ${props => props.theme.shadow};
+
+  @media (max-width: 1200px) {
+    display: none;
+  }
+`;
+
+const SidebarMenu = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  padding: 0 20px;
+`;
+
+const MenuItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: ${props => props.active ? '#FFFFFF' : props.theme.text};
+  background: ${props => props.active ? props.theme.gradient : 'transparent'};
+  margin: 4px 12px;
+  box-shadow: ${props => props.active ? `0 4px 15px ${props.theme.shadow}` : 'none'};
+  transform: ${props => props.active ? 'translateX(8px)' : 'translateX(0)'};
+
+  &:hover {
+    background: ${props => props.theme.primary};
+    color: #FFFFFF;
+    transform: translateX(8px);
+    box-shadow: 0 6px 20px ${props => props.theme.shadow};
+  }
+`;
+
+const MenuIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: 20px;
+`;
+
+const MenuText = styled.span`
+  font-size: 18px;
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: inherit;
+`;
+
+const Content = styled.div`
+  flex: 1;
+  min-width: 0;
+  width: calc(100vw - 280px);
+  height: 100vh;
+  overflow-y: auto;
+  padding: 0;
+  margin-left: 280px;
+  margin-right: 0;
+  background: ${props => props.theme.background};
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: 1200px) {
+    height: auto;
+    overflow: visible;
+    padding: 0;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+`;
+
+const ContentInner = styled.div`
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px;
+  flex: 1;
 `;
 
 const Header = styled.div`
@@ -29,6 +149,7 @@ const Header = styled.div`
   padding: 16px 24px;
   z-index: 100;
   backdrop-filter: blur(20px);
+  margin-bottom: 20px;
 `;
 
 const HeaderTitle = styled.h1`
@@ -51,12 +172,6 @@ const NotificationIcon = styled.div`
   justify-content: center;
   color: white;
   font-size: 1.2rem;
-`;
-
-const Content = styled.div`
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 24px;
 `;
 
 const FilterTabs = styled.div`
@@ -347,6 +462,8 @@ const mockNotifications = [
 ];
 
 const Notifications = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { theme } = useTheme();
   const [activeFilter, setActiveFilter] = useState('all');
   const [notifications, setNotifications] = useState(mockNotifications);
@@ -394,17 +511,58 @@ const Notifications = () => {
 
   return (
     <Container theme={theme}>
-      <Header theme={theme}>
-        <HeaderTitle theme={theme}>
-          <NotificationIcon theme={theme}>
-            <FiBell />
-          </NotificationIcon>
-          Bildirimler
-        </HeaderTitle>
-      </Header>
-
-      <Content theme={theme}>
-        <FilterTabs theme={theme}>
+      <LeftSidebar theme={theme}>
+        <SidebarMenu>
+          <MenuItem theme={theme} active={location.pathname === '/'} onClick={() => navigate('/')}>
+            <MenuIcon>
+              <FiHome />
+            </MenuIcon>
+            <MenuText>Ana Sayfa</MenuText>
+          </MenuItem>
+          
+          <MenuItem theme={theme} active={location.pathname === '/explore'} onClick={() => navigate('/explore')}>
+            <MenuIcon>
+              <FiEye />
+            </MenuIcon>
+            <MenuText>Keşfet</MenuText>
+          </MenuItem>
+          
+          <MenuItem theme={theme} active={location.pathname === '/notifications'} onClick={() => navigate('/notifications')}>
+            <MenuIcon>
+              <FiBell />
+            </MenuIcon>
+            <MenuText>Bildirimler</MenuText>
+          </MenuItem>
+          
+          <MenuItem theme={theme} onClick={() => navigate('/profile')}>
+            <MenuIcon>
+              <FiUser />
+            </MenuIcon>
+            <MenuText>Profil</MenuText>
+          </MenuItem>
+          
+          <MenuItem theme={theme} onClick={() => navigate('/saved')}>
+            <MenuIcon>
+              <FiBookmark />
+            </MenuIcon>
+            <MenuText>Kaydedilenler</MenuText>
+          </MenuItem>
+        </SidebarMenu>
+      </LeftSidebar>
+      
+      <MainLayout>
+        <Content theme={theme}>
+          <Header theme={theme}>
+            <HeaderTitle theme={theme}>
+              <NotificationIcon theme={theme}>
+                <FiBell />
+              </NotificationIcon>
+              Bildirimler
+            </HeaderTitle>
+          </Header>
+          
+          <ContentInner>
+            <FilterTabs theme={theme}>
           <FilterTab 
             theme={theme} 
             active={activeFilter === 'all'}
@@ -516,8 +674,10 @@ const Notifications = () => {
               </NotificationItem>
             ))}
           </NotificationList>
-        )}
-      </Content>
+          )}
+          </ContentInner>
+        </Content>
+      </MainLayout>
     </Container>
   );
 };

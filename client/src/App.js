@@ -15,11 +15,17 @@ import LoadingSpinner from './components/LoadingSpinner';
 import Home from './pages/Home';
 import Explore from './pages/Explore';
 import Profile from './pages/Profile';
+import EditProfile from './pages/EditProfile';
 import Saved from './pages/Saved';
 import Notifications from './pages/Notifications';
+import Messages from './pages/Messages';
 import WorkDetail from './pages/WorkDetail';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Admin from './pages/Admin';
+import AdminLogin from './pages/AdminLogin';
+import MuseumLogin from './pages/MuseumLogin';
+import MuseumDashboard from './pages/MuseumDashboard';
 import NotFound from './pages/NotFound';
 
 // Global styles
@@ -82,13 +88,76 @@ function App() {
 
   // Show different navbar for login/register pages
   const isAuthPage = location === '/login' || location === '/register';
+  const isAdminPage = location === '/admin' || location === '/admin-login';
 
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyles>
         <AppContainer>
-          {isAuthPage ? <LoginNavbar /> : <Navbar />}
-          <MainContent user={user} isAuthPage={isAuthPage}>
+          {isAuthPage ? <LoginNavbar /> : isAdminPage ? null : <Navbar />}
+          {isAdminPage ? (
+            <AnimatePresence mode="wait">
+              <Routes>
+                <Route 
+                  path="/admin-login" 
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                    >
+                      <AdminLogin />
+                    </motion.div>
+                  } 
+                />
+                <Route 
+                  path="/admin" 
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                    >
+                      <Admin />
+                    </motion.div>
+                  } 
+                />
+                <Route 
+                  path="/museum-login" 
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                    >
+                      <MuseumLogin />
+                    </motion.div>
+                  } 
+                />
+                <Route 
+                  path="/museum-dashboard" 
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                    >
+                      <MuseumDashboard />
+                    </motion.div>
+                  } 
+                />
+              </Routes>
+            </AnimatePresence>
+          ) : (
+            <MainContent user={user} isAuthPage={isAuthPage}>
             <AnimatePresence mode="wait">
               <Routes>
                 <Route 
@@ -134,6 +203,20 @@ function App() {
                   } 
                 />
                 <Route 
+                  path="/edit-profile" 
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                    >
+                      <EditProfile />
+                    </motion.div>
+                  } 
+                />
+                <Route 
                   path="/profile/:username" 
                   element={
                     <motion.div
@@ -172,6 +255,20 @@ function App() {
                       transition={pageTransition}
                     >
                       <Notifications />
+                    </motion.div>
+                  } 
+                />
+                <Route 
+                  path="/messages" 
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                    >
+                      <Messages />
                     </motion.div>
                   } 
                 />
@@ -234,7 +331,8 @@ function App() {
               </Routes>
             </AnimatePresence>
           </MainContent>
-          <Footer />
+          )}
+          {!isAdminPage && <Footer />}
         </AppContainer>
       </GlobalStyles>
     </ThemeProvider>

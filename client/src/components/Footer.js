@@ -200,6 +200,7 @@ const Footer = () => {
             <FooterLink to="/privacy">Gizlilik</FooterLink>
             <FooterLink to="/terms">Şartlar</FooterLink>
             <FooterLink to="/cookies">Çerezler</FooterLink>
+            <FooterLink to="/admin-login">Admin Paneli</FooterLink>
           </FooterLinks>
         </FooterBottom>
       </Container>

@@ -8,7 +8,7 @@ import {
   FiHome, 
   FiSearch, 
   FiUser, 
-  FiBookmark, 
+  FiUserPlus,
   FiSun, 
   FiMoon, 
   FiMenu, 
@@ -17,7 +17,7 @@ import {
   FiSettings,
   FiVolume2,
   FiVolumeX,
-  FiBell
+  FiShield
 } from 'react-icons/fi';
 
 const Nav = styled.nav`
@@ -423,6 +423,29 @@ const MusicToggle = styled.button`
   }
 `;
 
+const AdminButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+  border: none;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
 
 const AuthButtons = styled.div`
   display: flex;
@@ -525,14 +548,26 @@ const Navbar = () => {
     }
   ];
 
+  const stopMusic = () => {
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+      // Tüm event listener'ları temizle
+      audio.removeEventListener('ended', () => {});
+      audio.removeEventListener('canplaythrough', () => {});
+      audio.removeEventListener('error', () => {});
+      // Audio element'ini tamamen temizle
+      audio.src = '';
+      audio.load();
+    }
+    setIsMusicPlaying(false);
+    setAudio(null);
+  };
+
   const toggleMusic = () => {
     if (isMusicPlaying) {
       // Müziği durdur
-      if (audio) {
-        audio.pause();
-        audio.currentTime = 0;
-      }
-      setIsMusicPlaying(false);
+      stopMusic();
     } else {
       // Müziği başlat
       playMusic();
@@ -548,36 +583,36 @@ const Navbar = () => {
 
   // Gerçek müzik çalma fonksiyonu
   const playMusic = () => {
-    // Önceki müziği durdur
-    if (audio) {
-      audio.pause();
-      audio.currentTime = 0;
-    }
+    // Önceki müziği tamamen durdur
+    stopMusic();
 
     // Yeni müzik oluştur
     const newAudio = new Audio(musicTracks[currentTrack].url);
     
-    // Müzik yüklendiğinde çal
-    newAudio.addEventListener('canplaythrough', () => {
+    // Event listener'ları tanımla
+    const handleCanPlay = () => {
       newAudio.play().catch(error => {
         console.log('Müzik çalma hatası:', error);
-        // Eğer müzik çalınamazsa, simülasyon göster
         console.log(`🎵 Şu anda çalıyor: ${musicTracks[currentTrack].name}`);
       });
-    });
+    };
 
-    // Müzik bittiğinde tekrar başlat
-    newAudio.addEventListener('ended', () => {
+    const handleEnded = () => {
       if (isMusicPlaying) {
         playMusic(); // Aynı müziği tekrar başlat
       }
-    });
+    };
 
-    // Hata durumunda simülasyon göster
-    newAudio.addEventListener('error', () => {
+    const handleError = () => {
       console.log(`🎵 Şu anda çalıyor: ${musicTracks[currentTrack].name}`);
-    });
+    };
+    
+    // Event listener'ları ekle
+    newAudio.addEventListener('canplaythrough', handleCanPlay);
+    newAudio.addEventListener('ended', handleEnded);
+    newAudio.addEventListener('error', handleError);
 
+    // Audio referansını güncelle
     setAudio(newAudio);
     setIsMusicPlaying(true);
   };
@@ -629,11 +664,17 @@ const Navbar = () => {
             {isDark ? <FiSun size={20} /> : <FiMoon size={20} />}
           </ThemeToggle>
           
-          {user && (
-            <UserMenu>
-              <UserIcon onClick={() => setShowUserDropdown(!showUserDropdown)}>
-                <FiUser size={20} />
-              </UserIcon>
+          {user && (user.email === 'admin@feellink.com' || user.username === 'admin') && (
+            <AdminButton onClick={() => navigate('/admin-login')}>
+              <FiShield size={18} />
+              Admin
+            </AdminButton>
+          )}
+          
+          <UserMenu>
+            <UserIcon onClick={() => setShowUserDropdown(!showUserDropdown)}>
+              <FiUser size={20} />
+            </UserIcon>
               
               <AnimatePresence>
                 {showUserDropdown && (
@@ -643,28 +684,27 @@ const Navbar = () => {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <DropdownItem onClick={() => navigate('/profile')}>
-                      <FiUser size={16} />
-                      Profil
-                    </DropdownItem>
-                    <DropdownItem onClick={() => navigate('/saved')}>
-                      <FiBookmark size={16} />
-                      Kaydedilenler
-                    </DropdownItem>
-                    <DropdownItem onClick={() => navigate('/notifications')}>
-                      <FiBell size={16} />
-                      Bildirimler
-                    </DropdownItem>
-                    <DropdownDivider />
-                    <DropdownItem onClick={handleLogout}>
-                      <FiLogOut size={16} />
-                      Çıkış Yap
-                    </DropdownItem>
+                    {user ? (
+                      <DropdownItem onClick={handleLogout}>
+                        <FiLogOut size={16} />
+                        Çıkış Yap
+                      </DropdownItem>
+                    ) : (
+                      <>
+                        <DropdownItem onClick={() => navigate('/login')}>
+                          <FiUser size={16} />
+                          Giriş Yap
+                        </DropdownItem>
+                        <DropdownItem onClick={() => navigate('/register')}>
+                          <FiUserPlus size={16} />
+                          Kayıt Ol
+                        </DropdownItem>
+                      </>
+                    )}
                   </UserDropdown>
                 )}
               </AnimatePresence>
             </UserMenu>
-          )}
         </NavActions>
       </NavContainer>
 

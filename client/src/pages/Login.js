@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from 'react-icons/fi';
+import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight, FiHome, FiShield } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -266,6 +266,39 @@ const SignupLink = styled.div`
   }
 `;
 
+const AlternativeLogins = styled.div`
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+const AlternativeLoginButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border: 2px solid ${props => props.theme.border};
+  background: ${props => props.theme.background};
+  color: ${props => props.theme.text};
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: ${props => props.color || props.theme.primary};
+    background: ${props => props.color ? props.color + '10' : props.theme.primary + '10'};
+    transform: translateY(-1px);
+  }
+
+  svg {
+    font-size: 18px;
+  }
+`;
+
 const ErrorMessage = styled.div`
   background: #fee2e2;
   color: #dc2626;
@@ -394,6 +427,26 @@ const Login = () => {
             Hesabınız yok mu?{' '}
             <Link to="/register">Kayıt olun</Link>
           </SignupLink>
+
+          <AlternativeLogins>
+            <AlternativeLoginButton 
+              theme={theme} 
+              color="#667eea"
+              onClick={() => navigate('/museum-login')}
+            >
+              <FiHome />
+              Müze Sahibi Girişi
+            </AlternativeLoginButton>
+            
+            <AlternativeLoginButton 
+              theme={theme} 
+              color="#f093fb"
+              onClick={() => navigate('/admin-login')}
+            >
+              <FiShield />
+              Admin Girişi
+            </AlternativeLoginButton>
+          </AlternativeLogins>
         </LoginCard>
     </Container>
   );

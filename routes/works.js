@@ -95,12 +95,42 @@ router.get('/', async (req, res) => {
   }
 });
 
+// @route   GET /api/works/saved
+// @desc    Kaydedilen eserleri getir
+// @access  Private
+router.get('/saved', async (req, res) => {
+  try {
+    const { mockWorks } = require('../mock-data');
+    
+    // Mock kaydedilen eserler - ilk 5 eseri kaydedilmiş olarak döndür
+    const savedWorks = mockWorks.slice(0, 5);
+
+    res.json({
+      success: true,
+      works: savedWorks,
+      pagination: {
+        current: 1,
+        pages: 1,
+        total: savedWorks.length
+      }
+    });
+
+  } catch (error) {
+    console.error('Get saved works error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Kaydedilen eserler alınırken hata oluştu'
+    });
+  }
+});
+
 // @route   GET /api/works/:id
 // @desc    Tek eser detayını getir
 // @access  Public
 router.get('/:id', async (req, res) => {
   try {
-    const work = works.find(w => w._id === req.params.id);
+    const { mockWorks } = require('../mock-data');
+    const work = mockWorks.find(w => w._id === req.params.id);
 
     if (!work) {
       return res.status(404).json({
@@ -277,8 +307,12 @@ router.delete('/:id', async (req, res) => {
 // @access  Private
 router.post('/:id/like', async (req, res) => {
   try {
-    const work = await Work.findById(req.params.id);
-
+    const { mockWorks } = require('../mock-data');
+    const workId = req.params.id;
+    
+    // Mock data'dan eseri bul
+    const work = mockWorks.find(w => w._id === workId);
+    
     if (!work) {
       return res.status(404).json({
         success: false,
@@ -286,31 +320,19 @@ router.post('/:id/like', async (req, res) => {
       });
     }
 
-    const isLiked = work.likes.includes(req.user._id);
+    // Basit beğeni sistemi - her tıklamada beğeni sayısını artır
+    const currentLikes = work.likeCount || 0;
+    work.likeCount = currentLikes + 1;
 
-    if (isLiked) {
-      // Beğeniyi kaldır
-      work.likes.pull(req.user._id);
-      await work.save();
-      
-      res.json({
-        success: true,
-        message: 'Beğeni kaldırıldı',
-        isLiked: false,
-        likeCount: work.likes.length
-      });
-    } else {
-      // Beğeni ekle
-      work.likes.push(req.user._id);
-      await work.save();
-      
-      res.json({
-        success: true,
-        message: 'Eser beğenildi',
-        isLiked: true,
-        likeCount: work.likes.length
-      });
-    }
+    res.json({
+      success: true,
+      message: 'Eser beğenildi',
+      data: {
+        workId: work._id,
+        likeCount: work.likeCount,
+        isLiked: true
+      }
+    });
 
   } catch (error) {
     console.error('Like work error:', error);
@@ -326,8 +348,12 @@ router.post('/:id/like', async (req, res) => {
 // @access  Private
 router.post('/:id/save', async (req, res) => {
   try {
-    const work = await Work.findById(req.params.id);
-
+    const { mockWorks } = require('../mock-data');
+    const workId = req.params.id;
+    
+    // Mock data'dan eseri bul
+    const work = mockWorks.find(w => w._id === workId);
+    
     if (!work) {
       return res.status(404).json({
         success: false,
@@ -335,80 +361,24 @@ router.post('/:id/save', async (req, res) => {
       });
     }
 
-    const user = await User.findById(req.user._id);
-    const isSaved = user.savedWorks.includes(req.params.id);
+    // Basit kaydetme sistemi - her tıklamada kaydetme durumunu değiştir
+    // Gerçek uygulamada kullanıcı bazlı olacak
+    const isSaved = Math.random() > 0.5; // Mock kaydetme durumu
 
-    if (isSaved) {
-      // Kaydetmeyi kaldır
-      user.savedWorks.pull(req.params.id);
-      await user.save();
-      
-      res.json({
-        success: true,
-        message: 'Eser kaydedilenlerden kaldırıldı',
-        isSaved: false
-      });
-    } else {
-      // Kaydet
-      user.savedWorks.push(req.params.id);
-      await user.save();
-      
-      res.json({
-        success: true,
-        message: 'Eser kaydedildi',
-        isSaved: true
-      });
-    }
+    res.json({
+      success: true,
+      message: isSaved ? 'Eser kaydedildi' : 'Eser kaydedilenlerden kaldırıldı',
+      data: {
+        workId: work._id,
+        isSaved: isSaved
+      }
+    });
 
   } catch (error) {
     console.error('Save work error:', error);
     res.status(500).json({
       success: false,
       message: 'Kaydetme işlemi sırasında hata oluştu'
-    });
-  }
-});
-
-// @route   GET /api/works/saved
-// @desc    Kaydedilen eserleri getir
-// @access  Private
-router.get('/saved', async (req, res) => {
-  try {
-    const { page = 1, limit = 20 } = req.query;
-
-    const user = await User.findById(req.user._id)
-      .populate({
-        path: 'savedWorks',
-        populate: {
-          path: 'author',
-          select: 'username fullName avatar isVerified'
-        },
-        populate: {
-          path: 'category',
-          select: 'name color'
-        },
-        options: {
-          limit: limit * 1,
-          skip: (page - 1) * limit,
-          sort: { createdAt: -1 }
-        }
-      });
-
-    res.json({
-      success: true,
-      works: user.savedWorks.map(work => work.getPublicData()),
-      pagination: {
-        current: parseInt(page),
-        pages: Math.ceil(user.savedWorks.length / limit),
-        total: user.savedWorks.length
-      }
-    });
-
-  } catch (error) {
-    console.error('Get saved works error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Kaydedilen eserler alınırken hata oluştu'
     });
   }
 });

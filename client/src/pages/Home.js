@@ -964,12 +964,12 @@ const Home = () => {
                        </HighlightCard>
 
                        <HighlightCard
-                         backgroundImage="/zeynep.jpg"
+                         backgroundImage="/sude.jpg"
                        >
                          <HighlightOverlay>
                            <HighlightInfo>
                              <HighlightDescription>⭐ Ayın Sanatçısı</HighlightDescription>
-                             <HighlightName>Zeynep Esmer</HighlightName>
+                             <HighlightName>Sude Esmer</HighlightName>
                              <HighlightStats>1.8K takipçi</HighlightStats>
                            </HighlightInfo>
                          </HighlightOverlay>
@@ -1000,12 +1000,12 @@ const Home = () => {
             </HighlightCard>
 
             <HighlightCard
-              backgroundImage="/images/venice-art.jpg"
+              backgroundImage="/zeynep.jpg"
             >
               <HighlightOverlay>
                 <HighlightInfo>
                   <HighlightDescription>⭐ Ayın Koleksiyoneri</HighlightDescription>
-                  <HighlightName>Mehmet Özkan</HighlightName>
+                  <HighlightName>Zeynep Esmer</HighlightName>
                   <HighlightStats>2.8K takipçi</HighlightStats>
                 </HighlightInfo>
               </HighlightOverlay>
