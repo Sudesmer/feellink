@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FiHeart, FiEye, FiTrendingUp, FiMessageCircle, FiBookmark } from 'react-icons/fi';
+import { FiHeart, FiEye, FiTrendingUp, FiMessageCircle, FiBookmark, FiPlus, FiFolder } from 'react-icons/fi';
 import { useTheme } from '../contexts/ThemeContext';
+import { useLocation } from 'react-router-dom';
 
 const Card = styled.div`
   background: ${props => props.theme.surface};
@@ -784,6 +785,7 @@ const ReactionItem = styled.span`
 
 const WorkCard = ({ work }) => {
   const { theme } = useTheme();
+  const location = useLocation();
   
   // localStorage'dan like durumunu yükle
   const getStoredLikeState = () => {
@@ -827,6 +829,10 @@ const WorkCard = ({ work }) => {
   const [isSaved, setIsSaved] = useState(getStoredSaveState());
   const [isSaving, setIsSaving] = useState(false);
   
+  // Koleksiyonlar için state
+  const [collections, setCollections] = useState([]);
+  const [showCollectionModal, setShowCollectionModal] = useState(false);
+  
   const [showBadgeDetails, setShowBadgeDetails] = useState(false);
   const [visibleBadges, setVisibleBadges] = useState([]);
   
@@ -841,6 +847,33 @@ const WorkCard = ({ work }) => {
       console.error('Yorum beğenme durumu okuma hatası:', error);
       return {};
     }
+  };
+
+  // Koleksiyonları localStorage'dan yükle
+  useEffect(() => {
+    const savedCollections = localStorage.getItem('feellink-collections');
+    if (savedCollections) {
+      setCollections(JSON.parse(savedCollections));
+    }
+  }, []);
+
+  // Eseri koleksiyona ekle/çıkar
+  const toggleWorkInCollection = (collectionId) => {
+    const updatedCollections = collections.map(collection => {
+      if (collection.id === collectionId) {
+        const workExists = collection.works.includes(work._id);
+        return {
+          ...collection,
+          works: workExists 
+            ? collection.works.filter(id => id !== work._id)
+            : [...collection.works, work._id]
+        };
+      }
+      return collection;
+    });
+    
+    setCollections(updatedCollections);
+    localStorage.setItem('feellink-collections', JSON.stringify(updatedCollections));
   };
   
   const getStoredReactions = () => {
@@ -1431,6 +1464,16 @@ const WorkCard = ({ work }) => {
                     }}
                   />
                 </ModalActionButton>
+                
+                {/* Koleksiyon butonu - sadece Saved sayfasında göster */}
+                {location.pathname === '/saved' && (
+                  <ModalActionButton 
+                    theme={theme}
+                    onClick={() => setShowCollectionModal(true)}
+                  >
+                    <FiFolder size={20} />
+                  </ModalActionButton>
+                )}
               </div>
               
               {/* İfade butonları */}
@@ -1520,6 +1563,62 @@ const WorkCard = ({ work }) => {
               </PostButton>
             </ModalCommentForm>
           </ModalInfoSection>
+        </ModalContent>
+      </ModalOverlay>
+    )}
+
+    {/* Koleksiyon Seçim Modalı */}
+    {showCollectionModal && (
+      <ModalOverlay onClick={() => setShowCollectionModal(false)}>
+        <ModalContent theme={theme} onClick={(e) => e.stopPropagation()}>
+          <ModalTitle>Koleksiyona Ekle</ModalTitle>
+          <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+            {collections.map((collection) => {
+              const isInCollection = collection.works.includes(work._id);
+              return (
+                <div
+                  key={collection.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '12px 0',
+                    borderBottom: `1px solid ${theme.border}`,
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => toggleWorkInCollection(collection.id)}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <FiFolder size={20} color={theme.primary} />
+                    <span style={{ color: theme.text, fontSize: '16px' }}>
+                      {collection.name}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      border: `2px solid ${isInCollection ? theme.primary : theme.border}`,
+                      borderRadius: '4px',
+                      backgroundColor: isInCollection ? theme.primary : 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'white',
+                      fontSize: '12px'
+                    }}
+                  >
+                    {isInCollection && '✓'}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <ModalButtons>
+            <ModalButton theme={theme} onClick={() => setShowCollectionModal(false)}>
+              Kapat
+            </ModalButton>
+          </ModalButtons>
         </ModalContent>
       </ModalOverlay>
     )}

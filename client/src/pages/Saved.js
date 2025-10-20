@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FiBookmark, FiGrid, FiList, FiSearch, FiHome, FiEye, FiBell, FiUser } from 'react-icons/fi';
+import { FiBookmark, FiGrid, FiList, FiSearch, FiHome, FiEye, FiBell, FiUser, FiPlus, FiEdit3, FiTrash2, FiFolder } from 'react-icons/fi';
 import axios from 'axios';
 import WorkCard from '../components/WorkCard';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -300,6 +300,219 @@ const EmptyDescription = styled.p`
   margin: 0 auto;
 `;
 
+// Koleksiyonlar için yeni styled components
+const CollectionsSection = styled.div`
+  margin-bottom: 40px;
+`;
+
+const CollectionsHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+`;
+
+const CollectionsTitle = styled.h2`
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: ${props => props.theme.text};
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+const CreateCollectionButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: ${props => props.theme.primary};
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: ${props => props.theme.primaryHover};
+    transform: translateY(-2px);
+  }
+`;
+
+const CollectionsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+`;
+
+const CollectionCard = styled.div`
+  background: ${props => props.theme.surface};
+  border: 1px solid ${props => props.theme.border};
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px ${props => props.theme.shadow};
+    border-color: ${props => props.theme.primary};
+  }
+`;
+
+const CollectionPreview = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  background: ${props => props.theme.background};
+`;
+
+const CollectionImage = styled.div`
+  background-image: url(${props => props.src});
+  background-size: cover;
+  background-position: center;
+  background-color: ${props => props.theme.background};
+`;
+
+const CollectionInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const CollectionName = styled.h3`
+  font-size: 14px;
+  font-weight: 600;
+  color: ${props => props.theme.text};
+  margin: 0;
+`;
+
+const CollectionCount = styled.p`
+  font-size: 12px;
+  color: ${props => props.theme.textSecondary};
+  margin: 0;
+`;
+
+const CollectionActions = styled.div`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  ${CollectionCard}:hover & {
+    opacity: 1;
+  }
+`;
+
+const ActionButton = styled.button`
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.9);
+  }
+`;
+
+// Modal components
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(8px);
+`;
+
+const ModalContent = styled.div`
+  background: ${props => props.theme.surface};
+  border-radius: 16px;
+  padding: 24px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 20px 40px ${props => props.theme.shadow};
+`;
+
+const ModalTitle = styled.h3`
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: ${props => props.theme.text};
+  margin: 0 0 16px 0;
+`;
+
+const ModalInput = styled.input`
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid ${props => props.theme.border};
+  border-radius: 8px;
+  background: ${props => props.theme.background};
+  color: ${props => props.theme.text};
+  font-size: 16px;
+  margin-bottom: 16px;
+
+  &:focus {
+    outline: none;
+    border-color: ${props => props.theme.primary};
+  }
+`;
+
+const ModalButtons = styled.div`
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+`;
+
+const ModalButton = styled.button`
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+
+  ${props => props.primary ? `
+    background: ${props.theme.primary};
+    color: white;
+    
+    &:hover {
+      background: ${props.theme.primaryHover};
+    }
+  ` : `
+    background: ${props.theme.background};
+    color: ${props.theme.text};
+    border: 1px solid ${props.theme.border};
+    
+    &:hover {
+      background: ${props.theme.surface};
+    }
+  `}
+`;
+
 const Saved = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -307,6 +520,14 @@ const Saved = () => {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState('grid');
+  
+  // Koleksiyonlar state
+  const [collections, setCollections] = useState([]);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingCollection, setEditingCollection] = useState(null);
+  const [newCollectionName, setNewCollectionName] = useState('');
+  const [selectedCollection, setSelectedCollection] = useState(null);
 
   // Mock saved works for now
   const mockSavedWorks = [
@@ -332,6 +553,78 @@ const Saved = () => {
     }
   ];
 
+  // Koleksiyonları localStorage'dan yükle
+  useEffect(() => {
+    const savedCollections = localStorage.getItem('feellink-collections');
+    if (savedCollections) {
+      setCollections(JSON.parse(savedCollections));
+    } else {
+      // Varsayılan koleksiyonlar
+      const defaultCollections = [
+        {
+          id: '1',
+          name: 'Favorilerim',
+          works: ['1', '2'],
+          createdAt: new Date()
+        }
+      ];
+      setCollections(defaultCollections);
+      localStorage.setItem('feellink-collections', JSON.stringify(defaultCollections));
+    }
+  }, []);
+
+  // Koleksiyon oluştur
+  const createCollection = () => {
+    if (newCollectionName.trim()) {
+      const newCollection = {
+        id: Date.now().toString(),
+        name: newCollectionName.trim(),
+        works: [],
+        createdAt: new Date()
+      };
+      const updatedCollections = [...collections, newCollection];
+      setCollections(updatedCollections);
+      localStorage.setItem('feellink-collections', JSON.stringify(updatedCollections));
+      setNewCollectionName('');
+      setShowCreateModal(false);
+    }
+  };
+
+  // Koleksiyon düzenle
+  const editCollection = () => {
+    if (newCollectionName.trim() && editingCollection) {
+      const updatedCollections = collections.map(col => 
+        col.id === editingCollection.id 
+          ? { ...col, name: newCollectionName.trim() }
+          : col
+      );
+      setCollections(updatedCollections);
+      localStorage.setItem('feellink-collections', JSON.stringify(updatedCollections));
+      setNewCollectionName('');
+      setShowEditModal(false);
+      setEditingCollection(null);
+    }
+  };
+
+  // Koleksiyon sil
+  const deleteCollection = (collectionId) => {
+    const updatedCollections = collections.filter(col => col.id !== collectionId);
+    setCollections(updatedCollections);
+    localStorage.setItem('feellink-collections', JSON.stringify(updatedCollections));
+  };
+
+  // Koleksiyon seç
+  const selectCollection = (collection) => {
+    setSelectedCollection(collection);
+  };
+
+  // Koleksiyon düzenleme modalını aç
+  const openEditModal = (collection) => {
+    setEditingCollection(collection);
+    setNewCollectionName(collection.name);
+    setShowEditModal(true);
+  };
+
   // Fetch saved works
   const { data: savedData, isLoading } = useQuery(
     'saved-works',
@@ -351,10 +644,25 @@ const Saved = () => {
 
   const works = savedData?.works || mockSavedWorks;
 
-  const filteredWorks = works.filter(work =>
-    work.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    work.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Seçili koleksiyona göre eserleri filtrele
+  const getFilteredWorks = () => {
+    let filtered = works;
+    
+    if (selectedCollection) {
+      filtered = works.filter(work => selectedCollection.works.includes(work._id));
+    }
+    
+    if (searchQuery) {
+      filtered = filtered.filter(work =>
+        work.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        work.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    return filtered;
+  };
+
+  const filteredWorks = getFilteredWorks();
 
 
   return (
@@ -404,12 +712,86 @@ const Saved = () => {
         <Header>
           <Title>
             <FiBookmark size={32} />
-            Kaydedilenler
+            {selectedCollection ? selectedCollection.name : 'Kaydedilenler'}
           </Title>
           <Subtitle>
-            Beğendiğiniz ve kaydettiğiniz eserleri burada bulabilirsiniz
+            {selectedCollection 
+              ? `${selectedCollection.name} koleksiyonundaki eserler`
+              : 'Beğendiğiniz ve kaydettiğiniz eserleri burada bulabilirsiniz'
+            }
           </Subtitle>
         </Header>
+
+        {/* Koleksiyonlar Bölümü */}
+        <CollectionsSection>
+          <CollectionsHeader>
+            <CollectionsTitle>
+              <FiFolder size={24} />
+              Koleksiyonlarım
+            </CollectionsTitle>
+            <CreateCollectionButton onClick={() => setShowCreateModal(true)}>
+              <FiPlus size={16} />
+              Yeni Koleksiyon
+            </CreateCollectionButton>
+          </CollectionsHeader>
+
+          <CollectionsGrid>
+            {collections.map((collection) => {
+              const collectionWorks = works.filter(work => collection.works.includes(work._id));
+              const previewImages = collectionWorks.slice(0, 4).map(work => work.image);
+              
+              return (
+                <CollectionCard 
+                  key={collection.id} 
+                  onClick={() => selectCollection(collection)}
+                  style={{ 
+                    borderColor: selectedCollection?.id === collection.id ? theme.primary : theme.border,
+                    backgroundColor: selectedCollection?.id === collection.id ? theme.primaryLight : theme.surface
+                  }}
+                >
+                  <CollectionActions>
+                    <ActionButton onClick={(e) => {
+                      e.stopPropagation();
+                      openEditModal(collection);
+                    }}>
+                      <FiEdit3 />
+                    </ActionButton>
+                    <ActionButton onClick={(e) => {
+                      e.stopPropagation();
+                      deleteCollection(collection.id);
+                    }}>
+                      <FiTrash2 />
+                    </ActionButton>
+                  </CollectionActions>
+                  
+                  <CollectionPreview>
+                    {previewImages.length > 0 ? (
+                      previewImages.map((image, index) => (
+                        <CollectionImage key={index} src={image} />
+                      ))
+                    ) : (
+                      <div style={{ 
+                        gridColumn: '1 / -1', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center',
+                        color: theme.textSecondary,
+                        fontSize: '12px'
+                      }}>
+                        Boş koleksiyon
+                      </div>
+                    )}
+                  </CollectionPreview>
+                  
+                  <CollectionInfo>
+                    <CollectionName>{collection.name}</CollectionName>
+                    <CollectionCount>{collection.works.length} eser</CollectionCount>
+                  </CollectionInfo>
+                </CollectionCard>
+              );
+            })}
+          </CollectionsGrid>
+        </CollectionsSection>
 
         <FiltersContainer>
           <SearchContainer>
@@ -446,7 +828,10 @@ const Saved = () => {
           <>
             <ResultsHeader>
               <ResultsCount>
-                {filteredWorks.length} kaydedilen eser
+                {selectedCollection 
+                  ? `${filteredWorks.length} eser (${selectedCollection.name})`
+                  : `${filteredWorks.length} kaydedilen eser`
+                }
               </ResultsCount>
             </ResultsHeader>
 
@@ -491,6 +876,56 @@ const Saved = () => {
               }
             </EmptyDescription>
           </EmptyState>
+        )}
+
+        {/* Koleksiyon Oluşturma Modalı */}
+        {showCreateModal && (
+          <ModalOverlay onClick={() => setShowCreateModal(false)}>
+            <ModalContent theme={theme} onClick={(e) => e.stopPropagation()}>
+              <ModalTitle>Yeni Koleksiyon Oluştur</ModalTitle>
+              <ModalInput
+                theme={theme}
+                type="text"
+                placeholder="Koleksiyon adı girin..."
+                value={newCollectionName}
+                onChange={(e) => setNewCollectionName(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && createCollection()}
+              />
+              <ModalButtons>
+                <ModalButton theme={theme} onClick={() => setShowCreateModal(false)}>
+                  İptal
+                </ModalButton>
+                <ModalButton theme={theme} primary onClick={createCollection}>
+                  Oluştur
+                </ModalButton>
+              </ModalButtons>
+            </ModalContent>
+          </ModalOverlay>
+        )}
+
+        {/* Koleksiyon Düzenleme Modalı */}
+        {showEditModal && (
+          <ModalOverlay onClick={() => setShowEditModal(false)}>
+            <ModalContent theme={theme} onClick={(e) => e.stopPropagation()}>
+              <ModalTitle>Koleksiyon Düzenle</ModalTitle>
+              <ModalInput
+                theme={theme}
+                type="text"
+                placeholder="Koleksiyon adı girin..."
+                value={newCollectionName}
+                onChange={(e) => setNewCollectionName(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && editCollection()}
+              />
+              <ModalButtons>
+                <ModalButton theme={theme} onClick={() => setShowEditModal(false)}>
+                  İptal
+                </ModalButton>
+                <ModalButton theme={theme} primary onClick={editCollection}>
+                  Kaydet
+                </ModalButton>
+              </ModalButtons>
+            </ModalContent>
+          </ModalOverlay>
         )}
           </ContentInner>
         </Content>
