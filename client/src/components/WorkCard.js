@@ -1004,10 +1004,15 @@ const WorkCard = ({ work }) => {
     setVisibleBadges([]);
   };
   
-  // Trend ikonuna tıklama fonksiyonu
+  // Trend ikonuna tıklama fonksiyonu - sadece menüyü aç/kapat
   const handleTrendClick = (e) => {
     e.stopPropagation();
     setShowBadgeVoting(!showBadgeVoting);
+  };
+  
+  // Rozet oylama fonksiyonu - rozetlere tıklayınca oy ver
+  const handleBadgeClick = (badgeKey) => {
+    handleBadgeVote(badgeKey);
   };
 
   // Yorum gönderme fonksiyonu
@@ -1338,7 +1343,7 @@ const WorkCard = ({ work }) => {
                   <BadgeVoteButton
                     key={key}
                     isVoted={badgeVotes[key]}
-                    onClick={() => handleBadgeVote(key)}
+                    onClick={() => handleBadgeClick(key)}
                   >
                     <BadgeVoteIcon>{badge.emoji}</BadgeVoteIcon>
                     <BadgeVoteText>{badge.name}</BadgeVoteText>
