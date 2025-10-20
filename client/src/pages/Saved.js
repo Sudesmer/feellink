@@ -7,7 +7,6 @@ import { FiBookmark, FiGrid, FiList, FiSearch, FiHome, FiEye, FiBell, FiUser, Fi
 import axios from 'axios';
 import WorkCard from '../components/WorkCard';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 
 const Container = styled.div`
@@ -517,7 +516,6 @@ const Saved = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { theme } = useTheme();
-  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState('grid');
   

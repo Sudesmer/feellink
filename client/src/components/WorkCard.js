@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FiHeart, FiEye, FiTrendingUp, FiMessageCircle, FiBookmark, FiPlus, FiFolder } from 'react-icons/fi';
+import { FiHeart, FiEye, FiTrendingUp, FiMessageCircle, FiBookmark, FiFolder } from 'react-icons/fi';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLocation } from 'react-router-dom';
 
@@ -459,6 +459,47 @@ const ModalLikes = styled.div`
   font-weight: 600;
   color: ${props => props.theme.text};
   font-size: 14px;
+`;
+
+// Modal components for collections
+const ModalTitle = styled.h3`
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: ${props => props.theme.text};
+  margin: 0 0 16px 0;
+`;
+
+const ModalButtons = styled.div`
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+`;
+
+const ModalButton = styled.button`
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+
+  ${props => props.primary ? `
+    background: ${props.theme.primary};
+    color: white;
+    
+    &:hover {
+      background: ${props.theme.primaryHover};
+    }
+  ` : `
+    background: ${props.theme.background};
+    color: ${props.theme.text};
+    border: 1px solid ${props.theme.border};
+    
+    &:hover {
+      background: ${props.theme.surface};
+    }
+  `}
 `;
 
 const ModalCaption = styled.div`
