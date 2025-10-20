@@ -88,7 +88,8 @@ const BadgeItem = styled.div`
   position: relative;
   width: 28px;
   height: 28px;
-  background: ${props => props.bgColor || 'rgba(255, 255, 255, 0.95)'};
+  background: ${props => props.isVoted ? 'rgba(255, 107, 53, 0.9)' : (props.bgColor || 'rgba(255, 255, 255, 0.95)')};
+  border: ${props => props.isVoted ? '2px solid #FF6B35' : 'none'};
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -96,14 +97,14 @@ const BadgeItem = styled.div`
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: ${props => props.isVoted ? '0 4px 12px rgba(255, 107, 53, 0.3)' : '0 2px 8px rgba(0, 0, 0, 0.1)'};
   pointer-events: ${props => props.isVisible ? 'auto' : 'none'};
   opacity: ${props => props.isVisible ? 1 : 0};
   transform: ${props => props.isVisible ? 'translateY(0) scale(1)' : 'translateY(-10px) scale(0.8)'};
 
   &:hover {
     transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: ${props => props.isVoted ? '0 6px 16px rgba(255, 107, 53, 0.4)' : '0 4px 12px rgba(0, 0, 0, 0.2)'};
   }
 
   &:active {
@@ -846,6 +847,16 @@ const WorkCard = ({ work }) => {
       return {};
     }
   };
+
+  const getStoredBadgeVotes = () => {
+    try {
+      const stored = localStorage.getItem(`badgeVotes_${work._id}`);
+      return stored ? JSON.parse(stored) : {};
+    } catch (error) {
+      console.error('Rozet oylama durumu okuma hatası:', error);
+      return {};
+    }
+  };
   
   
   // Yorum state'leri
@@ -858,6 +869,9 @@ const WorkCard = ({ work }) => {
   const [reactions, setReactions] = useState(getStoredReactions());
   const [showReactions, setShowReactions] = useState(false);
   const [showHoverReactions, setShowHoverReactions] = useState(false);
+  
+  // Rozet oylama state'leri
+  const [badgeVotes, setBadgeVotes] = useState(getStoredBadgeVotes());
   
 
   // Modal açıldığında yorumları yükle
@@ -1023,6 +1037,30 @@ const WorkCard = ({ work }) => {
     setReactions(newReactions);
     localStorage.setItem(`reactions_${work._id}`, JSON.stringify(newReactions));
     setShowHoverReactions(false);
+  };
+
+  // Rozet oylama fonksiyonu
+  const handleBadgeVote = (badgeKey) => {
+    const newBadgeVotes = { ...badgeVotes };
+    if (newBadgeVotes[badgeKey]) {
+      delete newBadgeVotes[badgeKey];
+    } else {
+      newBadgeVotes[badgeKey] = true;
+    }
+    setBadgeVotes(newBadgeVotes);
+    localStorage.setItem(`badgeVotes_${work._id}`, JSON.stringify(newBadgeVotes));
+    
+    // Görsel feedback için rozet animasyonu
+    const badgeElement = document.querySelector(`[data-badge="${badgeKey}"]`);
+    if (badgeElement) {
+      badgeElement.style.transform = 'scale(0.8)';
+      setTimeout(() => {
+        badgeElement.style.transform = 'scale(1.1)';
+        setTimeout(() => {
+          badgeElement.style.transform = 'scale(1)';
+        }, 150);
+      }, 100);
+    }
   };
   
 
@@ -1238,6 +1276,8 @@ const WorkCard = ({ work }) => {
                   key={key} 
                   bgColor={badge.color}
                   isVisible={visibleBadges.includes(key)}
+                  isVoted={badgeVotes[key]}
+                  onClick={() => handleBadgeVote(key)}
                   data-badge={key}
                 >
                   {badge.emoji}
