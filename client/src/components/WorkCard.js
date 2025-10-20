@@ -283,6 +283,35 @@ const ModernCommentIcon = styled.div`
   }
 `;
 
+const ModernReactionIcon = styled.div`
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 20px;
+  position: relative;
+
+  &:hover {
+    background: rgba(255, 107, 53, 0.9);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(255, 107, 53, 0.3);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+`;
+
 // Sağ üst trend ikonları
 const TopRightOverlay = styled.div`
   position: absolute;
@@ -653,6 +682,30 @@ const ReactionDropdown = styled.div`
   z-index: 1000;
 `;
 
+const HoverReactionDropdown = styled.div`
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 25px;
+  padding: 12px 16px;
+  display: ${props => props.show ? 'flex' : 'none'};
+  gap: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  opacity: 0;
+  transform: translateX(-50%) translateY(10px) scale(0.9);
+  transition: all 0.3s ease;
+
+  ${props => props.show && `
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  `}
+`;
+
 const ReactionEmoji = styled.button`
   background: none;
   border: none;
@@ -668,6 +721,30 @@ const ReactionEmoji = styled.button`
   &:hover {
     background: rgba(255, 107, 53, 0.1);
     transform: scale(1.2);
+  }
+  
+  &:active {
+    transform: scale(0.9);
+  }
+`;
+
+const HoverReactionEmoji = styled.button`
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  
+  &:hover {
+    background: rgba(255, 107, 53, 0.15);
+    transform: scale(1.3);
   }
   
   &:active {
@@ -777,6 +854,7 @@ const WorkCard = ({ work }) => {
   // İfade state'leri
   const [reactions, setReactions] = useState(getStoredReactions());
   const [showReactions, setShowReactions] = useState(false);
+  const [showHoverReactions, setShowHoverReactions] = useState(false);
 
   // Modal açıldığında yorumları yükle
   useEffect(() => {
@@ -926,6 +1004,19 @@ const WorkCard = ({ work }) => {
     setReactions(newReactions);
     localStorage.setItem(`reactions_${work._id}`, JSON.stringify(newReactions));
     setShowReactions(false);
+  };
+  
+  // Hover ifade bırakma fonksiyonu
+  const handleHoverReaction = (emoji) => {
+    const newReactions = { ...reactions };
+    if (newReactions[emoji]) {
+      delete newReactions[emoji];
+    } else {
+      newReactions[emoji] = true;
+    }
+    setReactions(newReactions);
+    localStorage.setItem(`reactions_${work._id}`, JSON.stringify(newReactions));
+    setShowHoverReactions(false);
   };
 
   // Beğeni fonksiyonu
@@ -1102,14 +1193,37 @@ const WorkCard = ({ work }) => {
           </div>
         )}
         
-        {/* Ortada modern yorum ikonu */}
+        {/* Ortada modern ikonlar */}
         <CenterOverlay>
-          <ModernCommentIcon onClick={(e) => {
-            e.stopPropagation();
-            setIsModalOpen(true);
-          }}>
-            <FiMessageCircle size={20} />
-          </ModernCommentIcon>
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+            {/* Yorum ikonu */}
+            <ModernCommentIcon onClick={(e) => {
+              e.stopPropagation();
+              setIsModalOpen(true);
+            }}>
+              <FiMessageCircle size={20} />
+            </ModernCommentIcon>
+            
+            {/* İfade ikonu */}
+            <ModernReactionIcon 
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowHoverReactions(!showHoverReactions);
+              }}
+              onMouseEnter={() => setShowHoverReactions(true)}
+              onMouseLeave={() => setShowHoverReactions(false)}
+            >
+              😊
+              <HoverReactionDropdown show={showHoverReactions}>
+                <HoverReactionEmoji onClick={() => handleHoverReaction('❤️')}>❤️</HoverReactionEmoji>
+                <HoverReactionEmoji onClick={() => handleHoverReaction('😍')}>😍</HoverReactionEmoji>
+                <HoverReactionEmoji onClick={() => handleHoverReaction('🤩')}>🤩</HoverReactionEmoji>
+                <HoverReactionEmoji onClick={() => handleHoverReaction('😮')}>😮</HoverReactionEmoji>
+                <HoverReactionEmoji onClick={() => handleHoverReaction('😢')}>😢</HoverReactionEmoji>
+                <HoverReactionEmoji onClick={() => handleHoverReaction('😂')}>😂</HoverReactionEmoji>
+              </HoverReactionDropdown>
+            </ModernReactionIcon>
+          </div>
         </CenterOverlay>
         
         {/* Sağ üst trend ikonları */}
