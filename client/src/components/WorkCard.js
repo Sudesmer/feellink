@@ -1238,7 +1238,6 @@ const WorkCard = ({ work }) => {
                   key={key} 
                   bgColor={badge.color}
                   isVisible={visibleBadges.includes(key)}
-                  onClick={() => handleBadgeClick(key, badge.name)}
                   data-badge={key}
                 >
                   {badge.emoji}
