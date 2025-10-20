@@ -1196,25 +1196,6 @@ const WorkCard = ({ work }) => {
     }
   };
 
-  // Rozet tıklama fonksiyonu
-  const handleBadgeClick = (badgeKey, badgeName) => {
-    console.log(`${badgeName} rozetine tıklandı!`);
-    
-    // Görsel feedback için rozet animasyonu
-    const badgeElement = document.querySelector(`[data-badge="${badgeKey}"]`);
-    if (badgeElement) {
-      badgeElement.style.transform = 'scale(0.8)';
-      setTimeout(() => {
-        badgeElement.style.transform = 'scale(1.1)';
-        setTimeout(() => {
-          badgeElement.style.transform = 'scale(1)';
-        }, 150);
-      }, 100);
-    }
-    
-    // Burada rozet tıklama işlemi yapılabilir
-    // Örneğin: toast mesajı, modal açma, vs.
-  };
   
 
   // const handleLike = async (e) => {
