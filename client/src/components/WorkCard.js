@@ -88,7 +88,12 @@ const BadgeItem = styled.div`
   position: relative;
   width: 28px;
   height: 28px;
-  background: ${props => props.isVoted ? 'rgba(255, 107, 53, 0.9)' : (props.bgColor || 'rgba(255, 255, 255, 0.95)')};
+  background: ${props => {
+    if (props.isVoted) {
+      return 'linear-gradient(135deg, #FF6B35, #FF8C42)';
+    }
+    return props.bgColor || 'rgba(255, 255, 255, 0.95)';
+  }};
   border: ${props => props.isVoted ? '2px solid #FF6B35' : 'none'};
   border-radius: 50%;
   display: flex;
@@ -916,11 +921,11 @@ const WorkCard = ({ work }) => {
   
   // Rozet türleri
   const badgeTypes = {
-    star: { emoji: '🏆', name: 'Sahnenin Yıldızı Rozeti', color: 'rgba(255, 215, 0, 1)' },
-    echo: { emoji: '✨', name: 'Sanatın Yankısı Rozeti', color: 'rgba(255, 105, 180, 1)' },
-    light: { emoji: '🖌️', name: 'Yaratıcılığın Işığı Rozeti', color: 'rgba(30, 144, 255, 1)' },
-    inspiration: { emoji: '🌿', name: 'İlham Kaynağı Rozeti', color: 'rgba(50, 205, 50, 1)' },
-    horizons: { emoji: '🌟', name: 'Yeni Ufuklar Rozeti', color: 'rgba(138, 43, 226, 1)' }
+    star: { emoji: '🏆', name: 'Sahnenin Yıldızı Rozeti', color: 'linear-gradient(135deg, #FFD700, #FFA500)' },
+    echo: { emoji: '✨', name: 'Sanatın Yankısı Rozeti', color: 'linear-gradient(135deg, #FF69B4, #FF1493)' },
+    light: { emoji: '🖌️', name: 'Yaratıcılığın Işığı Rozeti', color: 'linear-gradient(135deg, #1E90FF, #00BFFF)' },
+    inspiration: { emoji: '🌿', name: 'İlham Kaynağı Rozeti', color: 'linear-gradient(135deg, #32CD32, #00FF7F)' },
+    horizons: { emoji: '🌟', name: 'Yeni Ufuklar Rozeti', color: 'linear-gradient(135deg, #8A2BE2, #DA70D6)' }
   };
 
   // Trend ikonuna hover fonksiyonu
