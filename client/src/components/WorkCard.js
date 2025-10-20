@@ -922,10 +922,10 @@ const WorkCard = ({ work }) => {
   // Rozet türleri
   const badgeTypes = {
     star: { emoji: '🏆', name: 'Sahnenin Yıldızı Rozeti', color: '#FFD700' },
-    echo: { emoji: '✨', name: 'Sanatın Yankısı Rozeti', color: '#FF69B4' },
-    light: { emoji: '🖌️', name: 'Yaratıcılığın Işığı Rozeti', color: '#4169E1' },
-    inspiration: { emoji: '🌿', name: 'İlham Kaynağı Rozeti', color: '#228B22' },
-    horizons: { emoji: '🌟', name: 'Yeni Ufuklar Rozeti', color: '#9932CC' }
+    echo: { emoji: '✨', name: 'Sanatın Yankısı Rozeti', color: '#FF1493' },
+    light: { emoji: '🖌️', name: 'Yaratıcılığın Işığı Rozeti', color: '#0000FF' },
+    inspiration: { emoji: '🌿', name: 'İlham Kaynağı Rozeti', color: '#00FF00' },
+    horizons: { emoji: '🌟', name: 'Yeni Ufuklar Rozeti', color: '#FF00FF' }
   };
 
   // Trend ikonuna hover fonksiyonu
