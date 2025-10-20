@@ -820,7 +820,7 @@ const Home = () => {
         category: { name: 'Fotoğraf', color: '#9C27B0' },
         likeCount: 198,
         viewCount: 890,
-        isTrending: true,
+        isTrending: false,
         createdAt: new Date('2024-01-18')
       },
       {
@@ -832,7 +832,7 @@ const Home = () => {
         category: { name: 'Resim', color: '#E91E63' },
         likeCount: 267,
         viewCount: 1020,
-        isTrending: true,
+        isTrending: false,
         createdAt: new Date('2024-01-16')
       },
       {
@@ -856,7 +856,7 @@ const Home = () => {
         category: { name: 'Fotoğraf', color: '#4CAF50' },
         likeCount: 234,
         viewCount: 923,
-        isTrending: true,
+        isTrending: false,
         createdAt: new Date('2024-01-12')
       },
       {
