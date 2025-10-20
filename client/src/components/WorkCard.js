@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FiHeart, FiEye, FiTrendingUp, FiMessageCircle, FiBookmark, FiFolder } from 'react-icons/fi';
+import { FiHeart, FiEye, FiTrendingUp, FiMessageCircle, FiBookmark, FiFolder, FiZap } from 'react-icons/fi';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLocation } from 'react-router-dom';
 
@@ -53,109 +53,26 @@ const WorkImage = styled.img`
 // Trend ikonu
 const TrendIcon = styled.div`
   position: relative;
-  width: 28px;
-  height: 28px;
-  background: linear-gradient(135deg, #FF6B35, #F7931E);
+  width: 18px;
+  height: 18px;
+  background: #FF6B35;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 12px;
-  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
-  }
-`;
-
-// Rozet detayları container
-const BadgeDetails = styled.div`
-  position: absolute;
-  top: 35px;
-  right: 1px;
-  display: ${props => props.show ? 'flex' : 'none'};
-  flex-direction: column;
-  gap: 4px;
-  z-index: 15;
-  pointer-events: auto;
-`;
-
-// Rozet item
-const BadgeItem = styled.div`
-  position: relative;
-  width: 28px;
-  height: 28px;
-  background: ${props => {
-    if (props.isVoted) {
-      return 'linear-gradient(135deg, #FF6B35, #FF8C42)';
-    }
-    return props.bgColor || 'rgba(255, 255, 255, 0.95)';
-  }};
-  border: ${props => props.isVoted ? '2px solid #FF6B35' : 'none'};
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
+  font-size: 9px;
+  box-shadow: 0 2px 6px rgba(255, 107, 53, 0.4);
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: ${props => props.isVoted ? '0 4px 12px rgba(255, 107, 53, 0.3)' : '0 2px 8px rgba(0, 0, 0, 0.1)'};
-  pointer-events: ${props => props.isVisible ? 'auto' : 'none'};
-  opacity: ${props => props.isVisible ? 1 : 0};
-  transform: ${props => props.isVisible ? 'translateY(0) scale(1)' : 'translateY(-10px) scale(0.8)'};
 
   &:hover {
-    transform: scale(1.1);
-    box-shadow: ${props => props.isVoted ? '0 6px 16px rgba(255, 107, 53, 0.4)' : '0 4px 12px rgba(0, 0, 0, 0.2)'};
-  }
-
-  &:active {
-    transform: scale(0.8);
-    transition: transform 0.1s ease;
+    transform: scale(1.2);
+    box-shadow: 0 3px 8px rgba(255, 107, 53, 0.5);
+    background: #FF5722;
   }
 `;
 
-// Rozet açıklama tooltip
-const BadgeTooltip = styled.div`
-  position: absolute;
-  right: 40px;
-  top: 50%;
-  transform: translateY(-50%);
-  padding: 8px 12px;
-  background: rgba(0, 0, 0, 0.9);
-  color: white;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  white-space: nowrap;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
-  z-index: 20;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-
-  ${BadgeItem}:hover & {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(-50%) scale(1.05);
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    left: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 0;
-    height: 0;
-    border: 6px solid transparent;
-    border-left-color: rgba(0, 0, 0, 0.8);
-  }
-`;
 
 
 
@@ -166,6 +83,181 @@ const PostContent = styled.div`
   padding: 12px 16px;
   background: ${props => props.theme.surface};
   border-top: 1px solid #262626;
+`;
+
+const PinnedCommentsOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(0.5px);
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  
+  ${Card}:hover & {
+    opacity: 1;
+  }
+`;
+
+const PinnedCommentCard = styled.div`
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(5px);
+  border-radius: 8px;
+  padding: 16px 20px;
+  max-width: 300px;
+  width: 85%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  
+  ${PinnedCommentsOverlay}:hover & {
+    transform: translateY(0);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+`;
+
+const PinnedCommentHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+`;
+
+const PinnedIcon = styled.div`
+  width: 16px;
+  height: 16px;
+  background: #FF6B35;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(255, 107, 53, 0.3);
+`;
+
+const PinnedAuthorInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+`;
+
+const PinnedAuthorAvatar = styled.img`
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+`;
+
+const PinnedAuthorName = styled.span`
+  font-size: 11px;
+  font-weight: 500;
+  color: #374151;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+`;
+
+const PinnedCommentText = styled.p`
+  font-size: 14px;
+  line-height: 1.5;
+  color: #374151;
+  margin: 0;
+  font-weight: 400;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-align: left;
+  
+  &::after {
+    content: '...';
+    color: #9CA3AF;
+    font-weight: 600;
+  }
+`;
+
+const PinnedCommentMeta = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, 
+    rgba(255, 107, 53, 0.05) 0%, 
+    rgba(255, 193, 7, 0.05) 50%,
+    rgba(156, 39, 176, 0.05) 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 107, 53, 0.1);
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(255, 107, 53, 0.3) 50%, 
+      transparent 100%);
+  }
+`;
+
+const PinnedCommentAuthor = styled.span`
+  font-size: 14px;
+  color: #4a5568;
+  font-weight: 600;
+  background: linear-gradient(135deg, 
+    #FF6B35 0%, 
+    #9C27B0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+  
+  &::before {
+    content: '👤';
+    margin-right: 6px;
+    font-size: 12px;
+    -webkit-text-fill-color: initial;
+  }
+`;
+
+const PinnedCommentDate = styled.span`
+  font-size: 12px;
+  color: #718096;
+  font-weight: 500;
+  background: linear-gradient(135deg, 
+    #2196F3 0%, 
+    #4CAF50 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+  
+  &::before {
+    content: '📅';
+    margin-right: 4px;
+    font-size: 10px;
+    -webkit-text-fill-color: initial;
+  }
 `;
 
 const PostHeader = styled.div`
@@ -278,6 +370,7 @@ const ModernCommentIcon = styled.div`
   transition: all 0.3s ease;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  opacity: 1;
 
   &:hover {
     background: rgba(255, 255, 255, 1);
@@ -287,6 +380,12 @@ const ModernCommentIcon = styled.div`
 
   &:active {
     transform: scale(0.95);
+  }
+  
+  /* Hover durumunda gizle */
+  ${Card}:hover & {
+    opacity: 0;
+    pointer-events: none;
   }
 `;
 
@@ -322,8 +421,8 @@ const ModernReactionIcon = styled.div`
 // Sağ üst trend ikonları
 const TopRightOverlay = styled.div`
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 8px;
+  right: 8px;
   display: flex;
   gap: 8px;
   z-index: 10;
@@ -688,64 +787,23 @@ const ReactionButton = styled.button`
   }
 `;
 
-const ReactionContainer = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-`;
-
-const ReactionToggle = styled.button`
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  padding: 6px;
-  border-radius: 50%;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${props => props.theme.textSecondary};
-  
-  &:hover {
-    background: rgba(255, 107, 53, 0.1);
-    color: #FF6B35;
-    transform: scale(1.1);
-  }
-`;
-
-const ReactionDropdown = styled.div`
-  position: absolute;
-  top: -60px;
-  left: 0;
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 25px;
-  padding: 8px 12px;
-  display: ${props => props.show ? 'flex' : 'none'};
-  gap: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-`;
 
 const HoverReactionDropdown = styled.div`
   position: absolute;
-  top: -80px;
+  top: 25px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 25px;
-  padding: 12px 16px;
+  border-radius: 20px;
+  padding: 8px 12px;
   display: ${props => props.show ? 'flex' : 'none'};
-  gap: 12px;
+  gap: 8px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   z-index: 1000;
   opacity: 0;
-  transform: translateX(-50%) translateY(10px) scale(0.9);
+  transform: translateX(-50%) translateY(-10px) scale(0.9);
   transition: all 0.3s ease;
 
   ${props => props.show && `
@@ -755,78 +813,58 @@ const HoverReactionDropdown = styled.div`
 `;
 
 
-const ReactionEmoji = styled.button`
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 50%;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  &:hover {
-    background: rgba(255, 107, 53, 0.1);
-    transform: scale(1.2);
-  }
-  
-  &:active {
-    transform: scale(0.9);
-  }
-`;
 
 const HoverReactionEmoji = styled.button`
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 16px;
   cursor: pointer;
-  padding: 8px;
+  padding: 6px;
   border-radius: 50%;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   
   &:hover {
     background: rgba(255, 107, 53, 0.15);
-    transform: scale(1.3);
+    transform: scale(1.1);
   }
   
   &:active {
-    transform: scale(0.9);
+    transform: scale(0.95);
   }
 `;
 
 
-const ReactionDisplay = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-wrap: wrap;
-  margin-top: 8px;
-`;
-
-const ReactionItem = styled.span`
-  background: rgba(255, 107, 53, 0.1);
-  color: #FF6B35;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-`;
 
 
 
 const WorkCard = ({ work }) => {
   const { theme } = useTheme();
   const location = useLocation();
+  const [pinnedComments, setPinnedComments] = useState([]);
+  
+  // Sabitlenmiş yorumları al
+  const getPinnedCommentsForWork = () => {
+    try {
+      const pinnedCommentsIds = JSON.parse(localStorage.getItem('pinnedComments') || '[]');
+      const userComments = JSON.parse(localStorage.getItem('userComments') || '[]');
+      
+      // Bu esere ait sabitlenmiş yorumları filtrele
+      const workPinnedComments = userComments.filter(comment => 
+        pinnedCommentsIds.includes(comment._id) && 
+        String(comment.workId) === String(work._id)
+      );
+      
+      return workPinnedComments;
+    } catch (error) {
+      console.error('Sabitlenmiş yorumlar okuma hatası:', error);
+      return [];
+    }
+  };
   
   // localStorage'dan like durumunu yükle
   const getStoredLikeState = () => {
@@ -874,8 +912,6 @@ const WorkCard = ({ work }) => {
   const [collections, setCollections] = useState([]);
   const [showCollectionModal, setShowCollectionModal] = useState(false);
   
-  const [showBadgeDetails, setShowBadgeDetails] = useState(false);
-  const [visibleBadges, setVisibleBadges] = useState([]);
   
   // Modal state'i
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -898,6 +934,39 @@ const WorkCard = ({ work }) => {
     }
   }, []);
 
+  // Sabitlenmiş yorumları yükle
+  useEffect(() => {
+    setPinnedComments(getPinnedCommentsForWork());
+  }, [work._id]);
+
+  // Sabitlenmiş yorumları dinle
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setPinnedComments(getPinnedCommentsForWork());
+    };
+
+    const handlePinnedCommentsUpdate = () => {
+      setPinnedComments(getPinnedCommentsForWork());
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('pinnedCommentsUpdated', handlePinnedCommentsUpdate);
+    
+    // Periyodik kontrol
+    const interval = setInterval(() => {
+      const currentPinnedComments = getPinnedCommentsForWork();
+      if (JSON.stringify(currentPinnedComments) !== JSON.stringify(pinnedComments)) {
+        setPinnedComments(currentPinnedComments);
+      }
+    }, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('pinnedCommentsUpdated', handlePinnedCommentsUpdate);
+      clearInterval(interval);
+    };
+  }, [work._id, pinnedComments]);
+
   // Eseri koleksiyona ekle/çıkar
   const toggleWorkInCollection = (collectionId) => {
     const updatedCollections = collections.map(collection => {
@@ -917,15 +986,6 @@ const WorkCard = ({ work }) => {
     localStorage.setItem('feellink-collections', JSON.stringify(updatedCollections));
   };
   
-  const getStoredReactions = () => {
-    try {
-      const stored = localStorage.getItem(`reactions_${work._id}`);
-      return stored ? JSON.parse(stored) : {};
-    } catch (error) {
-      console.error('İfade durumu okuma hatası:', error);
-      return {};
-    }
-  };
 
   const getStoredBadgeVotes = () => {
     try {
@@ -944,10 +1004,11 @@ const WorkCard = ({ work }) => {
   const [comments, setComments] = useState([]);
   const [commentLikes, setCommentLikes] = useState(getStoredCommentLikes());
   
-  // İfade state'leri
-  const [reactions, setReactions] = useState(getStoredReactions());
-  const [showReactions, setShowReactions] = useState(false);
+  // Hover reaksiyon state'i
   const [showHoverReactions, setShowHoverReactions] = useState(false);
+  
+  // Trend reaksiyon state'i
+  const [showTrendReactions, setShowTrendReactions] = useState(false);
   
   // Rozet oylama state'leri
   const [badgeVotes, setBadgeVotes] = useState(getStoredBadgeVotes());
@@ -1002,23 +1063,14 @@ const WorkCard = ({ work }) => {
     horizons: { emoji: '🌟', name: 'Yeni Ufuklar Rozeti', color: '#FF00FF' }
   };
 
-  // Trend ikonuna hover fonksiyonu
+  // Trend ikonuna hover fonksiyonu (artık sadece görsel)
   const handleTrendHover = () => {
-    setShowBadgeDetails(true);
-    setVisibleBadges([]);
-    
-    const badgeKeys = Object.keys(badgeTypes);
-    badgeKeys.forEach((key, index) => {
-      setTimeout(() => {
-        setVisibleBadges(prev => [...prev, key]);
-      }, index * 150); // Her rozet 150ms arayla çıksın
-    });
+    // Sadece trend ikonunun görsel efektini aktifleştir
   };
 
   // Trend ikonundan çıkma fonksiyonu
   const handleTrendLeave = () => {
-    setShowBadgeDetails(false);
-    setVisibleBadges([]);
+    // Sadece trend ikonunun görsel efektini deaktifleştir
   };
   
   
@@ -1055,6 +1107,34 @@ const WorkCard = ({ work }) => {
             workComments[work._id] = updatedComments;
             localStorage.setItem('workComments', JSON.stringify(workComments));
             console.log('Yorum localStorage\'a kaydedildi');
+            
+            // Kullanıcı yorumlarını da sakla
+            const userComment = {
+              _id: result.data._id || Date.now().toString(),
+              text: newComment.trim(),
+              workId: work._id,
+              workTitle: work.title,
+              workImage: work.imageUrl,
+              author: {
+                _id: result.data.author?._id || '1',
+                username: result.data.author?.username || 'zeynep_esmer',
+                fullName: result.data.author?.fullName || 'Zeynep Esmer',
+                avatar: result.data.author?.avatar || '/zeynep.jpg'
+              },
+              createdAt: new Date(),
+              isApproved: true,
+              likes: 0
+            };
+            
+            const existingUserComments = JSON.parse(localStorage.getItem('userComments') || '[]');
+            const updatedUserComments = [userComment, ...existingUserComments];
+            localStorage.setItem('userComments', JSON.stringify(updatedUserComments));
+            console.log('Kullanıcı yorumu localStorage\'a kaydedildi');
+            
+            // Profile sayfasını güncellemek için custom event dispatch et
+            window.dispatchEvent(new CustomEvent('userCommentsUpdated', { 
+              detail: { comments: updatedUserComments } 
+            }));
           } catch (error) {
             console.error('Yorum kaydetme hatası:', error);
           }
@@ -1092,31 +1172,6 @@ const WorkCard = ({ work }) => {
     }
   };
   
-  // İfade bırakma fonksiyonu
-  const handleReaction = (emoji) => {
-    const newReactions = { ...reactions };
-    if (newReactions[emoji]) {
-      delete newReactions[emoji];
-    } else {
-      newReactions[emoji] = true;
-    }
-    setReactions(newReactions);
-    localStorage.setItem(`reactions_${work._id}`, JSON.stringify(newReactions));
-    setShowReactions(false);
-  };
-  
-  // Hover ifade bırakma fonksiyonu
-  const handleHoverReaction = (emoji) => {
-    const newReactions = { ...reactions };
-    if (newReactions[emoji]) {
-      delete newReactions[emoji];
-    } else {
-      newReactions[emoji] = true;
-    }
-    setReactions(newReactions);
-    localStorage.setItem(`reactions_${work._id}`, JSON.stringify(newReactions));
-    setShowHoverReactions(false);
-  };
 
   // Rozet oylama fonksiyonu
   const handleBadgeVote = (badgeKey) => {
@@ -1128,6 +1183,9 @@ const WorkCard = ({ work }) => {
     }
     setBadgeVotes(newBadgeVotes);
     localStorage.setItem(`badgeVotes_${work._id}`, JSON.stringify(newBadgeVotes));
+    
+    // Trend dropdown'ını kapat
+    setShowTrendReactions(false);
     
     // Görsel feedback için rozet animasyonu
     const badgeElement = document.querySelector(`[data-badge="${badgeKey}"]`);
@@ -1271,12 +1329,34 @@ const WorkCard = ({ work }) => {
   const mockCaption = work.description || `${work.title} - Bu eser bana ilham veriyor ✨`;
   const mockLikes = likeCount;
   // const mockComments = Math.floor(Math.random() * 50) + 10;
-  const mockViews = work.views || 1000; // Sabit değer kullan
+  const mockViews = work.views || 0; // Gerçek görüntülenme sayısını kullan
 
   return (
     <>
     <Card onClick={() => setIsModalOpen(true)}>
       <ImageContainer>
+        {/* Sabitlenmiş Yorumlar - Hover Overlay */}
+        {pinnedComments.length > 0 && (
+          <PinnedCommentsOverlay>
+            <PinnedCommentCard theme={theme}>
+              <PinnedCommentHeader>
+                <PinnedIcon>📌</PinnedIcon>
+                <PinnedAuthorInfo>
+                  <PinnedAuthorAvatar 
+                    src={pinnedComments[0].author?.avatar || '/zeynep.jpg'} 
+                    alt={pinnedComments[0].author?.username || 'Kullanıcı'}
+                  />
+                  <PinnedAuthorName>
+                    {pinnedComments[0].author?.fullName || pinnedComments[0].author?.username || 'Kullanıcı'}
+                  </PinnedAuthorName>
+                </PinnedAuthorInfo>
+              </PinnedCommentHeader>
+              <PinnedCommentText theme={theme}>
+                {pinnedComments[0].text}
+              </PinnedCommentText>
+            </PinnedCommentCard>
+          </PinnedCommentsOverlay>
+        )}
         {mainImage ? (
           <WorkImage 
             src={mainImage.url} 
@@ -1309,25 +1389,6 @@ const WorkCard = ({ work }) => {
               <FiMessageCircle size={20} />
             </ModernCommentIcon>
             
-            {/* İfade ikonu */}
-            <ModernReactionIcon 
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowHoverReactions(!showHoverReactions);
-              }}
-              onMouseEnter={() => setShowHoverReactions(true)}
-              onMouseLeave={() => setShowHoverReactions(false)}
-            >
-              😊
-              <HoverReactionDropdown show={showHoverReactions}>
-                <HoverReactionEmoji onClick={() => handleHoverReaction('❤️')}>❤️</HoverReactionEmoji>
-                <HoverReactionEmoji onClick={() => handleHoverReaction('😍')}>😍</HoverReactionEmoji>
-                <HoverReactionEmoji onClick={() => handleHoverReaction('🤩')}>🤩</HoverReactionEmoji>
-                <HoverReactionEmoji onClick={() => handleHoverReaction('😮')}>😮</HoverReactionEmoji>
-                <HoverReactionEmoji onClick={() => handleHoverReaction('😢')}>😢</HoverReactionEmoji>
-                <HoverReactionEmoji onClick={() => handleHoverReaction('😂')}>😂</HoverReactionEmoji>
-              </HoverReactionDropdown>
-            </ModernReactionIcon>
           </div>
         </CenterOverlay>
         
@@ -1337,35 +1398,30 @@ const WorkCard = ({ work }) => {
             onMouseEnter={handleTrendHover}
             onMouseLeave={handleTrendLeave}
           >
-            <TrendIcon>
-              <FiTrendingUp />
-            </TrendIcon>
-            
-            <BadgeDetails 
-              show={showBadgeDetails}
-              data-badge-details="true"
-              onMouseEnter={() => setShowBadgeDetails(true)}
-              onMouseLeave={() => {
-                setShowBadgeDetails(false);
-                setVisibleBadges([]);
+            <TrendIcon
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowTrendReactions(!showTrendReactions);
               }}
             >
+              <FiTrendingUp />
+              <HoverReactionDropdown show={showTrendReactions}>
+                {/* Badge ikonları */}
               {Object.entries(badgeTypes).map(([key, badge]) => (
-                <BadgeItem 
+                  <HoverReactionEmoji 
                   key={key} 
-                  bgColor={badge.color}
-                  isVisible={visibleBadges.includes(key)}
-                  isVoted={badgeVotes[key]}
-                  onClick={() => handleBadgeVote(key)}
-                  data-badge={key}
+                    onClick={() => handleBadgeVote(key)}
+                    style={{ 
+                      background: badge.color,
+                      color: 'white',
+                      fontSize: '18px'
+                    }}
                 >
                   {badge.emoji}
-                  <BadgeTooltip>
-                    {badge.name}
-                  </BadgeTooltip>
-                </BadgeItem>
+                  </HoverReactionEmoji>
               ))}
-            </BadgeDetails>
+              </HoverReactionDropdown>
+            </TrendIcon>
           </TopRightOverlay>
         )}
         
@@ -1517,36 +1573,8 @@ const WorkCard = ({ work }) => {
                 )}
               </div>
               
-              {/* İfade butonları */}
-              <ReactionContainer>
-                <ReactionToggle 
-                  theme={theme}
-                  onClick={() => setShowReactions(!showReactions)}
-                >
-                  😊
-                </ReactionToggle>
-                
-                <ReactionDropdown show={showReactions}>
-                  <ReactionEmoji onClick={() => handleReaction('❤️')}>❤️</ReactionEmoji>
-                  <ReactionEmoji onClick={() => handleReaction('😍')}>😍</ReactionEmoji>
-                  <ReactionEmoji onClick={() => handleReaction('🤩')}>🤩</ReactionEmoji>
-                  <ReactionEmoji onClick={() => handleReaction('😮')}>😮</ReactionEmoji>
-                  <ReactionEmoji onClick={() => handleReaction('😢')}>😢</ReactionEmoji>
-                  <ReactionEmoji onClick={() => handleReaction('😂')}>😂</ReactionEmoji>
-                </ReactionDropdown>
-              </ReactionContainer>
             </ModalActions>
             
-            {/* İfade gösterimi */}
-            {Object.keys(reactions).length > 0 && (
-              <ReactionDisplay>
-                {Object.keys(reactions).map(emoji => (
-                  <ReactionItem key={emoji}>
-                    {emoji}
-                  </ReactionItem>
-                ))}
-              </ReactionDisplay>
-            )}
             
             <ModalComments theme={theme}>
               {comments.length > 0 ? (

@@ -197,11 +197,126 @@ const Avatar = styled.div`
   font-weight: 700;
   border: 3px solid ${props => props.theme.border};
   flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  transform: ${props => props.expanded ? 'scale(1.2)' : 'scale(1)'};
+  z-index: ${props => props.expanded ? '1000' : '1'};
+  position: ${props => props.expanded ? 'relative' : 'static'};
+
+  &:hover {
+    transform: ${props => props.expanded ? 'scale(1.2)' : 'scale(1.05)'};
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
 
   @media (max-width: 768px) {
     width: 120px;
     height: 120px;
     font-size: 2.5rem;
+  }
+`;
+
+const AvatarOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: ${props => props.show ? 'flex' : 'none'};
+  align-items: center;
+  justify-content: center;
+  animation: ${props => props.show ? 'fadeIn' : 'fadeOut'} 0.3s ease;
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+`;
+
+const ExpandedAvatar = styled.img`
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid white;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  animation: ${props => props.show ? 'scaleIn' : 'scaleOut'} 0.3s ease;
+
+  @keyframes scaleIn {
+    from { 
+      transform: scale(0.5);
+      opacity: 0;
+    }
+    to { 
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes scaleOut {
+    from { 
+      transform: scale(1);
+      opacity: 1;
+    }
+    to { 
+      transform: scale(0.5);
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 768px) {
+    width: 250px;
+    height: 250px;
+  }
+`;
+
+const ExpandedAvatarText = styled.div`
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: ${props => props.theme.gradient};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 6rem;
+  font-weight: 700;
+  border: 5px solid white;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  animation: ${props => props.show ? 'scaleIn' : 'scaleOut'} 0.3s ease;
+
+  @keyframes scaleIn {
+    from { 
+      transform: scale(0.5);
+      opacity: 0;
+    }
+    to { 
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes scaleOut {
+    from { 
+      transform: scale(1);
+      opacity: 1;
+    }
+    to { 
+      transform: scale(0.5);
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 768px) {
+    width: 250px;
+    height: 250px;
+    font-size: 5rem;
   }
 `;
 
@@ -212,6 +327,16 @@ const AvatarImg = styled.img`
   object-fit: cover;
   border: 3px solid ${props => props.theme.border};
   flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  transform: ${props => props.expanded ? 'scale(1.2)' : 'scale(1)'};
+  z-index: ${props => props.expanded ? '1000' : '1'};
+  position: ${props => props.expanded ? 'relative' : 'static'};
+
+  &:hover {
+    transform: ${props => props.expanded ? 'scale(1.2)' : 'scale(1.05)'};
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
 
   @media (max-width: 768px) {
     width: 120px;
@@ -899,8 +1024,8 @@ const ConfirmContent = styled.div`
   background: #fff;
   border: 2px solid #ff6b35;
   border-radius: 16px;
-  padding: 32px;
-  max-width: 450px;
+  padding: 24px;
+  max-width: 320px;
   text-align: center;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
   transform: ${props => props.show ? 'scale(1)' : 'scale(0.8)'};
@@ -1050,8 +1175,8 @@ const mockProfile = {
   website: 'zeynepesmer.com',
   location: 'İstanbul, Türkiye',
   avatar: '/zeynep.jpg',
-  followers: 2847,
-  following: 156,
+  followers: 0,
+  following: 0,
   posts: 42,
   isFollowing: false,
   isOwnProfile: true
@@ -1069,73 +1194,23 @@ const Profile = () => {
   const [showFollowingModal, setShowFollowingModal] = useState(false);
   
   // Mock takipçi ve takip edilen kullanıcı verileri
-  const mockFollowers = [
-    {
-      _id: '1',
-      username: 'testuser',
-      fullName: 'Test User',
-      avatar: '/sude.jpg',
-      isVerified: false,
-      isFollowing: false
-    },
-    {
-      _id: '2',
-      username: 'designer',
-      fullName: 'Designer Pro',
-      avatar: '/leo1.jpg',
-      isVerified: true,
-      isFollowing: true
-    },
-    {
-      _id: '3',
-      username: 'artist_lover',
-      fullName: 'Art Lover',
-      avatar: '/leo2.jpeg',
-      isVerified: false,
-      isFollowing: false
-    },
-    {
-      _id: '4',
-      username: 'creative_mind',
-      fullName: 'Creative Mind',
-      avatar: '/picasso.webp',
-      isVerified: true,
-      isFollowing: true
-    }
-  ];
+  const mockFollowers = [];
   
-  const mockFollowing = [
-    {
-      _id: '5',
-      username: 'famous_artist',
-      fullName: 'Famous Artist',
-      avatar: '/t1.jpg',
-      isVerified: true,
-      isFollowing: true
-    },
-    {
-      _id: '6',
-      username: 'modern_art',
-      fullName: 'Modern Art',
-      avatar: '/t2.webp',
-      isVerified: false,
-      isFollowing: true
-    },
-    {
-      _id: '7',
-      username: 'digital_creator',
-      fullName: 'Digital Creator',
-      avatar: '/t3.jpg',
-      isVerified: true,
-      isFollowing: true
-    }
-  ];
+  const mockFollowing = [];
   
   const [followers, setFollowers] = useState(mockFollowers);
   const [following, setFollowing] = useState(mockFollowing);
   const [hoveredWorkId, setHoveredWorkId] = useState(null);
   const [message, setMessage] = useState({ text: '', type: '', show: false });
   const [confirmModal, setConfirmModal] = useState({ show: false, title: '', message: '', onConfirm: null });
+  const [isAvatarExpanded, setIsAvatarExpanded] = useState(false);
+  
+  // Yorum filtreleri ve sabitleme state'leri
+  const [commentFilter, setCommentFilter] = useState('all'); // 'all', 'most_interactive'
+  const [pinnedComments, setPinnedComments] = useState([]);
+  
+  // Sağ tık menüsü
+  const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, commentId: null });
   
   // Mesaj gösterme fonksiyonu
   const showMessage = (text, type = 'success') => {
@@ -1163,6 +1238,119 @@ const Profile = () => {
     closeConfirmModal();
   };
   
+  // localStorage'dan yorum filtrelerini yükle
+  const getStoredCommentFilter = () => {
+    try {
+      return localStorage.getItem('commentFilter') || 'all';
+    } catch (error) {
+      console.error('Yorum filtresi yüklenirken hata:', error);
+      return 'all';
+    }
+  };
+
+  // localStorage'dan sabitlenmiş yorumları yükle
+  const getStoredPinnedComments = () => {
+    try {
+      const stored = localStorage.getItem('pinnedComments');
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      console.error('Sabitlenmiş yorumlar yüklenirken hata:', error);
+      return [];
+    }
+  };
+
+  // Yorum sabitleme fonksiyonu
+  const togglePinComment = (commentId) => {
+    const isCurrentlyPinned = pinnedComments.includes(commentId);
+    
+    if (isCurrentlyPinned) {
+      // Sabitlemeyi kaldır
+      const newPinnedComments = pinnedComments.filter(id => id !== commentId);
+      setPinnedComments(newPinnedComments);
+      localStorage.setItem('pinnedComments', JSON.stringify(newPinnedComments));
+      
+      // Custom event dispatch et
+      window.dispatchEvent(new CustomEvent('pinnedCommentsUpdated', { 
+        detail: { pinnedComments: newPinnedComments } 
+      }));
+    } else {
+      // Yeni sabitleme - 3 yorum sınırını kontrol et
+      if (pinnedComments.length >= 3) {
+        showMessage('En fazla 3 yorum sabitleyebilirsiniz', 'error');
+        return;
+      }
+      
+      // Sabitle
+      const newPinnedComments = [...pinnedComments, commentId];
+      setPinnedComments(newPinnedComments);
+      localStorage.setItem('pinnedComments', JSON.stringify(newPinnedComments));
+      
+      // Custom event dispatch et
+      window.dispatchEvent(new CustomEvent('pinnedCommentsUpdated', { 
+        detail: { pinnedComments: newPinnedComments } 
+      }));
+    }
+  };
+
+  // Sağ tık menüsü fonksiyonları
+  const handleContextMenu = (e, commentId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+      commentId: commentId
+    });
+  };
+
+  const hideContextMenu = () => {
+    setContextMenu({ visible: false, x: 0, y: 0, commentId: null });
+  };
+
+  const handlePinFromMenu = (commentId) => {
+    togglePinComment(commentId);
+    hideContextMenu();
+  };
+
+  const handleDeleteFromMenu = (commentId) => {
+    // Yorum silme işlemi
+    const updatedComments = userComments.filter(comment => comment._id !== commentId);
+    setUserComments(updatedComments);
+    localStorage.setItem('userComments', JSON.stringify(updatedComments));
+    
+    // Sabitlenmiş yorumlar listesinden de kaldır
+    const updatedPinnedComments = pinnedComments.filter(id => id !== commentId);
+    setPinnedComments(updatedPinnedComments);
+    localStorage.setItem('pinnedComments', JSON.stringify(updatedPinnedComments));
+    
+    hideContextMenu();
+  };
+
+  // Filtre değiştirme fonksiyonu
+  const handleFilterChange = (newFilter) => {
+    setCommentFilter(newFilter);
+    localStorage.setItem('commentFilter', newFilter);
+  };
+
+  // Yorum filtreleme fonksiyonu
+  const filterComments = (comments) => {
+    if (commentFilter === 'most_interactive') {
+      // En çok etkileşim alan yorumları (beğeni sayısına göre sırala)
+      return comments.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+    }
+    return comments; // 'all' için tüm yorumlar
+  };
+
+  // Sabitlenmiş yorumları başa al
+  const sortCommentsWithPinned = (comments) => {
+    const pinned = comments.filter(comment => pinnedComments.includes(comment._id));
+    const unpinned = comments.filter(comment => !pinnedComments.includes(comment._id));
+    
+    return [...pinned, ...filterComments(unpinned)];
+  };
+
   // localStorage'dan takip durumunu yükle
   const getStoredFollowState = () => {
     try {
@@ -1184,7 +1372,6 @@ const Profile = () => {
   const [showWorkUpload, setShowWorkUpload] = useState(false);
   const [workTitle, setWorkTitle] = useState('');
   const [workDescription, setWorkDescription] = useState('');
-  const [workCategory, setWorkCategory] = useState('');
   const [workFile, setWorkFile] = useState(null);
   const [workPreviewUrl, setWorkPreviewUrl] = useState(null);
   const workFileInputRef = useRef(null);
@@ -1198,6 +1385,20 @@ const Profile = () => {
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState([]);
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [userComments, setUserComments] = useState([]);
+
+  // Filtre sayılarını hesapla
+  const getFilterCounts = () => {
+    const totalCount = userComments.length;
+    const mostInteractiveCount = userComments.filter(comment => (comment.likes || 0) > 0).length;
+    
+    return {
+      all: totalCount,
+      most_interactive: mostInteractiveCount
+    };
+  };
+
+  const filterCounts = getFilterCounts();
 
   // localStorage'dan profil fotoğrafını yükle
   const getStoredProfilePhoto = () => {
@@ -1208,11 +1409,92 @@ const Profile = () => {
       return mockProfile.avatar;
     }
   };
-  
-  const profile = {
-    ...mockProfile,
-    avatar: getStoredProfilePhoto()
+
+  // localStorage'dan kullanıcı yorumlarını yükle
+  const getStoredUserComments = () => {
+    try {
+      const stored = localStorage.getItem('userComments');
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      console.error('Kullanıcı yorumları okuma hatası:', error);
+      return [];
+    }
   };
+
+  // localStorage'dan profil verilerini yükle
+  const getStoredProfileData = () => {
+    try {
+      const storedProfile = localStorage.getItem('userProfile');
+      if (storedProfile) {
+        const parsedProfile = JSON.parse(storedProfile);
+        return {
+          ...mockProfile,
+          ...parsedProfile,
+          avatar: getStoredProfilePhoto() // Fotoğrafı ayrı key'den al
+        };
+      }
+    } catch (error) {
+      console.error('Profil verileri okuma hatası:', error);
+    }
+    return {
+      ...mockProfile,
+      avatar: getStoredProfilePhoto()
+    };
+  };
+  
+  const [profile, setProfile] = useState(getStoredProfileData());
+  
+  // Kullanıcı yorumlarını yükle
+  React.useEffect(() => {
+    setUserComments(getStoredUserComments());
+    setCommentFilter(getStoredCommentFilter());
+    setPinnedComments(getStoredPinnedComments());
+  }, []);
+
+  // Sağ tık menüsünü kapatma
+  React.useEffect(() => {
+    const handleClickOutside = () => {
+      if (contextMenu.visible) {
+        hideContextMenu();
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    document.addEventListener('contextmenu', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('contextmenu', handleClickOutside);
+    };
+  }, [contextMenu.visible]);
+
+  // localStorage'dan kullanıcı yorumlarını dinle
+  React.useEffect(() => {
+    const handleStorageChange = () => {
+      setUserComments(getStoredUserComments());
+    };
+
+    const handleUserCommentsUpdate = (event) => {
+      setUserComments(event.detail.comments);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('userCommentsUpdated', handleUserCommentsUpdate);
+    
+    // Sayfa içi değişiklikleri de dinle
+    const interval = setInterval(() => {
+      const currentComments = getStoredUserComments();
+      if (JSON.stringify(currentComments) !== JSON.stringify(userComments)) {
+        setUserComments(currentComments);
+      }
+    }, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('userCommentsUpdated', handleUserCommentsUpdate);
+      clearInterval(interval);
+    };
+  }, [userComments]);
   
   // localStorage'dan eserleri yükle, yoksa orijinal mock data'yı kullan
   const getStoredWorks = () => {
@@ -1246,24 +1528,12 @@ const Profile = () => {
   
   // Takipçi sayısını hesapla
   const getFollowersCount = () => {
-    try {
-      const stored = localStorage.getItem('followersCount');
-      return stored ? parseInt(stored) : profile.followers;
-    } catch (error) {
-      console.error('Takipçi sayısı okuma hatası:', error);
-      return profile.followers;
-    }
+    return profile.followers; // Her zaman 0 döndür (launch için)
   };
   
   // Takip ettiğim sayısını hesapla
   const getFollowingCount = () => {
-    try {
-      const stored = localStorage.getItem('followingCount');
-      return stored ? parseInt(stored) : profile.following;
-    } catch (error) {
-      console.error('Takip ettiğim sayısı okuma hatası:', error);
-      return profile.following;
-    }
+    return profile.following; // Her zaman 0 döndür (launch için)
   };
   
   // Sayıları güncelle
@@ -1275,6 +1545,12 @@ const Profile = () => {
   
   // Component mount olduğunda sayıları güncelle
   React.useEffect(() => {
+    // Takip sayılarını sıfırla (launch için)
+    localStorage.removeItem('followersCount');
+    localStorage.removeItem('followingCount');
+    localStorage.removeItem('followersData');
+    localStorage.removeItem('followingData');
+    
     updateCounts();
     
     // localStorage'dan takip verilerini yükle
@@ -1292,6 +1568,22 @@ const Profile = () => {
       console.error('localStorage takip verileri yükleme hatası:', error);
     }
   }, [updateCounts]);
+
+  // localStorage'dan güncellenmiş profil verilerini yükle
+  React.useEffect(() => {
+    try {
+      const storedProfile = localStorage.getItem('userProfile');
+      if (storedProfile) {
+        const updatedProfile = JSON.parse(storedProfile);
+        setProfile(prevProfile => ({
+          ...prevProfile,
+          ...updatedProfile
+        }));
+      }
+    } catch (error) {
+      console.error('localStorage profil verileri yükleme hatası:', error);
+    }
+  }, []);
 
   const handleFollow = () => {
     const newFollowState = !isFollowing;
@@ -1449,6 +1741,28 @@ const Profile = () => {
         const workComments = JSON.parse(localStorage.getItem('workComments') || '{}');
         workComments[selectedWork._id] = updatedComments;
         localStorage.setItem('workComments', JSON.stringify(workComments));
+        
+        // Kullanıcı yorumlarını da sakla
+        const userComment = {
+          _id: Date.now().toString(),
+          text: newComment,
+          workId: selectedWork._id,
+          workTitle: selectedWork.title,
+          workImage: selectedWork.imageUrl,
+          author: {
+            _id: currentUser?._id || '1',
+            username: currentUser?.username || 'zeynep_esmer',
+            fullName: currentUser?.fullName || 'Zeynep Esmer',
+            avatar: currentUser?.avatar || '/zeynep.jpg'
+          },
+          createdAt: new Date(),
+          isApproved: true,
+          likes: 0
+        };
+        
+        const updatedUserComments = [userComment, ...userComments];
+        setUserComments(updatedUserComments);
+        localStorage.setItem('userComments', JSON.stringify(updatedUserComments));
       } catch (error) {
         console.error('Yorum kaydetme hatası:', error);
       }
@@ -1482,8 +1796,21 @@ const Profile = () => {
         localStorage.setItem('userProfilePhoto', previewUrl);
         console.log('Profil fotoğrafı localStorage\'a kaydedildi');
         
+        // Profil state'ini güncelle
+        setProfile(prevProfile => ({
+          ...prevProfile,
+          avatar: previewUrl
+        }));
+        
         // Mock profil fotoğrafını güncelle
         mockProfile.avatar = previewUrl;
+        
+        // Profil verilerini de güncelle (EditProfile.js ile aynı key kullan)
+        const updatedProfile = {
+          ...profile,
+          avatar: previewUrl
+        };
+        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
         
         // Modal'ı kapat ve formu temizle
         setShowPhotoUpload(false);
@@ -1536,7 +1863,7 @@ const Profile = () => {
         _id: `work_${Date.now()}`,
         title: workTitle,
         description: workDescription || '',
-        category: workCategory || 'diger',
+        category: 'diger',
         imageUrl: workPreviewUrl,
         author: {
           _id: currentUser?._id || '1',
@@ -1565,18 +1892,20 @@ const Profile = () => {
       // Sayıları güncelle
       updateCounts();
       
-      // Modal'ı kapat ve formu temizle
-      setShowWorkUpload(false);
-      setWorkTitle('');
-      setWorkDescription('');
-      setWorkCategory('');
-      setWorkFile(null);
-      setWorkPreviewUrl(null);
-      if (workFileInputRef.current) {
-        workFileInputRef.current.value = '';
-      }
-      
+      // Başarı mesajını göster
       showMessage('Eser başarıyla eklendi ve kaydedildi!', 'success');
+      
+      // Modal'ı kapat ve formu temizle (mesaj gösterildikten sonra)
+      setTimeout(() => {
+        setShowWorkUpload(false);
+        setWorkTitle('');
+        setWorkDescription('');
+        setWorkFile(null);
+        setWorkPreviewUrl(null);
+        if (workFileInputRef.current) {
+          workFileInputRef.current.value = '';
+        }
+      }, 1500); // 1.5 saniye bekle
     } else {
       showMessage('Lütfen eser başlığı ve dosya seçin.', 'error');
     }
@@ -1607,8 +1936,6 @@ const Profile = () => {
         
         // Sayıları güncelle
         updateCounts();
-        
-        showMessage('Eser başarıyla silindi!', 'success');
       }
     );
   };
@@ -1617,7 +1944,6 @@ const Profile = () => {
     setShowWorkUpload(false);
     setWorkTitle('');
     setWorkDescription('');
-    setWorkCategory('');
     setWorkFile(null);
     setWorkPreviewUrl(null);
     if (workFileInputRef.current) {
@@ -1669,13 +1995,23 @@ const Profile = () => {
       <MainLayout>
         <Content theme={theme}>
           <ContentInner>
-            <ProfileContainer theme={theme}>
+      <ProfileContainer theme={theme}>
         <ProfileHeader theme={theme}>
           <AvatarSection>
             {profile.avatar ? (
-              <AvatarImg src={profile.avatar} alt={profile.fullName} theme={theme} />
+              <AvatarImg 
+                src={profile.avatar} 
+                alt={profile.fullName} 
+                theme={theme}
+                expanded={isAvatarExpanded}
+                onClick={() => setIsAvatarExpanded(!isAvatarExpanded)}
+              />
             ) : (
-              <Avatar theme={theme}>
+              <Avatar 
+                theme={theme}
+                expanded={isAvatarExpanded}
+                onClick={() => setIsAvatarExpanded(!isAvatarExpanded)}
+              >
                 {profile.fullName.charAt(0).toUpperCase()}
               </Avatar>
             )}
@@ -1689,26 +2025,26 @@ const Profile = () => {
           <ProfileInfo>
             <ProfileTop>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Username theme={theme}>{profile.username}</Username>
+              <Username theme={theme}>{profile.username}</Username>
                 <div 
                   style={{ 
                     position: 'relative',
-                    fontSize: '18px',
-                    backgroundColor: 'rgba(255, 105, 180, 1)',
+                    fontSize: '16px',
+                    backgroundColor: '#4CAF50',
                     borderRadius: '50%',
-                    width: '28px',
-                    height: '28px',
+                    width: '24px',
+                    height: '24px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
-                    boxShadow: '0 2px 8px rgba(255, 105, 180, 0.4)'
+                    boxShadow: '0 2px 8px rgba(76, 175, 80, 0.4)'
                   }}
-                  title="Sanatın Yankısı Rozeti"
+                  title="Kullanıcı Rozeti"
                   onMouseEnter={(e) => {
                     const tooltip = document.createElement('div');
-                    tooltip.id = 'rozet-tooltip';
+                    tooltip.id = 'user-badge-tooltip';
                     tooltip.style.cssText = `
                       position: absolute;
                       bottom: 35px;
@@ -1725,17 +2061,17 @@ const Profile = () => {
                       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
                       animation: fadeIn 0.3s ease;
                     `;
-                    tooltip.textContent = 'Sanatın Yankısı Rozeti';
+                    tooltip.textContent = 'Kullanıcı Rozeti';
                     e.target.appendChild(tooltip);
                   }}
                   onMouseLeave={(e) => {
-                    const tooltip = document.getElementById('rozet-tooltip');
+                    const tooltip = document.getElementById('user-badge-tooltip');
                     if (tooltip) {
                       tooltip.remove();
                     }
                   }}
                 >
-                  ✨
+                  👤
                 </div>
               </div>
             </ProfileTop>
@@ -1789,7 +2125,7 @@ const Profile = () => {
                   </ActionButton>
                   <ActionButton theme={theme} primary onClick={handleWorkUpload}>
                     <FiPlus size={14} />
-                    Eser Ekle
+                    Gönderi Ekle
                   </ActionButton>
                 </>
               ) : (
@@ -1828,7 +2164,23 @@ const Profile = () => {
             onClick={() => setActiveTab('posts')}
           >
             <FiGrid size={12} />
-            Eserler ({works.length})
+            Gönderiler ({works.length})
+          </Tab>
+          <Tab 
+            theme={theme} 
+            active={activeTab === 'comments'}
+            onClick={() => setActiveTab('comments')}
+          >
+            <FiMessageCircle size={12} />
+            Yorumlar ({userComments.length})
+          </Tab>
+          <Tab 
+            theme={theme} 
+            active={activeTab === 'favorites'}
+            onClick={() => setActiveTab('favorites')}
+          >
+            <FiHeart size={12} />
+            Favori Müzeleri (0)
           </Tab>
           <Tab 
             theme={theme} 
@@ -1911,10 +2263,219 @@ const Profile = () => {
             </EmptyDescription>
           </EmptyState>
         )}
-            </ProfileContainer>
+
+        {activeTab === 'comments' && (
+          userComments.length > 0 ? (
+            <div style={{ padding: '20px 0' }}>
+              {/* Yorum Filtreleri */}
+              <div style={{ 
+                display: 'flex',
+                gap: '8px',
+                marginBottom: '20px',
+                padding: '0 4px',
+                alignItems: 'center'
+              }}>
+                <button
+                  onClick={() => handleFilterChange('most_interactive')}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '20px',
+                    border: 'none',
+                    background: commentFilter === 'most_interactive' 
+                      ? '#ff6b35' 
+                      : (theme.isDark ? '#404040' : '#f0f0f0'),
+                    color: commentFilter === 'most_interactive' 
+                      ? 'white' 
+                      : theme.text,
+                    fontSize: '14px',
+                    fontWeight: commentFilter === 'most_interactive' ? '600' : '400',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  En Çok Etkileşim ({filterCounts.most_interactive})
+                </button>
+                <button
+                  onClick={() => handleFilterChange('all')}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: '20px',
+                    border: 'none',
+                    background: commentFilter === 'all' 
+                      ? '#ff6b35' 
+                      : (theme.isDark ? '#404040' : '#f0f0f0'),
+                    color: commentFilter === 'all' 
+                      ? 'white' 
+                      : theme.text,
+                    fontSize: '14px',
+                    fontWeight: commentFilter === 'all' ? '600' : '400',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  Tümü ({filterCounts.all})
+                </button>
+                
+                {/* Sabitlenmiş Yorum Sayısı İndikatörü */}
+                {pinnedComments.length > 0 && (
+                  <div style={{
+                    marginLeft: 'auto',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '6px 12px',
+                    background: theme.isDark ? '#2a2a2a' : '#f0f0f0',
+                    borderRadius: '16px',
+                    fontSize: '12px',
+                    color: theme.text,
+                    border: `1px solid ${theme.isDark ? '#404040' : '#e0e0e0'}`
+                  }}>
+                    <span>📌</span>
+                    <span>{pinnedComments.length}/3 sabitlenmiş</span>
+                  </div>
+                )}
+              </div>
+
+              <div style={{ 
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px'
+              }}>
+                {sortCommentsWithPinned(userComments).map((comment) => (
+                  <div 
+                    key={comment._id} 
+                    style={{
+                      background: theme.isDark ? '#2a2a2a' : '#f8f9fa',
+                      borderRadius: '8px',
+                      padding: '16px',
+                      border: `1px solid ${theme.isDark ? '#404040' : '#e9ecef'}`,
+                      borderLeft: pinnedComments.includes(comment._id) 
+                        ? `4px solid #ff6b35` 
+                        : `1px solid ${theme.isDark ? '#404040' : '#e9ecef'}`,
+                      transition: 'all 0.3s ease',
+                      cursor: 'pointer',
+                      position: 'relative',
+                      '&:hover': {
+                        background: theme.isDark ? '#333' : '#e9ecef'
+                      }
+                    }}
+                    onClick={() => {
+                      // Önce profil eserlerinde ara, sonra tüm eserlerde ara
+                      let work = works.find(w => String(w._id || w.id) === String(comment.workId));
+                      
+                      // Profil eserlerinde bulunamazsa, tüm eserlerde ara
+                      if (!work) {
+                        work = originalMockWorks.find(w => String(w._id || w.id) === String(comment.workId));
+                      }
+                      
+                      // Eser bulunursa modal aç
+                      if (work) {
+                        setSelectedWork(work);
+                        setIsLiked(false);
+                        setLikeCount(work.likeCount || work.likes?.length || 0);
+                        setIsSaved(false);
+                        setComments([]);
+                        setIsModalOpen(true);
+                      }
+                    }}
+                    onContextMenu={(e) => handleContextMenu(e, comment._id)}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = theme.isDark ? '#333' : '#e9ecef';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = theme.isDark ? '#2a2a2a' : '#f8f9fa';
+                    }}
+                  >
+
+                    {/* Sabitlenmiş İndikatörü */}
+                    {pinnedComments.includes(comment._id) && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '12px',
+                        left: '12px',
+                        background: '#ff6b35',
+                        color: 'white',
+                        fontSize: '10px',
+                        padding: '2px 6px',
+                        borderRadius: '10px',
+                        fontWeight: '600'
+                      }}>
+                        SABİTLENMİŞ
+                      </div>
+                    )}
+
+                    <div style={{ 
+                      color: theme.text,
+                      fontSize: '14px',
+                      lineHeight: '1.4',
+                      marginBottom: '8px',
+                      paddingRight: '40px',
+                      paddingTop: pinnedComments.includes(comment._id) ? '20px' : '0'
+                    }}>
+                      {comment.text}
+                    </div>
+                    
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'space-between',
+                      fontSize: '12px',
+                      color: theme.isDark ? '#888' : '#666'
+                    }}>
+                      <span>📅 {new Date(comment.createdAt).toLocaleDateString('tr-TR')}</span>
+                      <span>🎨 {comment.workTitle}</span>
+                      {comment.likes > 0 && (
+                        <span>❤️ {comment.likes}</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <EmptyState theme={theme}>
+              <EmptyIcon>💬</EmptyIcon>
+              <EmptyTitle theme={theme}>Yorumlarınız</EmptyTitle>
+              <EmptyDescription theme={theme}>
+                Eserlere yaptığınız yorumlar burada görünecek.
+              </EmptyDescription>
+            </EmptyState>
+          )
+        )}
+
+        {activeTab === 'favorites' && (
+          <EmptyState theme={theme}>
+            <EmptyIcon>🏛️</EmptyIcon>
+            <EmptyTitle theme={theme}>Favori müzeleriniz</EmptyTitle>
+            <EmptyDescription theme={theme}>
+              Beğendiğiniz müzeler burada görünecek.
+            </EmptyDescription>
+          </EmptyState>
+        )}
+      </ProfileContainer>
           </ContentInner>
         </Content>
       </MainLayout>
+
+      {/* Avatar Expansion Overlay */}
+      <AvatarOverlay show={isAvatarExpanded} onClick={() => setIsAvatarExpanded(false)}>
+        {profile.avatar ? (
+          <ExpandedAvatar 
+            src={profile.avatar} 
+            alt={profile.fullName}
+            show={isAvatarExpanded}
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : (
+          <ExpandedAvatarText 
+            theme={theme}
+            show={isAvatarExpanded}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {profile.fullName.charAt(0).toUpperCase()}
+          </ExpandedAvatarText>
+        )}
+      </AvatarOverlay>
 
       {/* Fotoğraf Yükleme Modalı */}
       {showPhotoUpload && (
@@ -1972,7 +2533,7 @@ const Profile = () => {
       {showWorkUpload && (
         <WorkUploadModal onClick={handleCancelWork}>
           <WorkUploadContent theme={theme} onClick={(e) => e.stopPropagation()}>
-            <WorkUploadTitle theme={theme}>Yeni Eser Ekle</WorkUploadTitle>
+            <WorkUploadTitle theme={theme}>Yeni Gönderi Ekle</WorkUploadTitle>
             
             <WorkForm>
               <WorkInput
@@ -1990,19 +2551,6 @@ const Profile = () => {
                 onChange={(e) => setWorkDescription(e.target.value)}
               />
               
-              <WorkSelect
-                theme={theme}
-                value={workCategory}
-                onChange={(e) => setWorkCategory(e.target.value)}
-              >
-                <option value="">Kategori Seçin</option>
-                <option value="resim">Resim</option>
-                <option value="heykel">Heykel</option>
-                <option value="fotograf">Fotoğraf</option>
-                <option value="dijital">Dijital Sanat</option>
-                <option value="seramik">Seramik</option>
-                <option value="diger">Diğer</option>
-              </WorkSelect>
               
               {workPreviewUrl && (
                 <WorkPreview>
@@ -2032,7 +2580,7 @@ const Profile = () => {
                   primary 
                   onClick={handleSaveWork}
                 >
-                  Eser Ekle
+                  Gönderi Ekle
                 </WorkUploadButton>
               )}
               
@@ -2284,8 +2832,6 @@ const Profile = () => {
       {/* Onay Modal */}
       <ConfirmOverlay show={confirmModal.show}>
         <ConfirmContent show={confirmModal.show}>
-          <ConfirmIcon>⚠️</ConfirmIcon>
-          <ConfirmTitle>{confirmModal.title}</ConfirmTitle>
           <ConfirmMessage>{confirmModal.message}</ConfirmMessage>
           <ConfirmButtons>
             <ConfirmButton onClick={closeConfirmModal}>
@@ -2297,6 +2843,97 @@ const Profile = () => {
           </ConfirmButtons>
         </ConfirmContent>
       </ConfirmOverlay>
+
+      {/* Sağ Tık Menüsü */}
+      {contextMenu.visible && (
+        <div
+          style={{
+            position: 'fixed',
+            top: contextMenu.y,
+            left: contextMenu.x,
+            background: theme.isDark ? '#2a2a2a' : '#ffffff',
+            border: `1px solid ${theme.isDark ? '#404040' : '#e0e0e0'}`,
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            zIndex: 1000,
+            minWidth: '150px',
+            overflow: 'hidden'
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={() => handlePinFromMenu(contextMenu.commentId)}
+            disabled={!pinnedComments.includes(contextMenu.commentId) && pinnedComments.length >= 3}
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              background: 'none',
+              border: 'none',
+              color: pinnedComments.includes(contextMenu.commentId) 
+                ? '#ff6b35' 
+                : (!pinnedComments.includes(contextMenu.commentId) && pinnedComments.length >= 3)
+                  ? (theme.isDark ? '#666' : '#999')
+                  : theme.text,
+              fontSize: '14px',
+              textAlign: 'left',
+              cursor: (!pinnedComments.includes(contextMenu.commentId) && pinnedComments.length >= 3) ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'background-color 0.2s ease',
+              opacity: (!pinnedComments.includes(contextMenu.commentId) && pinnedComments.length >= 3) ? 0.5 : 1
+            }}
+            onMouseEnter={(e) => {
+              if (!(!pinnedComments.includes(contextMenu.commentId) && pinnedComments.length >= 3)) {
+                e.target.style.backgroundColor = theme.isDark ? '#333' : '#f5f5f5';
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+            }}
+          >
+            <span>{pinnedComments.includes(contextMenu.commentId) ? '📌' : '📍'}</span>
+            <span>
+              {pinnedComments.includes(contextMenu.commentId) 
+                ? 'Sabitlemeyi Kaldır' 
+                : 'Yorumu Sabitle'}
+            </span>
+          </button>
+          
+          <div style={{
+            height: '1px',
+            background: theme.isDark ? '#404040' : '#e0e0e0',
+            margin: '0'
+          }} />
+          
+          <button
+            onClick={() => handleDeleteFromMenu(contextMenu.commentId)}
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              background: 'none',
+              border: 'none',
+              color: '#ff4757',
+              fontSize: '14px',
+              textAlign: 'left',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'background-color 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = theme.isDark ? '#333' : '#f5f5f5';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+            }}
+          >
+            <span>🗑️</span>
+            <span>Yorumu Sil</span>
+          </button>
+        </div>
+      )}
     </Container>
   );
 };
@@ -2537,6 +3174,5 @@ const PostButton = styled.button`
   }
 `;
 
-  
 export default Profile;
 

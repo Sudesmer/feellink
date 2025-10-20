@@ -12,16 +12,44 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   padding: 20px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.05)"/><circle cx="10" cy="60" r="0.5" fill="rgba(255,255,255,0.05)"/><circle cx="90" cy="40" r="0.5" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+  }
 `;
 
 const LoginCard = styled(motion.div)`
   background: ${props => props.theme.surface};
-  border-radius: 20px;
-  padding: 40px;
+  border-radius: 24px;
+  padding: 48px;
   width: 100%;
-  max-width: 400px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  max-width: 420px;
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.15);
   border: 1px solid ${props => props.theme.border};
+  backdrop-filter: blur(20px);
+  position: relative;
+  z-index: 10;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    border-radius: 24px;
+    z-index: -1;
+  }
 `;
 
 const Header = styled.div`
@@ -30,14 +58,35 @@ const Header = styled.div`
 `;
 
 const IconContainer = styled.div`
-  width: 80px;
-  height: 80px;
+  width: 96px;
+  height: 96px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 50%;
+  border-radius: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 20px;
+  margin: 0 auto 24px;
+  box-shadow: 0 16px 32px rgba(102, 126, 234, 0.3);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: rotate(45deg);
+    animation: shine 3s infinite;
+  }
+
+  @keyframes shine {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  }
 `;
 
 const Title = styled.h1`
@@ -65,22 +114,31 @@ const InputGroup = styled.div`
 
 const Input = styled.input`
   width: 100%;
-  padding: 16px 20px;
+  padding: 18px 24px;
   border: 2px solid ${props => props.theme.border};
-  border-radius: 12px;
+  border-radius: 16px;
   background: ${props => props.theme.background};
   color: ${props => props.theme.text};
   font-size: 16px;
+  font-weight: 500;
   outline: none;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 
   &:focus {
     border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15), 0 8px 24px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  &:hover {
+    border-color: ${props => props.theme.primary};
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
   }
 
   &::placeholder {
     color: ${props => props.theme.textSecondary};
+    font-weight: 400;
   }
 `;
 
@@ -106,30 +164,49 @@ const PasswordToggle = styled.button`
 
 const LoginButton = styled.button`
   width: 100%;
-  padding: 16px;
+  padding: 18px 24px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 16px;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 10px;
+  margin-top: 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 16px 32px rgba(102, 126, 234, 0.4);
+    
+    &::before {
+      left: 100%;
+    }
   }
 
   &:active {
-    transform: translateY(0);
+    transform: translateY(-1px);
   }
 
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
   }
 `;
 
@@ -168,6 +245,61 @@ const SuccessMessage = styled.div`
   font-size: 14px;
   margin-bottom: 20px;
   border: 1px solid #9ae6b4;
+`;
+
+const TestInfoCard = styled.div`
+  margin-top: 24px;
+  padding: 20px;
+  background: ${props => props.theme.background};
+  border-radius: 16px;
+  border: 1px solid ${props => props.theme.border};
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+`;
+
+const TestInfoHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+`;
+
+const TestInfoIcon = styled.div`
+  font-size: 20px;
+`;
+
+const TestInfoTitle = styled.div`
+  font-size: 14px;
+  font-weight: 600;
+  color: ${props => props.theme.text};
+`;
+
+const TestInfoContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const TestInfoItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: ${props => props.theme.surface};
+  border-radius: 8px;
+  border: 1px solid ${props => props.theme.border};
+`;
+
+const TestInfoLabel = styled.span`
+  font-size: 12px;
+  font-weight: 500;
+  color: ${props => props.theme.textSecondary};
+`;
+
+const TestInfoValue = styled.span`
+  font-size: 12px;
+  font-weight: 600;
+  color: ${props => props.theme.primary};
+  font-family: 'Courier New', monospace;
 `;
 
 const MuseumLogin = () => {
@@ -214,7 +346,7 @@ const MuseumLogin = () => {
         setSuccess('Giriş başarılı! Yönlendiriliyorsunuz...');
         
         setTimeout(() => {
-          navigate('/museum-dashboard');
+          navigate('/museum-panel');
         }, 1500);
       } else {
         setError('Geçersiz müze sahibi bilgileri!');
@@ -291,19 +423,22 @@ const MuseumLogin = () => {
           </LoginButton>
         </Form>
 
-        <div style={{ 
-          marginTop: '20px', 
-          padding: '16px', 
-          background: theme.background, 
-          borderRadius: '8px',
-          fontSize: '12px',
-          color: theme.textSecondary,
-          textAlign: 'center'
-        }}>
-          <strong>Test Bilgileri:</strong><br />
-          E-posta: muzesahibi@feellink.com<br />
-          Şifre: muzesahibi123
-        </div>
+        <TestInfoCard theme={theme}>
+          <TestInfoHeader>
+            <TestInfoIcon>🔑</TestInfoIcon>
+            <TestInfoTitle>Test Bilgileri</TestInfoTitle>
+          </TestInfoHeader>
+          <TestInfoContent>
+            <TestInfoItem>
+              <TestInfoLabel>E-posta:</TestInfoLabel>
+              <TestInfoValue>muzesahibi@feellink.com</TestInfoValue>
+            </TestInfoItem>
+            <TestInfoItem>
+              <TestInfoLabel>Şifre:</TestInfoLabel>
+              <TestInfoValue>muzesahibi123</TestInfoValue>
+            </TestInfoItem>
+          </TestInfoContent>
+        </TestInfoCard>
       </LoginCard>
     </Container>
   );

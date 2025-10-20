@@ -192,30 +192,68 @@ const ActionButton = styled.button`
 
 const StatsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  margin-bottom: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const StatCard = styled.div`
   background: ${props => props.theme.surface};
-  border-radius: 12px;
-  padding: 24px;
+  border-radius: 16px;
+  padding: 28px;
   border: 1px solid ${props => props.theme.border};
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    border-color: ${props => props.theme.primary + '30'};
+  }
 `;
 
 const StatIcon = styled.div`
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   background: linear-gradient(135deg, ${props => props.color || '#667eea'} 0%, ${props => props.color2 || '#764ba2'} 100%);
-  border-radius: 12px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: rotate(45deg);
+    animation: shine 4s infinite;
+  }
+
+  @keyframes shine {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  }
 `;
 
 const StatInfo = styled.div`
@@ -346,7 +384,11 @@ const MuseumDashboard = () => {
     totalWorks: 24,
     totalViews: 15420,
     totalLikes: 892,
-    totalComments: 156
+    totalComments: 156,
+    monthlyVisitors: 3240,
+    revenue: 45600,
+    exhibitions: 8,
+    artists: 45
   });
 
   // Mock museum works data
@@ -455,7 +497,7 @@ const MuseumDashboard = () => {
             <StatsGrid>
               <StatCard theme={theme}>
                 <StatIcon color="#667eea" color2="#764ba2">
-                  <FiImage size={24} />
+                  <FiImage size={28} />
                 </StatIcon>
                 <StatInfo>
                   <StatValue theme={theme}>{stats.totalWorks}</StatValue>
@@ -465,7 +507,7 @@ const MuseumDashboard = () => {
 
               <StatCard theme={theme}>
                 <StatIcon color="#f093fb" color2="#f5576c">
-                  <FiEye size={24} />
+                  <FiEye size={28} />
                 </StatIcon>
                 <StatInfo>
                   <StatValue theme={theme}>{stats.totalViews.toLocaleString()}</StatValue>
@@ -475,21 +517,61 @@ const MuseumDashboard = () => {
 
               <StatCard theme={theme}>
                 <StatIcon color="#4facfe" color2="#00f2fe">
-                  <FiUsers size={24} />
+                  <FiUsers size={28} />
                 </StatIcon>
                 <StatInfo>
-                  <StatValue theme={theme}>{stats.totalLikes}</StatValue>
-                  <StatLabel theme={theme}>Toplam Beğeni</StatLabel>
+                  <StatValue theme={theme}>{stats.monthlyVisitors.toLocaleString()}</StatValue>
+                  <StatLabel theme={theme}>Aylık Ziyaretçi</StatLabel>
                 </StatInfo>
               </StatCard>
 
               <StatCard theme={theme}>
                 <StatIcon color="#43e97b" color2="#38f9d7">
-                  <FiMessageCircle size={24} />
+                  <FiMessageCircle size={28} />
                 </StatIcon>
                 <StatInfo>
                   <StatValue theme={theme}>{stats.totalComments}</StatValue>
                   <StatLabel theme={theme}>Toplam Yorum</StatLabel>
+                </StatInfo>
+              </StatCard>
+
+              <StatCard theme={theme}>
+                <StatIcon color="#ffecd2" color2="#fcb69f">
+                  <FiBarChart2 size={28} />
+                </StatIcon>
+                <StatInfo>
+                  <StatValue theme={theme}>₺{stats.revenue.toLocaleString()}</StatValue>
+                  <StatLabel theme={theme}>Aylık Gelir</StatLabel>
+                </StatInfo>
+              </StatCard>
+
+              <StatCard theme={theme}>
+                <StatIcon color="#a8edea" color2="#fed6e3">
+                  <FiBuilding size={28} />
+                </StatIcon>
+                <StatInfo>
+                  <StatValue theme={theme}>{stats.exhibitions}</StatValue>
+                  <StatLabel theme={theme}>Aktif Sergi</StatLabel>
+                </StatInfo>
+              </StatCard>
+
+              <StatCard theme={theme}>
+                <StatIcon color="#d299c2" color2="#fef9d7">
+                  <FiUser size={28} />
+                </StatIcon>
+                <StatInfo>
+                  <StatValue theme={theme}>{stats.artists}</StatValue>
+                  <StatLabel theme={theme}>Kayıtlı Sanatçı</StatLabel>
+                </StatInfo>
+              </StatCard>
+
+              <StatCard theme={theme}>
+                <StatIcon color="#89f7fe" color2="#66a6ff">
+                  <FiBookmark size={28} />
+                </StatIcon>
+                <StatInfo>
+                  <StatValue theme={theme}>{stats.totalLikes}</StatValue>
+                  <StatLabel theme={theme}>Toplam Beğeni</StatLabel>
                 </StatInfo>
               </StatCard>
             </StatsGrid>

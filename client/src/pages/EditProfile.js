@@ -318,18 +318,47 @@ const EditProfile = () => {
   const { theme } = useTheme();
   const { user } = useAuth();
   
-  const [formData, setFormData] = useState({
-    fullName: user?.fullName || '',
-    username: user?.username || '',
-    email: user?.email || '',
-    bio: user?.bio || '',
-    website: user?.website || '',
-    location: user?.location || ''
-  });
+  // localStorage'dan profil verilerini yükle
+  const getStoredProfileData = () => {
+    try {
+      const storedProfile = localStorage.getItem('userProfile');
+      if (storedProfile) {
+        const parsedProfile = JSON.parse(storedProfile);
+        return {
+          fullName: parsedProfile.fullName || user?.fullName || '',
+          username: parsedProfile.username || user?.username || '',
+          email: parsedProfile.email || user?.email || '',
+          bio: parsedProfile.bio || user?.bio || '',
+          website: parsedProfile.website || user?.website || '',
+          location: parsedProfile.location || user?.location || ''
+        };
+      }
+    } catch (error) {
+      console.error('Profil verileri okuma hatası:', error);
+    }
+    return {
+      fullName: user?.fullName || '',
+      username: user?.username || '',
+      email: user?.email || '',
+      bio: user?.bio || '',
+      website: user?.website || '',
+      location: user?.location || ''
+    };
+  };
+
+  const [formData, setFormData] = useState(getStoredProfileData());
   
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(user?.avatar || null);
+  const [previewUrl, setPreviewUrl] = useState(() => {
+    // Önce localStorage'dan profil fotoğrafını kontrol et
+    const storedPhoto = localStorage.getItem('userProfilePhoto');
+    if (storedPhoto) {
+      return storedPhoto;
+    }
+    // Yoksa user'dan avatar'ı al
+    return user?.avatar || null;
+  });
   const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e) => {
@@ -358,7 +387,18 @@ const EditProfile = () => {
 
   const handleSavePhoto = () => {
     if (selectedFile) {
-      // Burada gerçek API çağrısı yapılacak
+      // Fotoğrafı localStorage'a kaydet (Profile.js ile aynı key kullan)
+      localStorage.setItem('userProfilePhoto', previewUrl);
+      
+      // Profil verilerini de güncelle
+      const updatedProfile = {
+        ...user,
+        ...formData,
+        avatar: previewUrl
+      };
+      
+      localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+      
       console.log('Fotoğraf kaydediliyor:', selectedFile);
       setShowPhotoUpload(false);
       setSelectedFile(null);
@@ -376,7 +416,20 @@ const EditProfile = () => {
     setIsLoading(true);
     
     try {
-      // Burada gerçek API çağrısı yapılacak
+      // Profil verilerini localStorage'a kaydet
+      const updatedProfile = {
+        ...user,
+        ...formData,
+        avatar: previewUrl
+      };
+      
+      localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+      
+      // Profil fotoğrafını da ayrı key'e kaydet
+      if (previewUrl) {
+        localStorage.setItem('userProfilePhoto', previewUrl);
+      }
+      
       console.log('Profil güncelleniyor:', formData);
       
       // Simüle edilmiş API çağrısı

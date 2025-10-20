@@ -26,6 +26,7 @@ import Admin from './pages/Admin';
 import AdminLogin from './pages/AdminLogin';
 import MuseumLogin from './pages/MuseumLogin';
 import MuseumDashboard from './pages/MuseumDashboard';
+import MuseumPanel from './pages/MuseumPanel';
 import NotFound from './pages/NotFound';
 
 // Global styles
@@ -151,6 +152,20 @@ function App() {
                       transition={pageTransition}
                     >
                       <MuseumDashboard />
+                    </motion.div>
+                  } 
+                />
+                <Route 
+                  path="/museum-panel" 
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                    >
+                      <MuseumPanel />
                     </motion.div>
                   } 
                 />
@@ -311,6 +326,48 @@ function App() {
                       transition={pageTransition}
                     >
                       <Register />
+                    </motion.div>
+                  } 
+                />
+                <Route 
+                  path="/museum-login" 
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                    >
+                      <MuseumLogin />
+                    </motion.div>
+                  } 
+                />
+                <Route 
+                  path="/museum-dashboard" 
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                    >
+                      <MuseumDashboard />
+                    </motion.div>
+                  } 
+                />
+                <Route 
+                  path="/museum-panel" 
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                    >
+                      <MuseumPanel />
                     </motion.div>
                   } 
                 />

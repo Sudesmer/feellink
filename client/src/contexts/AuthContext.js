@@ -59,9 +59,11 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      const response = await axios.get('/api/auth/me');
-      if (response.data.success) {
-        setUser(response.data.user);
+      // Mock data için localStorage'dan user bilgisini al
+      const storedUser = localStorage.getItem('feellink-user');
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+        console.log('User loaded from localStorage:', JSON.parse(storedUser));
       } else {
         localStorage.removeItem('feellink-token');
       }
@@ -78,27 +80,38 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       console.log('AuthContext login called with:', { email, password });
       
-      const response = await axios.post('/api/auth/login', {
-        email,
-        password,
-      });
-
-      console.log('Login response:', response.data);
-
-      if (response.data.success) {
-        const { token, user } = response.data;
+      // Mock data için basit kontrol
+      const mockUsers = [
+        { email: 'testuser@feellink.com', password: 'test123', username: 'testuser', fullName: 'Test User' },
+        { email: 'admin@feellink.com', password: 'admin123', username: 'admin', fullName: 'Admin User' }
+      ];
+      
+      const user = mockUsers.find(u => u.email === email && u.password === password);
+      
+      if (user) {
+        const token = 'mock-token-' + Date.now();
+        const userData = {
+          _id: '1',
+          email: user.email,
+          username: user.username,
+          fullName: user.fullName,
+          avatar: '',
+          isVerified: true
+        };
+        
         localStorage.setItem('feellink-token', token);
-        setUser(user);
-        console.log('User set:', user); // Debug log
+        localStorage.setItem('feellink-user', JSON.stringify(userData));
+        setUser(userData);
+        console.log('User set:', userData);
         toast.success('Giriş başarılı!');
         return { success: true };
       } else {
-        console.log('Login failed:', response.data);
-        return { success: false, message: response.data.message };
+        console.log('Login failed: Invalid credentials');
+        return { success: false, message: 'Geçersiz email veya şifre' };
       }
     } catch (error) {
       console.error('Login error:', error);
-      const message = error.response?.data?.message || 'Giriş yapılırken hata oluştu';
+      const message = 'Giriş yapılırken hata oluştu';
       toast.error(message);
       return { success: false, message };
     } finally {
@@ -129,6 +142,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('feellink-token');
+    localStorage.removeItem('feellink-user');
     setUser(null);
     setLoading(false);
     toast.success('Çıkış yapıldı');

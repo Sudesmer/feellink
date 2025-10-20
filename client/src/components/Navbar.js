@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -45,6 +45,7 @@ const NavContainer = styled.div`
   width: 100%;
   box-sizing: border-box;
   position: relative;
+  overflow: visible;
 `;
 
 const SearchContainer = styled.div`
@@ -160,12 +161,14 @@ const NavActions = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
+  overflow: visible;
 `;
 
 const UserMenu = styled.div`
   position: relative;
   display: flex;
   align-items: center;
+  overflow: visible;
 `;
 
 const UserIcon = styled.button`
@@ -199,8 +202,8 @@ const UserDropdown = styled(motion.div)`
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(20px);
   min-width: 180px;
-  z-index: 1000;
-  overflow: hidden;
+  z-index: 9999;
+  overflow: visible;
 `;
 
 const DropdownItem = styled.div`
@@ -208,11 +211,13 @@ const DropdownItem = styled.div`
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
+  min-height: 44px;
   color: ${props => props.theme.text};
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 0.9rem;
   font-weight: 500;
+  white-space: nowrap;
 
   &:hover {
     background: ${props => props.theme.surfaceHover};
@@ -528,7 +533,7 @@ const MobileNavLink = styled(Link)`
 
 const Navbar = () => {
   const { user, logout } = useAuth();
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark, toggleTheme, isInitialized } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -619,7 +624,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    setShowUserMenu(false);
+    setShowUserDropdown(false);
     // navigate('/') removed - AuthContext handles redirect to /login
   };
 
@@ -629,11 +634,30 @@ const Navbar = () => {
     }
   };
 
+  // Dropdown'ın dışına tıklandığında kapat
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showUserDropdown && !event.target.closest('.user-menu')) {
+        setShowUserDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showUserDropdown]);
+
 
 
   const isActive = (path) => {
     return location.pathname === path;
   };
+
+  // Don't render until theme is initialized
+  if (!isInitialized) {
+    return null;
+  }
 
   return (
     <Nav>
@@ -671,7 +695,7 @@ const Navbar = () => {
             </AdminButton>
           )}
           
-          <UserMenu>
+          <UserMenu className="user-menu">
             <UserIcon onClick={() => setShowUserDropdown(!showUserDropdown)}>
               <FiUser size={20} />
             </UserIcon>
@@ -684,23 +708,10 @@ const Navbar = () => {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
                   >
-                    {user ? (
-                      <DropdownItem onClick={handleLogout}>
-                        <FiLogOut size={16} />
-                        Çıkış Yap
-                      </DropdownItem>
-                    ) : (
-                      <>
-                        <DropdownItem onClick={() => navigate('/login')}>
-                          <FiUser size={16} />
-                          Giriş Yap
-                        </DropdownItem>
-                        <DropdownItem onClick={() => navigate('/register')}>
-                          <FiUserPlus size={16} />
-                          Kayıt Ol
-                        </DropdownItem>
-                      </>
-                    )}
+                    <DropdownItem onClick={handleLogout}>
+                      <FiLogOut size={16} />
+                      Çıkış Yap
+                    </DropdownItem>
                   </UserDropdown>
                 )}
               </AnimatePresence>

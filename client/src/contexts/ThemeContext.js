@@ -61,13 +61,18 @@ const darkTheme = {
 };
 
 export const ThemeProvider = ({ children }) => {
-  const [isDark, setIsDark] = useState(() => {
+  const [isDark, setIsDark] = useState(false); // Default light theme
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
     const saved = localStorage.getItem('feellink-theme');
     if (saved) {
-      return saved === 'dark';
+      setIsDark(saved === 'dark');
+    } else {
+      setIsDark(window.matchMedia('(prefers-color-scheme: dark)').matches);
     }
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
+    setIsInitialized(true);
+  }, []);
 
   const theme = isDark ? darkTheme : lightTheme;
 
@@ -89,6 +94,7 @@ export const ThemeProvider = ({ children }) => {
     theme,
     isDark,
     toggleTheme,
+    isInitialized,
   };
 
   return (
