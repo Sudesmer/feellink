@@ -147,7 +147,9 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
     toast.success('Çıkış yapıldı');
     // Redirect to login page
-    window.location.href = '/login';
+    setTimeout(() => {
+      window.location.href = '/login';
+    }, 1000);
   };
 
   const updateProfile = async (profileData) => {

@@ -90,6 +90,13 @@ function App() {
   // Show different navbar for login/register pages
   const isAuthPage = location === '/login' || location === '/register';
   const isAdminPage = location === '/admin' || location === '/admin-login';
+  const isMuseumPage = location === '/museum-login' || location === '/museum-dashboard' || location === '/museum-panel';
+
+  // Redirect to login if user is not authenticated and not on auth pages
+  if (!user && !isAuthPage && !isAdminPage && !isMuseumPage) {
+    window.location.href = '/login';
+    return <LoadingSpinner />;
+  }
 
   return (
     <ThemeProvider theme={theme}>
