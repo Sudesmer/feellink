@@ -251,17 +251,29 @@ const Divider = styled.div`
 const SignupLink = styled.div`
   text-align: center;
   color: ${props => props.theme.textSecondary};
-  font-size: 0.9rem;
+  font-size: 1rem;
+  margin: 20px 0;
+  padding: 15px;
+  background: ${props => props.theme.background};
+  border-radius: 12px;
+  border: 2px solid ${props => props.theme.border};
 
   a {
     color: ${props => props.theme.primary};
     text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s ease;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: ${props => props.theme.primary}15;
 
     &:hover {
       color: ${props => props.theme.primary};
-      text-decoration: underline;
+      background: ${props => props.theme.primary}25;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
     }
   }
 `;
@@ -424,8 +436,10 @@ const Login = () => {
           </Divider>
 
           <SignupLink theme={theme}>
-            Hesabınız yok mu?{' '}
-            <Link to="/register">Kayıt olun</Link>
+            <div style={{ marginBottom: '10px', fontSize: '0.9rem' }}>
+              Hesabınız yok mu?
+            </div>
+            <Link to="/register">🚀 Ücretsiz Kayıt Ol</Link>
           </SignupLink>
 
           <AlternativeLogins>
