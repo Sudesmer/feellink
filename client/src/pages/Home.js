@@ -42,10 +42,10 @@ const Container = styled.div`
 
 const MainLayout = styled.div`
   display: flex;
-  width: 100vw; /* Tam genişlik kullan */
+  width: 100vw;
   margin: 0;
-  gap: 0; /* Gap'i kaldır */
-  padding: 0; /* Padding'i kaldır */
+  gap: 0;
+  padding: 0;
   align-items: flex-start;
   position: relative;
   height: 100vh;
@@ -58,27 +58,32 @@ const MainLayout = styled.div`
     overflow: visible;
     width: 100vw;
     margin: 0;
-    padding: 0 20px;
+    padding: 0;
   }
 `;
 
 const MainContent = styled.div`
   flex: 1;
   min-width: 0;
-  width: calc(100vw - 680px); /* 280px (sol) + 400px (sağ) = 680px */
+  width: calc(100vw - 680px);
   height: 100vh;
   overflow-y: auto;
   padding: 20px;
-  margin-left: 280px; /* Sol sidebar genişliği */
+  margin-left: 280px;
   margin-right: 0;
   background: ${props => props.theme.surface};
 
   @media (max-width: 1200px) {
     height: auto;
     overflow: visible;
-    padding: 20px;
+    padding: 16px;
     width: 100%;
     margin-left: 0;
+    margin-right: 0;
+  }
+
+  @media (max-width: 768px) {
+    padding: 12px;
   }
 `;
 
@@ -270,10 +275,17 @@ const SectionHeader = styled.div`
     color: ${props => props.theme.text};
   }
   
-  @media (max-width: 768px) {
+  @media (max-width: 1200px) {
     padding: 0 20px;
-    flex-direction: column;
     gap: 20px;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 0 16px;
+    flex-direction: column;
+    gap: 16px;
     align-items: flex-start;
   }
 `;
@@ -375,16 +387,25 @@ const WorksGrid = styled.div`
     padding: 0 0 16px 300px;
   }
 
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 6px;
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
     width: 100%;
     margin: 0 0 40px 0;
-    padding: 0 0 12px 20px;
+    padding: 0 16px;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    width: 100%;
+    margin: 0 0 40px 0;
+    padding: 0 16px;
   }
 
   @media (max-width: 480px) {
-    gap: 6px;
+    gap: 8px;
+    padding: 0 12px;
   }
 `;
 
@@ -429,8 +450,12 @@ const HighlightsHeader = styled.div`
   align-items: center;
   gap: 16px;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1200px) {
     padding: 0 20px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 0 16px;
   }
 `;
 
@@ -485,11 +510,21 @@ const HighlightsGrid = styled.div`
   width: 100%;
   overflow: visible;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1200px) {
+    padding: 0 20px;
     gap: 16px;
-    padding: 0 0 12px 20px;
   }
 
+  @media (max-width: 768px) {
+    gap: 12px;
+    padding: 0 16px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 480px) {
+    gap: 8px;
+    padding: 0 12px;
+  }
 `;
 
 const HighlightCard = styled.div`
@@ -570,13 +605,24 @@ const HighlightCard = styled.div`
 
   /* İçerik Parlaklık Efekti - hover glow ile çakışmaması için kaldırıldı */
 
+  @media (max-width: 1200px) {
+    width: 200px;
+    height: 160px;
+  }
+
   @media (max-width: 768px) {
-    width: 300px;
-    height: 180px;
+    width: 150px;
+    height: 140px;
+    flex-shrink: 0;
     
     &:hover {
       transform: translateY(-4px) scale(1.01);
     }
+  }
+
+  @media (max-width: 480px) {
+    width: 140px;
+    height: 120px;
   }
 `;
 

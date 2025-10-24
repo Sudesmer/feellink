@@ -55,6 +55,16 @@ const SearchContainer = styled.div`
   transform: translate(-50%, -50%);
   width: 400px;
   max-width: 90%;
+
+  @media (max-width: 768px) {
+    width: 200px;
+    max-width: 80%;
+  }
+
+  @media (max-width: 480px) {
+    width: 150px;
+    max-width: 70%;
+  }
 `;
 
 const SearchInput = styled.input`
@@ -162,6 +172,16 @@ const NavActions = styled.div`
   align-items: center;
   gap: 12px;
   overflow: visible;
+
+  @media (max-width: 768px) {
+    gap: 8px;
+    right: 16px;
+  }
+
+  @media (max-width: 480px) {
+    gap: 6px;
+    right: 12px;
+  }
 `;
 
 const UserMenu = styled.div`
