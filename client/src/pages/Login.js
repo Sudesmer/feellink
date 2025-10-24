@@ -37,7 +37,7 @@ const Container = styled.div`
 `;
 
 
-const LoginCard = styled(motion.div)`
+const LoginCard = styled.div`
   background: ${props => props.theme.surface};
   border: 3px solid ${props => props.theme.surface};
   border-radius: 28px;
@@ -372,9 +372,6 @@ const Login = () => {
         <LoginCard
           className="login-page-card"
           theme={theme}
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
         >
           <Logo>
             <LogoIcon>
