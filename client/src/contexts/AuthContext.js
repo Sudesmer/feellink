@@ -153,10 +153,8 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setLoading(false);
     toast.success('Çıkış yapıldı');
-    // Redirect to login page
-    setTimeout(() => {
-      window.location.href = '/login';
-    }, 1000);
+    // Redirect to login page immediately
+    window.location.replace('/login');
   };
 
   const updateProfile = async (profileData) => {

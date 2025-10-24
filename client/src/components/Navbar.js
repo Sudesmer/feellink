@@ -645,7 +645,8 @@ const Navbar = () => {
   const handleLogout = () => {
     logout();
     setShowUserDropdown(false);
-    // navigate('/') removed - AuthContext handles redirect to /login
+    // Force redirect to login page
+    window.location.replace('/login');
   };
 
   const handleSearch = () => {
