@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FiMail, FiLock, FiUser, FiEye, FiEyeOff, FiArrowRight } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
-import Login from './Login';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -344,22 +343,15 @@ const Register = () => {
 
   // Panel geçiş fonksiyonları
   const switchToLogin = () => {
-    setCurrentPanel('login');
+    navigate('/login');
   };
 
   const switchToForgotPassword = () => {
-    setCurrentPanel('forgot-password');
+    navigate('/forgot-password');
   };
 
-  // Panel içeriğini render et
-  const renderPanelContent = () => {
-    if (currentPanel === 'login') {
-      return <Login />;
-    }
-    
-    // Register paneli (varsayılan)
-    return (
-      <>
+  return (
+    <Container>
       <LeafContainer>
         {[...Array(15)].map((_, i) => (
           <Leaf
@@ -582,13 +574,6 @@ const Register = () => {
           </LoginLink>
         </RegisterCard>
       </RightSection>
-      </>
-    );
-  };
-
-  return (
-    <Container>
-      {renderPanelContent()}
     </Container>
   );
 };
