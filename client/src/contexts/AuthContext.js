@@ -105,11 +105,11 @@ export const AuthProvider = ({ children }) => {
         return { success: false, message: 'Geçerli bir email adresi girin' };
       }
       
-      // Mock data için basit kontrol - gerçek mail adresleri ile çalışır
+      // Mock data için basit kontrol - GitHub Pages'de çalışır
       const mockUsers = [
-        { email: 'testuser@feellink.com', password: 'test123', username: 'testuser', fullName: 'Test User' },
-        { email: 'admin@feellink.com', password: 'admin123', username: 'admin', fullName: 'Admin User' },
-        { email: 'demo@feellink.com', password: 'demo123', username: 'demo', fullName: 'Demo User' }
+        { email: 'test@example.com', password: 'password', username: 'testuser', fullName: 'Test User' },
+        { email: 'admin@feellink.com', password: 'password', username: 'admin', fullName: 'Admin User' },
+        { email: 'designer@feellink.com', password: 'password', username: 'designer', fullName: 'Creative Designer' }
       ];
       
       const user = mockUsers.find(u => u.email === email && u.password === password);
