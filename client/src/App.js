@@ -107,6 +107,20 @@ function App() {
     );
   }
 
+  // Show register page if user is not authenticated and on register page
+  if (!user && location === '/register') {
+    return (
+      <ThemeProvider theme={theme}>
+        <GlobalStyles>
+          <LoginNavbar />
+          <MainContent isAuthPage={true}>
+            <Register />
+          </MainContent>
+        </GlobalStyles>
+      </ThemeProvider>
+    );
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyles>
