@@ -10,10 +10,9 @@ const Container = styled.div`
   background: ${props => props.theme.background};
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 20px 120px 20px 20px;
+  justify-content: center;
+  padding: 20px;
   position: relative;
-  overflow: hidden;
 `;
 
 const LeafContainer = styled.div`
@@ -352,92 +351,6 @@ const Register = () => {
 
   return (
     <Container>
-      <LeafContainer>
-        {[...Array(15)].map((_, i) => (
-          <Leaf
-            key={i}
-            size={Math.random() * 20 + 10}
-            color={`hsl(${Math.random() * 40 + 20}, 80%, 60%)`}
-            left={Math.random() * 100}
-            initial={{ y: -50, rotate: 0 }}
-            animate={{
-              y: [0, window.innerHeight + 50],
-              rotate: [0, 360, 720],
-              x: [0, Math.random() * 100 - 50, Math.random() * 100 - 50]
-            }}
-            transition={{
-              duration: Math.random() * 10 + 10,
-              delay: Math.random() * 5,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-          />
-        ))}
-      </LeafContainer>
-      
-      <LeftSection>
-        <ArtworkTitle>Yaratıcılığınızı Keşfedin</ArtworkTitle>
-        <ArtworkSubtitle>
-          Dijital sanat dünyasına adım atın.
-          Üç boyutlu eserlerinizi dünyayla paylaşın ve ilham verin.
-        </ArtworkSubtitle>
-        
-        <ArtworkContainer>
-          <FloatingElement
-            gradient="linear-gradient(135deg, #FF8C42, #FF6B35)"
-            initial={{ y: 0, rotate: 0 }}
-            animate={{ 
-              y: [-10, 10, -10],
-              rotate: [0, 5, -5, 0]
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          <FloatingElement
-            gradient="linear-gradient(135deg, #D2691E, #CD853F)"
-            initial={{ y: 0, rotate: 0 }}
-            animate={{ 
-              y: [10, -10, 10],
-              rotate: [0, -3, 3, 0]
-            }}
-            transition={{
-              duration: 5,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          <FloatingElement
-            gradient="linear-gradient(135deg, #CD853F, #DEB887)"
-            initial={{ y: 0, rotate: 0 }}
-            animate={{ 
-              y: [-5, 15, -5],
-              rotate: [0, 2, -2, 0]
-            }}
-            transition={{
-              duration: 6,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          <FloatingElement
-            gradient="linear-gradient(135deg, #FF6B35, #FF8C42)"
-            initial={{ y: 0, rotate: 0 }}
-            animate={{ 
-              y: [15, -5, 15],
-              rotate: [0, -4, 4, 0]
-            }}
-            transition={{
-              duration: 7,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-        </ArtworkContainer>
-      </LeftSection>
-
       <RightSection>
         <RegisterCard
           initial={{ opacity: 0, y: 30 }}
