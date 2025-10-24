@@ -98,8 +98,9 @@ function App() {
     localStorage.removeItem('feellink-token');
     localStorage.removeItem('feellink-user');
     
-    // Force redirect to login page
-    window.location.replace('/login');
+    // Force redirect to login page with full URL
+    const currentOrigin = window.location.origin;
+    window.location.replace(`${currentOrigin}/login`);
     return <LoadingSpinner />;
   }
 
