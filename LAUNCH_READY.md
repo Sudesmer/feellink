@@ -117,3 +117,5 @@ Tüm özellikler çalışıyor, veriler temizlendi ve gerçek kullanıcı etkile
 **Versiyon**: 2.0.0 - Production Ready
 
 
+
+
