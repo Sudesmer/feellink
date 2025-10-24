@@ -329,7 +329,7 @@ const Register = () => {
       
       const result = await register(userData);
       if (result.success) {
-        navigate('/');
+        window.location.href = '/';
       } else {
         setError(result.message || 'Kayıt olurken bir hata oluştu');
       }
