@@ -251,29 +251,17 @@ const Divider = styled.div`
 const SignupLink = styled.div`
   text-align: center;
   color: ${props => props.theme.textSecondary};
-  font-size: 1rem;
-  margin: 20px 0;
-  padding: 15px;
-  background: ${props => props.theme.background};
-  border-radius: 12px;
-  border: 2px solid ${props => props.theme.border};
+  font-size: 0.9rem;
 
   a {
     color: ${props => props.theme.primary};
     text-decoration: none;
-    font-weight: 700;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
-    display: inline-block;
-    padding: 8px 16px;
-    border-radius: 8px;
-    background: ${props => props.theme.primary}15;
+    font-weight: 600;
+    transition: color 0.3s ease;
 
     &:hover {
       color: ${props => props.theme.primary};
-      background: ${props => props.theme.primary}25;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+      text-decoration: underline;
     }
   }
 `;
@@ -328,6 +316,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [currentPanel, setCurrentPanel] = useState('login'); // Panel state'i
 
   const { login } = useAuth();
   const { theme } = useTheme();
@@ -363,6 +352,19 @@ const Login = () => {
     }
     
     setLoading(false);
+  };
+
+  // Panel geçiş fonksiyonları
+  const switchToRegister = () => {
+    setCurrentPanel('register');
+  };
+
+  const switchToLogin = () => {
+    setCurrentPanel('login');
+  };
+
+  const switchToForgotPassword = () => {
+    setCurrentPanel('forgot-password');
   };
 
   return (
@@ -436,10 +438,22 @@ const Login = () => {
           </Divider>
 
           <SignupLink theme={theme}>
-            <div style={{ marginBottom: '10px', fontSize: '0.9rem' }}>
-              Hesabınız yok mu?
-            </div>
-            <Link to="/register">🚀 Ücretsiz Kayıt Ol</Link>
+            Hesabınız yok mu?{' '}
+            <button 
+              type="button" 
+              onClick={switchToRegister}
+              style={{ 
+                background: 'none', 
+                border: 'none', 
+                color: theme.primary, 
+                textDecoration: 'none', 
+                fontWeight: 600, 
+                cursor: 'pointer',
+                fontSize: 'inherit'
+              }}
+            >
+              Kayıt olun
+            </button>
           </SignupLink>
 
           <AlternativeLogins>
