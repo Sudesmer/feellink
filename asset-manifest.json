@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/FEELLINK/static/css/main.a667917d.css",
-    "main.js": "/FEELLINK/static/js/main.1a35fe1f.js",
-    "index.html": "/FEELLINK/index.html",
-    "main.a667917d.css.map": "/FEELLINK/static/css/main.a667917d.css.map",
-    "main.1a35fe1f.js.map": "/FEELLINK/static/js/main.1a35fe1f.js.map"
+    "main.css": "/static/css/main.a667917d.css",
+    "main.js": "/static/js/main.776c68fe.js",
+    "index.html": "/index.html",
+    "main.a667917d.css.map": "/static/css/main.a667917d.css.map",
+    "main.776c68fe.js.map": "/static/js/main.776c68fe.js.map"
   },
   "entrypoints": [
     "static/css/main.a667917d.css",
-    "static/js/main.1a35fe1f.js"
+    "static/js/main.776c68fe.js"
   ]
 }
