@@ -48,3 +48,5 @@ const LoadingSpinner = ({ text = 'Yükleniyor...' }) => {
 
 export default LoadingSpinner;
 
+
+
