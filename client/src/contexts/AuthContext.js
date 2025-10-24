@@ -72,16 +72,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('feellink-token');
         localStorage.removeItem('feellink-user');
         setUser(null);
-        // Force redirect to login
-        const currentOrigin = window.location.origin;
-        const currentPath = window.location.pathname;
-        const isAuthPage = currentPath === '/login' || currentPath === '/register';
-        const isAdminPage = currentPath === '/admin' || currentPath === '/admin-login';
-        const isMuseumPage = currentPath === '/museum-login' || currentPath === '/museum-dashboard' || currentPath === '/museum-panel';
-        
-        if (!isAuthPage && !isAdminPage && !isMuseumPage) {
-          window.location.replace(`${currentOrigin}/login`);
-        }
+        // Don't redirect, let App.js handle it
       }
     } catch (error) {
       console.error('Auth check error:', error);
