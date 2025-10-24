@@ -34,7 +34,7 @@ cd client && npm start  # Frontend (Port 3000)
 
 ## 🌐 Canlı Demo
 
-- **Website:** [sudesmer.github.io/feellink](https://sudesmer.github.io/feellink)
+- **Website:** [www.feellink.io](https://www.feellink.io/)
 - **GitHub:** [github.com/Sudesmer/feellink](https://github.com/Sudesmer/feellink)
 
 ## 📊 Performans

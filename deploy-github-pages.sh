@@ -26,5 +26,5 @@ echo "⬆️ Pushing to GitHub..."
 git push origin main
 
 echo "✅ Deploy completed!"
-echo "🌐 Your site will be available at: https://sudesmer.github.io/feellink"
+echo "🌐 Your site will be available at: https://www.feellink.io/"
 echo "⏰ Please wait 2-3 minutes for GitHub Pages to update"
