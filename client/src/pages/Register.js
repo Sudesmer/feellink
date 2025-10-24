@@ -311,11 +311,25 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Form submitted!', formData);
     setLoading(true);
     setError('');
 
+    // Basit validasyon
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+      setError('Tüm alanları doldurun');
+      setLoading(false);
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       setError('Şifreler eşleşmiyor');
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError('Şifre en az 6 karakter olmalıdır');
       setLoading(false);
       return;
     }
@@ -325,21 +339,28 @@ const Register = () => {
         fullName: formData.name,
         email: formData.email,
         password: formData.password,
-        username: formData.email.split('@')[0] // Email'den username oluştur
+        username: formData.email.split('@')[0]
       };
       
+      console.log('Calling register with:', userData);
       const result = await register(userData);
+      console.log('Register result:', result);
+      
       if (result.success) {
+        console.log('Registration successful!');
         toast.success('Kayıt başarılı! Hoş geldiniz!');
         setTimeout(() => {
           window.location.href = '/';
         }, 1000);
       } else {
+        console.log('Registration failed:', result.message);
         setError(result.message || 'Kayıt olurken bir hata oluştu');
         toast.error(result.message || 'Kayıt olurken bir hata oluştu');
       }
     } catch (err) {
+      console.error('Registration error:', err);
       setError(err.message || 'Kayıt olurken bir hata oluştu');
+      toast.error(err.message || 'Kayıt olurken bir hata oluştu');
     }
     
     setLoading(false);
