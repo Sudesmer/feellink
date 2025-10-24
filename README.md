@@ -1,22 +1,66 @@
-# Feellink - Yaratıcı Tasarım Platformu
+# 🎨 Feellink - Yaratıcı Tasarım Platformu
 
-Bu proje GitHub Pages ile deploy edilmiştir.
+Behance benzeri tasarım platformu - Yaratıcı tasarımcıların buluşma noktası.
 
-## GitHub Pages Ayarları
+## 🚀 Özellikler
 
-- **Source**: Deploy from a branch
-- **Branch**: main
-- **Folder**: / (root)
-- **Custom Domain**: www.feellink.io
-- **Enforce HTTPS**: ✅
+- **Modern UI/UX** - Optimize edilmiş CSS ile hızlı yükleme
+- **Responsive Design** - Tüm cihazlarda mükemmel görünüm
+- **Modüler Yapı** - Kolay bakım ve geliştirme
+- **GitHub Actions** - Otomatik deployment
 
-## Dosya Yapısı
+## 🛠️ Teknolojiler
 
-- `index.html` - Ana sayfa
-- `static/` - CSS ve JS dosyaları
-- `CNAME` - Custom domain ayarı
-- `.nojekyll` - Jekyll'i devre dışı bırakır
+- **Frontend:** React 18, CSS Modules
+- **Backend:** Node.js, Express
+- **Database:** MongoDB
+- **Deployment:** GitHub Pages, GitHub Actions
 
-## Deployment
+## 📦 Kurulum
 
-Bu proje otomatik olarak GitHub Actions ile deploy edilir.
+```bash
+# Repository'yi klonlayın
+git clone https://github.com/Sudesmer/FEELLINK.git
+cd FEELLINK
+
+# Dependencies yükleyin
+npm install
+cd client && npm install
+
+# Development server'ı başlatın
+npm start          # Backend (Port 5000)
+cd client && npm start  # Frontend (Port 3000)
+```
+
+## 🌐 Canlı Demo
+
+- **Website:** [feellink.github.io](https://feellink.github.io)
+- **GitHub:** [github.com/Sudesmer/FEELLINK](https://github.com/Sudesmer/FEELLINK)
+
+## 📊 Performans
+
+- **CSS Boyutu:** 2.39KB (20% optimizasyon)
+- **Modüler Yapı:** 3 ayrı CSS dosyası
+- **Build Süresi:** ~2 dakika
+- **Deployment:** Otomatik
+
+## 🔧 Geliştirme
+
+```bash
+# CSS optimizasyonu
+npm run build:css
+
+# Production build
+npm run build
+
+# Deploy
+npm run deploy
+```
+
+## 📝 Lisans
+
+MIT License - Detaylar için [LICENSE](LICENSE) dosyasına bakın.
+
+---
+
+**Feellink Team** - Yaratıcılığın buluşma noktası 🎯
