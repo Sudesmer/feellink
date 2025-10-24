@@ -1,4 +1,4 @@
-# 🚀 FEELLINK - LAUNCH READY! 
+# 🚀 feellink - LAUNCH READY! 
 
 ## 🎉 **Web Siteniz Aktif Hale Getirilmeye Hazır!**
 
@@ -108,7 +108,7 @@ Web siteniz **tamamen hazır** ve canlı yayına geçmeye hazır!
 
 Tüm özellikler çalışıyor, veriler temizlendi ve gerçek kullanıcı etkileşimi için mükemmel bir başlangıç noktası oluşturuldu.
 
-**FEELLINK** artık dünyaya açılmaya hazır! 🌍✨
+**feellink** artık dünyaya açılmaya hazır! 🌍✨
 
 ---
 

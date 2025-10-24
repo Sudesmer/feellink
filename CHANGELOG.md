@@ -1,4 +1,4 @@
-# FEELLINK - Changelog
+# feellink - Changelog
 
 ## Son Güncellemeler (20 Ekim 2024)
 
@@ -88,7 +88,7 @@
 ## 📁 **Proje Yapısı**
 
 ```
-FEELLINK/
+feellink/
 ├── client/
 │   ├── src/
 │   │   ├── components/

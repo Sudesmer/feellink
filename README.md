@@ -20,8 +20,8 @@ Behance benzeri tasarım platformu - Yaratıcı tasarımcıların buluşma nokta
 
 ```bash
 # Repository'yi klonlayın
-git clone https://github.com/Sudesmer/FEELLINK.git
-cd FEELLINK
+git clone https://github.com/Sudesmer/feellink.git
+cd feellink
 
 # Dependencies yükleyin
 npm install
@@ -34,8 +34,8 @@ cd client && npm start  # Frontend (Port 3000)
 
 ## 🌐 Canlı Demo
 
-- **Website:** [feellink.github.io](https://feellink.github.io)
-- **GitHub:** [github.com/Sudesmer/FEELLINK](https://github.com/Sudesmer/FEELLINK)
+- **Website:** [sudesmer.github.io/feellink](https://sudesmer.github.io/feellink)
+- **GitHub:** [github.com/Sudesmer/feellink](https://github.com/Sudesmer/feellink)
 
 ## 📊 Performans
 
