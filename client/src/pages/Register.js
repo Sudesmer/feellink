@@ -91,7 +91,7 @@ const RightSection = styled.div`
   padding-top: 0px;
 `;
 
-const RegisterCard = styled(motion.div)`
+const RegisterCard = styled.div`
   background: #1a1a1a;
   border: 1px solid ${props => props.theme.border};
   border-radius: 20px;
@@ -106,7 +106,7 @@ const Logo = styled.div`
   margin-bottom: 40px;
 `;
 
-const LogoIcon = styled(motion.div)`
+const LogoIcon = styled.div`
   width: 200px;
   height: 80px;
   display: flex;
@@ -352,23 +352,9 @@ const Register = () => {
   return (
     <Container>
       <RightSection>
-        <RegisterCard
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
+        <RegisterCard>
           <Logo>
-            <LogoIcon
-              animate={{ 
-                scale: [1, 1.1, 1],
-                rotate: [0, 5, -5, 0]
-              }}
-              transition={{ 
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            >
+            <LogoIcon>
               <img src="/images/feellink.logo.png" alt="Feellink Logo" />
             </LogoIcon>
             <LogoSubtext>Hesap oluşturun</LogoSubtext>
