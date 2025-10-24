@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
 import { FiMail, FiLock, FiUser, FiEye, FiEyeOff, FiArrowRight } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
@@ -16,74 +14,6 @@ const Container = styled.div`
   position: relative;
 `;
 
-const LeafContainer = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1;
-`;
-
-const Leaf = styled(motion.div)`
-  position: absolute;
-  width: ${props => props.size}px;
-  height: ${props => props.size}px;
-  background: ${props => props.color};
-  border-radius: 0 100% 0 100%;
-  opacity: 0.8;
-  top: -10px;
-  left: ${props => props.left}%;
-`;
-
-const LeftSection = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding-right: 60px;
-  height: 100vh;
-`;
-
-const ArtworkTitle = styled.h1`
-  font-size: 3.5rem;
-  font-weight: 900;
-  color: #000000;
-  margin-bottom: 20px;
-  text-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
-  animation: pulse 2s ease-in-out infinite;
-  
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); filter: brightness(1); }
-    50% { transform: scale(1.05); filter: brightness(1.2); }
-  }
-`;
-
-const ArtworkSubtitle = styled.p`
-  font-size: 1.2rem;
-  color: #FFFFFF;
-  margin-bottom: 40px;
-  line-height: 1.6;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-`;
-
-const ArtworkContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  max-width: 400px;
-`;
-
-const FloatingElement = styled(motion.div)`
-  width: 80px;
-  height: 80px;
-  background: ${props => props.gradient};
-  border-radius: 20px;
-  filter: blur(1px);
-  opacity: 0.8;
-`;
 
 const RightSection = styled.div`
   flex: 0 0 400px;
@@ -296,10 +226,8 @@ const Register = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [currentPanel, setCurrentPanel] = useState('register'); // Panel state'i
 
   const { register } = useAuth();
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -371,9 +299,6 @@ const Register = () => {
     window.location.href = '/login';
   };
 
-  const switchToForgotPassword = () => {
-    navigate('/forgot-password');
-  };
 
   return (
     <Container>
