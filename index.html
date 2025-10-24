@@ -1,1 +1,27 @@
-<!doctype html><html lang="tr"><head><meta charset="utf-8"/><link rel="icon" href="/favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#FF6B35"/><meta name="description" content="Feellink - Yaratıcı tasarımcıların buluşma noktası"/><link rel="apple-touch-icon" href="/logo192.png"/><link rel="manifest" href="/manifest.json"/><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"><title>Feellink - Yaratıcı Tasarım Platformu</title><script defer="defer" src="/static/js/main.a979c7af.js"></script><link href="/static/css/main.a667917d.css" rel="stylesheet"></head><body><noscript>Bu uygulamayı çalıştırmak için JavaScript'i etkinleştirmeniz gerekir.</noscript><div id="root"></div></body></html>
+<!doctype html><html lang="tr"><head><meta charset="utf-8"/><link rel="icon" href="./favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#FF6B35"/><meta name="description" content="Feellink - Yaratıcı tasarımcıların buluşma noktası"/><link rel="apple-touch-icon" href="./logo192.png"/><link rel="manifest" href="./manifest.json"/><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"><title>Feellink - Yaratıcı Tasarım Platformu</title><script defer="defer" src="./static/js/main.a979c7af.js"></script><link href="./static/css/main.a667917d.css" rel="stylesheet"><script>
+// IMMEDIATE REDIRECT TO LOGIN - Force login page on first visit
+(function() {
+  // Check if we're on the root page or any non-auth page
+  const currentPath = window.location.pathname;
+  const isAuthPage = currentPath === '/login' || currentPath === '/register';
+  const isAdminPage = currentPath === '/admin' || currentPath === '/admin-login';
+  const isMuseumPage = currentPath === '/museum-login' || currentPath === '/museum-dashboard' || currentPath === '/museum-panel';
+  
+  // If not on auth pages, check authentication
+  if (!isAuthPage && !isAdminPage && !isMuseumPage) {
+    const token = localStorage.getItem('feellink-token');
+    const user = localStorage.getItem('feellink-user');
+    
+    // If no authentication, immediately redirect to login
+    if (!token || !user) {
+      // Clear any existing data
+      localStorage.removeItem('feellink-token');
+      localStorage.removeItem('feellink-user');
+      
+      // IMMEDIATE redirect to login
+      const currentOrigin = window.location.origin;
+      window.location.replace(`${currentOrigin}/login`);
+    }
+  }
+})();
+</script></head><body><noscript>Bu uygulamayı çalıştırmak için JavaScript'i etkinleştirmeniz gerekir.</noscript><div id="root"></div></body></html>
