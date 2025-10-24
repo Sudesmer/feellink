@@ -342,7 +342,7 @@ const Register = () => {
 
   // Panel geçiş fonksiyonları
   const switchToLogin = () => {
-    navigate('/login');
+    window.location.href = '/login';
   };
 
   const switchToForgotPassword = () => {

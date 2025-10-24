@@ -356,7 +356,7 @@ const Login = () => {
 
   // Panel geçiş fonksiyonları
   const switchToRegister = () => {
-    navigate('/register');
+    window.location.href = '/register';
   };
 
   const switchToLogin = () => {
