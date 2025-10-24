@@ -92,6 +92,34 @@ function App() {
   const isAdminPage = location === '/admin' || location === '/admin-login';
   const isMuseumPage = location === '/museum-login' || location === '/museum-dashboard' || location === '/museum-panel';
 
+  // Show auth pages if user is not authenticated
+  if (!user && (isAuthPage || isAdminPage || isMuseumPage)) {
+    // Show appropriate auth page
+    if (location === '/register') {
+      return (
+        <ThemeProvider theme={theme}>
+          <GlobalStyles>
+            <LoginNavbar />
+            <MainContent isAuthPage={true}>
+              <Register />
+            </MainContent>
+          </GlobalStyles>
+        </ThemeProvider>
+      );
+    } else if (location === '/login') {
+      return (
+        <ThemeProvider theme={theme}>
+          <GlobalStyles>
+            <LoginNavbar />
+            <MainContent isAuthPage={true}>
+              <Login />
+            </MainContent>
+          </GlobalStyles>
+        </ThemeProvider>
+      );
+    }
+  }
+
   // Show login page if user is not authenticated and not on auth pages
   if (!user && !isAuthPage && !isAdminPage && !isMuseumPage) {
     // Show login page permanently until user logs in
@@ -101,20 +129,6 @@ function App() {
           <LoginNavbar />
           <MainContent isAuthPage={true}>
             <Login />
-          </MainContent>
-        </GlobalStyles>
-      </ThemeProvider>
-    );
-  }
-
-  // Show register page if user is not authenticated and on register page
-  if (!user && location === '/register') {
-    return (
-      <ThemeProvider theme={theme}>
-        <GlobalStyles>
-          <LoginNavbar />
-          <MainContent isAuthPage={true}>
-            <Register />
           </MainContent>
         </GlobalStyles>
       </ThemeProvider>
