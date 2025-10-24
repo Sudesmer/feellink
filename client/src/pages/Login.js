@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight, FiHome, FiShield } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
-import Register from './Register';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -357,26 +356,26 @@ const Login = () => {
 
   // Panel geçiş fonksiyonları
   const switchToRegister = () => {
-    setCurrentPanel('register');
+    navigate('/register');
   };
 
   const switchToLogin = () => {
-    setCurrentPanel('login');
+    navigate('/login');
   };
 
   const switchToForgotPassword = () => {
-    setCurrentPanel('forgot-password');
+    navigate('/forgot-password');
   };
 
-  // Panel içeriğini render et
-  const renderPanelContent = () => {
-    if (currentPanel === 'register') {
-      return <Register />;
-    }
-    
-    // Login paneli (varsayılan)
-    return (
-      <>
+  return (
+    <Container className="login-page-container" theme={theme}>
+        <LoginCard
+          className="login-page-card"
+          theme={theme}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
           <Logo>
             <LogoIcon>
               <img src="/images/feellink.logo.png" alt="Feellink Logo" />
@@ -476,20 +475,6 @@ const Login = () => {
               Admin Girişi
             </AlternativeLoginButton>
           </AlternativeLogins>
-      </>
-    );
-  };
-
-  return (
-    <Container className="login-page-container" theme={theme}>
-        <LoginCard
-          className="login-page-card"
-          theme={theme}
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          {renderPanelContent()}
         </LoginCard>
     </Container>
   );
