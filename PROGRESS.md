@@ -1,4 +1,4 @@
-# FEELLINK Proje İlerleme Durumu
+# feellink Proje İlerleme Durumu
 
 ## 🎯 Son Tamamlanan Görevler
 
@@ -28,7 +28,7 @@
 
 ### Backstage Entegrasyonu (Beklemede)
 1. Backstage konfigürasyonu ve temel ayarlar
-2. FEELLINK projesini Backstage cataloguna ekleme
+2. feellink projesini Backstage cataloguna ekleme
 3. Backstage UI ve tema özelleştirmesi
 4. Backstage ile mevcut proje entegrasyonu
 

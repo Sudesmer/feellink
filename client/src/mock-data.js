@@ -4,7 +4,7 @@ const mockUsers = [
     _id: '1',
     username: 'testuser',
     email: 'test@example.com',
-    password: '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password: password
+    password: 'password',
     fullName: 'Test User',
     bio: 'Test kullanıcısı',
     avatar: '',
@@ -18,7 +18,7 @@ const mockUsers = [
     _id: '2',
     username: 'admin',
     email: 'admin@feellink.com',
-    password: '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password: password
+    password: 'password',
     fullName: 'Admin User',
     bio: 'Feellink yöneticisi',
     avatar: '',
@@ -32,7 +32,7 @@ const mockUsers = [
     _id: '3',
     username: 'designer',
     email: 'designer@feellink.com',
-    password: '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password: password
+    password: 'password',
     fullName: 'Creative Designer',
     bio: 'Profesyonel grafik tasarımcı',
     avatar: '',
