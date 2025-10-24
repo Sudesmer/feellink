@@ -296,6 +296,7 @@ const Register = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [currentPanel, setCurrentPanel] = useState('register'); // Panel state'i
 
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -338,6 +339,15 @@ const Register = () => {
     }
     
     setLoading(false);
+  };
+
+  // Panel geçiş fonksiyonları
+  const switchToLogin = () => {
+    setCurrentPanel('login');
+  };
+
+  const switchToForgotPassword = () => {
+    setCurrentPanel('forgot-password');
   };
 
   return (
@@ -546,7 +556,21 @@ const Register = () => {
 
           <LoginLink>
             Zaten hesabınız var mı?{' '}
-            <Link to="/login">Giriş yapın</Link>
+            <button 
+              type="button" 
+              onClick={switchToLogin}
+              style={{ 
+                background: 'none', 
+                border: 'none', 
+                color: '#FF6B35', 
+                textDecoration: 'none', 
+                fontWeight: 600, 
+                cursor: 'pointer',
+                fontSize: 'inherit'
+              }}
+            >
+              Giriş yapın
+            </button>
           </LoginLink>
         </RegisterCard>
       </RightSection>
