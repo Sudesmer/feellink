@@ -55,6 +55,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const token = localStorage.getItem('feellink-token');
       if (!token) {
+        setUser(null);
         setLoading(false);
         return;
       }
@@ -62,14 +63,20 @@ export const AuthProvider = ({ children }) => {
       // Mock data için localStorage'dan user bilgisini al
       const storedUser = localStorage.getItem('feellink-user');
       if (storedUser) {
-        setUser(JSON.parse(storedUser));
-        console.log('User loaded from localStorage:', JSON.parse(storedUser));
+        const userData = JSON.parse(storedUser);
+        setUser(userData);
+        console.log('User loaded from localStorage:', userData);
       } else {
+        // Token var ama user data yok - temizle
         localStorage.removeItem('feellink-token');
+        localStorage.removeItem('feellink-user');
+        setUser(null);
       }
     } catch (error) {
       console.error('Auth check error:', error);
       localStorage.removeItem('feellink-token');
+      localStorage.removeItem('feellink-user');
+      setUser(null);
     } finally {
       setLoading(false);
     }
