@@ -92,16 +92,19 @@ function App() {
   const isAdminPage = location === '/admin' || location === '/admin-login';
   const isMuseumPage = location === '/museum-login' || location === '/museum-dashboard' || location === '/museum-panel';
 
-  // IMMEDIATE redirect to login if user is not authenticated and not on auth pages
+  // Redirect to login if user is not authenticated and not on auth pages
   if (!user && !isAuthPage && !isAdminPage && !isMuseumPage) {
-    // Clear any existing localStorage data
-    localStorage.removeItem('feellink-token');
-    localStorage.removeItem('feellink-user');
-    
-    // IMMEDIATE redirect to login page with full URL
-    const currentOrigin = window.location.origin;
-    window.location.replace(`${currentOrigin}/login`);
-    return null; // Don't render anything, just redirect
+    // Show login page instead of redirecting
+    return (
+      <ThemeProvider theme={theme}>
+        <GlobalStyles>
+          <LoginNavbar />
+          <MainContent isAuthPage={true}>
+            <Login />
+          </MainContent>
+        </GlobalStyles>
+      </ThemeProvider>
+    );
   }
 
   return (
