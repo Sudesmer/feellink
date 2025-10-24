@@ -7,7 +7,7 @@ Bu proje GitHub Pages ile deploy edilmiştir.
 - **Source**: Deploy from a branch
 - **Branch**: main
 - **Folder**: / (root)
-- **Custom Domain**: feellink.io
+- **Custom Domain**: www.feellink.io
 - **Enforce HTTPS**: ✅
 
 ## Dosya Yapısı
