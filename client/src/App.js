@@ -94,7 +94,7 @@ function App() {
 
   // Show login page if user is not authenticated and not on auth pages
   if (!user && !isAuthPage && !isAdminPage && !isMuseumPage) {
-    // Only show login page, don't redirect
+    // Show login page permanently until user logs in
     return (
       <ThemeProvider theme={theme}>
         <GlobalStyles>
