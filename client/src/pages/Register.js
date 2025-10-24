@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FiMail, FiLock, FiUser, FiEye, FiEyeOff, FiArrowRight } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
+import toast from 'react-hot-toast';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -329,9 +330,13 @@ const Register = () => {
       
       const result = await register(userData);
       if (result.success) {
-        window.location.href = '/';
+        toast.success('Kayıt başarılı! Hoş geldiniz!');
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1000);
       } else {
         setError(result.message || 'Kayıt olurken bir hata oluştu');
+        toast.error(result.message || 'Kayıt olurken bir hata oluştu');
       }
     } catch (err) {
       setError(err.message || 'Kayıt olurken bir hata oluştu');

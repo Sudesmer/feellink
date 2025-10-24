@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #FF6B35;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #e55a2b;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+        .success {
+            color: green;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Register Test</h2>
+    <form id="registerForm">
+        <div class="form-group">
+            <label for="name">Ad Soyad</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">E-posta</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Şifre</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="confirmPassword">Şifre Tekrar</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required>
+        </div>
+        
+        <button type="submit">Kayıt Ol</button>
+    </form>
+    
+    <div id="message"></div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const messageDiv = document.getElementById('message');
+            
+            // Email formatını kontrol et
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                messageDiv.innerHTML = '<div class="error">Geçerli bir email adresi girin</div>';
+                return;
+            }
+            
+            // Şifre uzunluğunu kontrol et
+            if (password.length < 6) {
+                messageDiv.innerHTML = '<div class="error">Şifre en az 6 karakter olmalıdır</div>';
+                return;
+            }
+            
+            // Şifre eşleşme kontrolü
+            if (password !== confirmPassword) {
+                messageDiv.innerHTML = '<div class="error">Şifreler eşleşmiyor</div>';
+                return;
+            }
+            
+            // Mock kayıt işlemi
+            const userData = {
+                fullName: name,
+                email: email,
+                password: password,
+                username: email.split('@')[0]
+            };
+            
+            // localStorage'a kaydet
+            const token = 'mock-token-' + Date.now();
+            const newUser = {
+                _id: Date.now().toString(),
+                email: userData.email,
+                username: userData.username,
+                fullName: userData.fullName,
+                avatar: '',
+                isVerified: true
+            };
+            
+            localStorage.setItem('feellink-token', token);
+            localStorage.setItem('feellink-user', JSON.stringify(newUser));
+            
+            messageDiv.innerHTML = '<div class="success">Kayıt başarılı! Kullanıcı: ' + newUser.fullName + '</div>';
+            
+            // 2 saniye sonra ana sayfaya yönlendir
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
