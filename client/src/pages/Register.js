@@ -320,8 +320,19 @@ const Register = () => {
     }
 
     try {
-      await register(formData.name, formData.email, formData.password);
-      navigate('/');
+      const userData = {
+        fullName: formData.name,
+        email: formData.email,
+        password: formData.password,
+        username: formData.email.split('@')[0] // Email'den username oluştur
+      };
+      
+      const result = await register(userData);
+      if (result.success) {
+        navigate('/');
+      } else {
+        setError(result.message || 'Kayıt olurken bir hata oluştu');
+      }
     } catch (err) {
       setError(err.message || 'Kayıt olurken bir hata oluştu');
     }
