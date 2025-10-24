@@ -216,6 +216,7 @@ const ErrorMessage = styled.div`
 `;
 
 const Register = () => {
+  console.log('Register component loaded!');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
