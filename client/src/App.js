@@ -92,9 +92,9 @@ function App() {
   const isAdminPage = location === '/admin' || location === '/admin-login';
   const isMuseumPage = location === '/museum-login' || location === '/museum-dashboard' || location === '/museum-panel';
 
-  // Redirect to login if user is not authenticated and not on auth pages
+  // Show login page if user is not authenticated and not on auth pages
   if (!user && !isAuthPage && !isAdminPage && !isMuseumPage) {
-    // Show login page instead of redirecting
+    // Only show login page, don't redirect
     return (
       <ThemeProvider theme={theme}>
         <GlobalStyles>
