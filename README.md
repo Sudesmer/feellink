@@ -67,16 +67,16 @@ npm start
 
 ## 🚀 Deployment
 
-### **Vercel (Önerilen)**
+### **Netlify (Önerilen)**
+- Frontend deployment
+- Mock API kullanır
+- Otomatik SSL
+- Detaylı rehber: [NETLIFY_DEPLOY.md](NETLIFY_DEPLOY.md)
+
+### **Vercel**
 - Full-stack deployment
 - Backend API çalışır
 - Otomatik SSL
-- Domain: feellink.io
-
-### **Netlify**
-- Static site deployment
-- Mock API kullanır
-- Backend API çalışmaz
 
 ## 📝 Scripts
 
@@ -98,9 +98,11 @@ npm start
 - Functions: `api/index.js`
 
 ### **Netlify (netlify.toml)**
-- Build command: `npm run build`
+- Build command: `cd client && npm ci && npm run build`
 - Publish directory: `client/build`
+- Base directory: `client`
 - Node version: 18
+- SPA redirects: `/*` → `/index.html`
 
 ## 📱 Özellikler
 
