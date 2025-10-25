@@ -2489,6 +2489,31 @@ const Profile = () => {
               </StatItem>
             </Stats>
 
+            <Bio theme={theme}>
+              <BioText theme={theme}>
+                {profile.fullName}
+                {profile.bio && (
+                  <>
+                    <br />
+                    {profile.bio.split('\n').map((line, index) => (
+                      <span key={index}>
+                        {line}
+                        {index < profile.bio.split('\n').length - 1 && <br />}
+                      </span>
+                    ))}
+                  </>
+                )}
+                {profile.website && (
+                  <>
+                    <br />
+                    <BioLink theme={theme} href={profile.website} target="_blank" rel="noopener noreferrer">
+                      {profile.website}
+                    </BioLink>
+                  </>
+                )}
+              </BioText>
+            </Bio>
+
             {/* Gizli Hesap Uyarısı */}
             {isOtherUserProfile && isPrivateAccount && !isFollower && (
               <div style={{
@@ -2525,31 +2550,6 @@ const Profile = () => {
                 </div>
               </div>
             )}
-
-            <Bio theme={theme}>
-              <BioText theme={theme}>
-                {profile.fullName}
-                {profile.bio && (
-                  <>
-                    <br />
-                    {profile.bio.split('\n').map((line, index) => (
-                      <span key={index}>
-                        {line}
-                        {index < profile.bio.split('\n').length - 1 && <br />}
-                      </span>
-                    ))}
-                  </>
-                )}
-                {profile.website && (
-                  <>
-                    <br />
-                    <BioLink theme={theme} href={profile.website} target="_blank" rel="noopener noreferrer">
-                      {profile.website}
-                    </BioLink>
-                  </>
-                )}
-              </BioText>
-            </Bio>
             
             <ActionButtons>
               {isOwnProfile ? (
