@@ -1652,13 +1652,35 @@ const Profile = () => {
   
   // Component mount olduğunda sayıları güncelle
   React.useEffect(() => {
-    // Takip sayılarını sıfırla (launch için)
-    localStorage.removeItem('followersCount');
-    localStorage.removeItem('followingCount');
-    localStorage.removeItem('followersData');
-    localStorage.removeItem('followingData');
+    // localStorage'dan takip sayılarını yükle (kullanıcıya özel)
+    const userEmail = currentUser?.email || 'anonymous';
     
-    updateCounts();
+    // isOwnProfile hesapla
+    const isOwnProfileCheck = !id || (currentUser && currentUser._id === id);
+    
+    // Takipçi sayısını yükle
+    if (isOwnProfileCheck) {
+      // Kendi profildeysek kendi takipçi sayımızı yükle
+      const followersKey = `followersCount_${userEmail}`;
+      const storedFollowersCount = localStorage.getItem(followersKey);
+      if (storedFollowersCount) {
+        setFollowersCount(parseInt(storedFollowersCount));
+      }
+    } else {
+      // Başka kullanıcının profiline bakıyorsak onun takipçi sayısını yükle
+      const targetFollowersKey = `followersCount_user_${id}`;
+      const storedFollowersCount = localStorage.getItem(targetFollowersKey);
+      if (storedFollowersCount) {
+        setFollowersCount(parseInt(storedFollowersCount));
+      }
+    }
+    
+    // Takip sayısını yükle (HER ZAMAN - Instagram'da kendi takip sayınız her zaman görünür)
+    const followingKey = `followingCount_${userEmail}`;
+    const storedFollowingCount = localStorage.getItem(followingKey);
+    if (storedFollowingCount) {
+      setFollowingCount(parseInt(storedFollowingCount));
+    }
     
     // localStorage'dan takip verilerini yükle
     try {
@@ -1674,7 +1696,7 @@ const Profile = () => {
     } catch (error) {
       console.error('localStorage takip verileri yükleme hatası:', error);
     }
-  }, [updateCounts]);
+  }, [currentUser, id]);
 
   // localStorage'dan güncellenmiş profil verilerini yükle - eski userProfile verisini kullanma
   React.useEffect(() => {
@@ -1725,15 +1747,10 @@ const Profile = () => {
     const currentFollowingCount = parseInt(localStorage.getItem(followingKey) || '0');
     const newFollowingCount = newFollowState ? Math.max(0, currentFollowingCount + 1) : Math.max(0, currentFollowingCount - 1);
     
-    // State'i güncelle (sadece kendi profildeysek)
-    if (!isOtherUserProfile) {
-      setFollowingCount(newFollowingCount);
-    }
-    
     // localStorage'a kaydet (HER ZAMAN)
     localStorage.setItem(followingKey, Math.max(0, newFollowingCount).toString());
     
-    console.log('✅ Benim takip sayım güncellendi:', newFollowingCount);
+    console.log('✅ Benim takip sayım güncellendi:', newFollowingCount, 'LocalStorage\'a kaydedildi');
     
     // Kullanıcıya özel takip bilgilerini localStorage'a kaydet
     const followKey = `userFollowState_${userEmail}`;
