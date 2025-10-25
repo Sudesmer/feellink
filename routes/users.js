@@ -2,7 +2,51 @@ const express = require('express');
 const User = require('../models/User');
 const Work = require('../models/Work');
 const { authenticateToken, optionalAuth } = require('../middleware/auth');
+const fs = require('fs').promises;
+const path = require('path');
 const router = express.Router();
+
+// Read users from JSON file
+const readUsers = async () => {
+  try {
+    const filePath = path.join(__dirname, '../data/users.json');
+    const data = await fs.readFile(filePath, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error('Error reading users:', error);
+    return [];
+  }
+};
+
+// @route   GET /api/users
+// @desc    Tüm kullanıcıları getir (public info only)
+// @access  Public
+router.get('/', async (req, res) => {
+  try {
+    const users = await readUsers();
+    
+    // Map to public user info
+    const publicUsers = users.map(user => ({
+      _id: user._id,
+      email: user.email,
+      fullName: user.fullName,
+      avatar: user.avatar || '',
+      isVerified: user.isVerified || false,
+      createdAt: user.createdAt
+    }));
+    
+    res.json({
+      success: true,
+      users: publicUsers
+    });
+  } catch (error) {
+    console.error('Get users error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Kullanıcılar alınırken hata oluştu'
+    });
+  }
+});
 
 // @route   GET /api/users/profile/:username
 // @desc    Kullanıcı profilini getir

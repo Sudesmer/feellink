@@ -1,7 +1,8 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { useTheme } from '../contexts/ThemeContext';
+import axios from 'axios';
 import { 
   FiGrid,
   FiHeart,
@@ -20,6 +21,7 @@ import {
 } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import { mockWorks as originalMockWorks } from '../mock-data';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -1184,7 +1186,7 @@ const mockProfile = {
 
 
 const Profile = () => {
-  const { username } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { theme } = useTheme();
@@ -1460,6 +1462,8 @@ const Profile = () => {
   };
   
   const [profile, setProfile] = useState(getStoredProfileData());
+  const [userToDisplay, setUserToDisplay] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(false);
   
   // Kullanıcı yorumlarını yükle
   React.useEffect(() => {
@@ -1467,6 +1471,47 @@ const Profile = () => {
     setCommentFilter(getStoredCommentFilter());
     setPinnedComments(getStoredPinnedComments());
   }, []);
+
+  // Eğer URL'de id varsa, o kullanıcının bilgilerini yükle
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      if (!id) return; // Eğer id yoksa (kendi profili), hiçbir şey yapma
+      
+      setLoadingUser(true);
+      try {
+        // Backend'den tüm kullanıcıları al
+        const response = await axios.get('http://localhost:5000/api/users');
+        if (response.data && response.data.success) {
+          const allUsers = response.data.users || [];
+          // Belirtilen id ile eşleşen kullanıcıyı bul
+          const foundUser = allUsers.find(user => user._id === id);
+          if (foundUser) {
+            setUserToDisplay(foundUser);
+            // Profile state'ini güncelle
+            setProfile({
+              username: foundUser.fullName?.split(' ').join('_').toLowerCase() || foundUser.email?.split('@')[0],
+              fullName: foundUser.fullName || foundUser.email,
+              bio: foundUser.bio || '',
+              website: foundUser.website || '',
+              location: foundUser.location || '',
+              avatar: foundUser.avatar || '',
+              followers: foundUser.followers || 0,
+              following: foundUser.following || 0,
+              posts: 0,
+              isFollowing: false,
+              isOwnProfile: foundUser._id === currentUser?._id
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error loading user profile:', error);
+      } finally {
+        setLoadingUser(false);
+      }
+    };
+
+    loadUserProfile();
+  }, [id, currentUser]);
 
   // Sağ tık menüsünü kapatma
   React.useEffect(() => {
@@ -1974,6 +2019,15 @@ const Profile = () => {
       workFileInputRef.current.value = '';
     }
   };
+
+  // Loading durumunu göster
+  if (loadingUser) {
+    return (
+      <Container theme={theme}>
+        <LoadingSpinner text="Kullanıcı bilgileri yükleniyor..." />
+      </Container>
+    );
+  }
 
   return (
     <Container theme={theme}>

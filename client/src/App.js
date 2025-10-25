@@ -292,7 +292,7 @@ function App() {
                   } 
                 />
                 <Route 
-                  path="/profile/:username" 
+                  path="/profile/:id" 
                   element={
                     <motion.div
                       initial="initial"
