@@ -2754,17 +2754,36 @@ const Profile = () => {
         )}
 
         {activeTab === 'saved' && (
-          <EmptyState theme={theme}>
-            <EmptyIcon>🔖</EmptyIcon>
-            <EmptyTitle theme={theme}>Kaydedilen eserler</EmptyTitle>
-            <EmptyDescription theme={theme}>
-              Kaydettiğiniz eserler burada görünecek.
-            </EmptyDescription>
-          </EmptyState>
+          isOtherUserProfile && isPrivateAccount && !isFollower ? (
+            <EmptyState theme={theme}>
+              <EmptyIcon>🔒</EmptyIcon>
+              <EmptyTitle theme={theme}>Bu Hesap Gizli</EmptyTitle>
+              <EmptyDescription theme={theme}>
+                Bu kullanıcının kaydettiği eserleri görmek için takip isteği göndermeniz gerekir.
+              </EmptyDescription>
+            </EmptyState>
+          ) : (
+            <EmptyState theme={theme}>
+              <EmptyIcon>🔖</EmptyIcon>
+              <EmptyTitle theme={theme}>Kaydedilen eserler</EmptyTitle>
+              <EmptyDescription theme={theme}>
+                Kaydettiğiniz eserler burada görünecek.
+              </EmptyDescription>
+            </EmptyState>
+          )
         )}
 
         {activeTab === 'comments' && (
-          userComments.length > 0 ? (
+          // Gizli hesap kontrolü
+          isOtherUserProfile && isPrivateAccount && !isFollower ? (
+            <EmptyState theme={theme}>
+              <EmptyIcon>🔒</EmptyIcon>
+              <EmptyTitle theme={theme}>Bu Hesap Gizli</EmptyTitle>
+              <EmptyDescription theme={theme}>
+                Bu kullanıcının yorumlarını görmek için takip isteği göndermeniz gerekir.
+              </EmptyDescription>
+            </EmptyState>
+          ) : userComments.length > 0 ? (
             <div style={{ padding: '20px 0' }}>
               {/* Yorum Filtreleri */}
               <div style={{ 
@@ -2943,13 +2962,23 @@ const Profile = () => {
         )}
 
         {activeTab === 'favorites' && (
-          <EmptyState theme={theme}>
-            <EmptyIcon>🏛️</EmptyIcon>
-            <EmptyTitle theme={theme}>Favori müzeleriniz</EmptyTitle>
-            <EmptyDescription theme={theme}>
-              Beğendiğiniz müzeler burada görünecek.
-            </EmptyDescription>
-          </EmptyState>
+          isOtherUserProfile && isPrivateAccount && !isFollower ? (
+            <EmptyState theme={theme}>
+              <EmptyIcon>🔒</EmptyIcon>
+              <EmptyTitle theme={theme}>Bu Hesap Gizli</EmptyTitle>
+              <EmptyDescription theme={theme}>
+                Bu kullanıcının favori müzelerini görmek için takip isteği göndermeniz gerekir.
+              </EmptyDescription>
+            </EmptyState>
+          ) : (
+            <EmptyState theme={theme}>
+              <EmptyIcon>🏛️</EmptyIcon>
+              <EmptyTitle theme={theme}>Favori müzeleriniz</EmptyTitle>
+              <EmptyDescription theme={theme}>
+                Beğendiğiniz müzeler burada görünecek.
+              </EmptyDescription>
+            </EmptyState>
+          )
         )}
       </ProfileContainer>
           </ContentInner>
