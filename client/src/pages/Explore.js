@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
@@ -357,15 +357,95 @@ const EmptyDescription = styled.p`
   margin: 0 auto;
 `;
 
+// User search components
+const UserSearchSection = styled.div`
+  margin-bottom: 40px;
+`;
+
+const UserSearchTitle = styled.h2`
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: ${props => props.theme.text};
+  margin-bottom: 20px;
+  background: ${props => props.theme.gradient};
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+`;
+
+const UsersGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+`;
+
+const UserCard = styled(motion.div)`
+  background: ${props => props.theme.cardBackground};
+  border: 1px solid ${props => props.theme.border};
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px ${props => props.theme.shadow};
+    border-color: ${props => props.theme.primary};
+  }
+`;
+
+const UserAvatar = styled.div`
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  background: ${props => props.theme.gradient};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 1.5rem;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
+
+const UserName = styled.h3`
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: ${props => props.theme.text};
+  margin-bottom: 8px;
+`;
+
+const UserEmail = styled.p`
+  font-size: 0.9rem;
+  color: ${props => props.theme.textSecondary};
+  margin: 0;
+`;
+
 const Explore = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { theme } = useTheme();
-  const [searchQuery, setSearchQuery] = useState('');
+  
+  // URL'den arama parametresini oku
+  const searchParams = new URLSearchParams(location.search);
+  const initialSearch = searchParams.get('search') || '';
+  
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [category, setCategory] = useState('');
   const [sortBy, setSortBy] = useState('newest');
   const [viewMode, setViewMode] = useState('grid');
   const [page, setPage] = useState(1);
+  const [searchMode, setSearchMode] = useState('works'); // 'works' or 'users'
+  const [users, setUsers] = useState([]);
 
   // Fetch categories
   const { data: categories } = useQuery(
@@ -375,6 +455,28 @@ const Explore = () => {
       return response.categories;
     }
   );
+
+  // Fetch users for search
+  const searchUsers = async (query) => {
+    if (!query.trim()) return [];
+    
+    try {
+      const response = await axios.get('http://localhost:5000/api/users');
+      if (response.data && response.data.success) {
+        const allUsers = response.data.users || [];
+        // Filter users by query
+        const filtered = allUsers.filter(user => 
+          user.fullName?.toLowerCase().includes(query.toLowerCase()) ||
+          user.email?.toLowerCase().includes(query.toLowerCase())
+        );
+        return filtered;
+      }
+      return [];
+    } catch (error) {
+      console.error('Error searching users:', error);
+      return [];
+    }
+  };
 
   // Fetch works - Gerçek zamanlı eserler için boş array (backend entegrasyonu için hazır)
   const { data: worksData, isLoading, isFetching } = useQuery(
@@ -392,6 +494,15 @@ const Explore = () => {
       };
     }
   );
+
+  // Search users when search query changes
+  useEffect(() => {
+    if (searchQuery.trim() && searchQuery.length > 0) {
+      searchUsers(searchQuery).then(setUsers);
+    } else {
+      setUsers([]);
+    }
+  }, [searchQuery]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -521,6 +632,37 @@ const Explore = () => {
             </ViewToggle>
           </FiltersContainer>
 
+          {/* User Search Results */}
+          {users.length > 0 && (
+            <UserSearchSection>
+              <UserSearchTitle theme={theme}>
+                👥 Bulunan Kullanıcılar
+              </UserSearchTitle>
+              <UsersGrid>
+                {users.map((user, index) => (
+                                     <UserCard
+                    key={user._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: index * 0.05 }}
+                    onClick={() => navigate(`/profile/${user._id}`)}
+                  >
+                    <UserAvatar theme={theme}>
+                      {user.avatar ? (
+                        <img src={user.avatar} alt={user.fullName} />
+                      ) : (
+                        user.fullName?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'
+                      )}
+                    </UserAvatar>
+                    <UserName theme={theme}>{user.fullName || user.email}</UserName>
+                    <UserEmail theme={theme}>{user.email}</UserEmail>
+                  </UserCard>
+                ))}
+              </UsersGrid>
+            </UserSearchSection>
+          )}
+
+          {/* Works Section */}
           {isLoading ? (
             <LoadingSpinner text="Eserler yükleniyor..." />
           ) : works.length > 0 ? (
