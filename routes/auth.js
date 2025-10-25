@@ -1,20 +1,42 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const fs = require('fs').promises;
+const path = require('path');
 const router = express.Router();
 
-// Mock database (imported from server.js)
-let users, categories, works, currentUserId;
+// Kalıcı veri dosyası
+const USERS_FILE = path.join(__dirname, '../data/users.json');
 
-// Initialize mock data
-router.use((req, res, next) => {
-  const { mockUsers, mockCategories, mockWorks } = require('../mock-data');
-  users = users || [...mockUsers];
-  categories = categories || [...mockCategories];
-  works = works || [...mockWorks];
-  currentUserId = currentUserId || 1;
-  next();
-});
+// Kullanıcıları dosyadan oku
+const readUsers = async () => {
+  try {
+    const data = await fs.readFile(USERS_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error('Users file read error:', error);
+    return [];
+  }
+};
+
+// Kullanıcıları dosyaya yaz
+const writeUsers = async (users) => {
+  try {
+    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2), 'utf8');
+    return true;
+  } catch (error) {
+    console.error('Users file write error:', error);
+    return false;
+  }
+};
+
+// En yüksek ID'yi bul
+const getNextUserId = async () => {
+  const users = await readUsers();
+  if (users.length === 0) return '1';
+  const maxId = Math.max(...users.map(u => parseInt(u._id) || 0));
+  return (maxId + 1).toString();
+};
 
 // Simple token generation
 const generateToken = (userId) => {
@@ -57,6 +79,9 @@ router.post('/register', async (req, res) => {
       });
     }
 
+    // Dosyadan kullanıcıları oku
+    const users = await readUsers();
+
     // Kullanıcı adı ve e-posta benzersizliğini kontrol et
     const existingUser = users.find(u => u.email === email || u.username === username);
 
@@ -74,8 +99,9 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Yeni kullanıcı oluştur
+    const newUserId = await getNextUserId();
     const newUser = {
-      _id: (++currentUserId).toString(),
+      _id: newUserId,
       username,
       email,
       fullName,
@@ -86,10 +112,14 @@ router.post('/register', async (req, res) => {
       following: [],
       savedWorks: [],
       isVerified: false,
-      createdAt: new Date()
+      createdAt: new Date().toISOString()
     };
 
+    // Kullanıcıyı listeye ekle ve dosyaya kaydet
     users.push(newUser);
+    await writeUsers(users);
+
+    console.log('✅ Yeni kullanıcı kaydedildi:', email);
 
     // Token oluştur
     const token = generateToken(newUser._id);
@@ -126,7 +156,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log('Login attempt:', { email, password });
+    console.log('🔐 Login attempt:', { email });
 
     if (!email || !password) {
       return res.status(400).json({
@@ -135,9 +165,12 @@ router.post('/login', async (req, res) => {
       });
     }
 
+    // Dosyadan kullanıcıları oku
+    const users = await readUsers();
+
     // Kullanıcıyı bul
     const user = users.find(u => u.email === email);
-    console.log('Found user:', user);
+    console.log('👤 Found user:', user ? `${user.fullName} (${user.email})` : 'Not found');
 
     if (!user) {
       return res.status(401).json({
@@ -166,7 +199,7 @@ router.post('/login', async (req, res) => {
 
     // Token oluştur
     const token = generateToken(user._id);
-    console.log('Token generated:', token);
+    console.log('✅ Login successful for:', user.fullName);
 
     const responseData = {
       success: true,
@@ -175,6 +208,7 @@ router.post('/login', async (req, res) => {
       user: {
         _id: user._id,
         username: user.username,
+        email: user.email,
         fullName: user.fullName,
         bio: user.bio,
         avatar: user.avatar,
@@ -185,7 +219,6 @@ router.post('/login', async (req, res) => {
       }
     };
 
-    console.log('Sending response:', responseData);
     res.json(responseData);
 
   } catch (error) {
@@ -210,6 +243,9 @@ router.get('/me', async (req, res) => {
         message: 'Token gerekli'
       });
     }
+
+    // Dosyadan kullanıcıları oku
+    const users = await readUsers();
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_super_secret_jwt_key_here_change_in_production');
     const user = users.find(u => u._id === decoded.userId);
@@ -258,6 +294,9 @@ router.post('/refresh', async (req, res) => {
       });
     }
 
+    // Dosyadan kullanıcıları oku
+    const users = await readUsers();
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_super_secret_jwt_key_here_change_in_production');
     const user = users.find(u => u._id === decoded.userId);
 
@@ -290,8 +329,10 @@ router.post('/verify-email', async (req, res) => {
   try {
     const { token } = req.body;
     
+    // Dosyadan kullanıcıları oku
+    const users = await readUsers();
+    
     // Basit token doğrulama (production'da daha güvenli olmalı)
-    // Şimdilik kullanıcı ID'sini token olarak kullanıyoruz
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_super_secret_jwt_key_here_change_in_production');
     const user = users.find(u => u._id === decoded.userId);
 
@@ -303,6 +344,7 @@ router.post('/verify-email', async (req, res) => {
     }
 
     user.isVerified = true;
+    await writeUsers(users); // Değişikliği kaydet
 
     res.json({
       success: true,

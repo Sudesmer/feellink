@@ -16,6 +16,9 @@ dist/
 .env.test.local
 .env.production.local
 
+# User data - keep this for production
+# data/users.json
+
 # IDE files
 .vscode/
 .idea/
