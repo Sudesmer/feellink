@@ -1925,30 +1925,47 @@ const Profile = () => {
 
   // Takip edilenler modal'ındaki takip işlemi
   const handleFollowingUnfollow = (followingId) => {
-    setFollowing(prevFollowing => 
-      prevFollowing.map(user => 
-        user._id === followingId 
-          ? { ...user, isFollowing: false }
-          : user
-      )
-    );
+    const userEmail = currentUser?.email || 'anonymous';
+    const followingKey = `followingCount_${userEmail}`;
     
-    // Takip edilen sayısını güncelle
-    const newFollowingCount = followingCount - 1;
-    setFollowingCount(newFollowingCount);
+    // localStorage'dan mevcut takip sayısını al
+    const currentFollowingCount = parseInt(localStorage.getItem(followingKey) || '0');
     
-    // localStorage'a kaydet
-    try {
+    // Takip edilen listesinden kontrol et
+    const followingListKey = `followingList_${userEmail}`;
+    const followingList = JSON.parse(localStorage.getItem(followingListKey) || '[]');
+    
+    // Kullanıcının listede olup olmadığını kontrol et
+    const userInList = followingList.some(u => u._id === followingId);
+    
+    // Eğer listede varsa, sayıyı azalt
+    if (userInList) {
+      const newFollowingCount = Math.max(0, currentFollowingCount - 1);
+      
+      // State'i güncelle
+      setFollowingCount(newFollowingCount);
+      
+      // Listeden çıkar
       const updatedFollowing = following.map(user => 
         user._id === followingId 
           ? { ...user, isFollowing: false }
           : user
       );
+      
+      // localStorage'a kaydet
+      setFollowing(updatedFollowing);
       localStorage.setItem('followingData', JSON.stringify(updatedFollowing));
-      localStorage.setItem('followingCount', newFollowingCount.toString());
-      console.log('Takip edilen kullanıcı takipten çıkarıldı:', followingId);
-    } catch (error) {
-      console.error('Takip edilen kullanıcı takipten çıkarma hatası:', error);
+      
+      // localStorage'daki takip edilenler listesini güncelle
+      const newFollowingList = followingList.filter(u => u._id !== followingId);
+      localStorage.setItem(followingListKey, JSON.stringify(newFollowingList));
+      
+      // Takip sayısını güncelle
+      localStorage.setItem(followingKey, newFollowingCount.toString());
+      
+      console.log('✅ Takip edilen kullanıcı takipten çıkarıldı:', followingId, 'Yeni sayı:', newFollowingCount);
+    } else {
+      console.log('⚠️ Kullanıcı zaten listede değil:', followingId);
     }
   };
 
