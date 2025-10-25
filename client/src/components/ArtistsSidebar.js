@@ -1,6 +1,6 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
 import { FiHeart, FiMessageCircle, FiCalendar, FiTrendingUp } from 'react-icons/fi';
 
 const SidebarContainer = styled.div`
@@ -16,8 +16,12 @@ const SidebarContainer = styled.div`
   overflow-y: auto;
   position: relative;
   z-index: 10;
-  display: flex;
+  display: flex !important;
   flex-direction: column;
+  visibility: visible !important;
+  opacity: 1 !important;
+  margin-top: 0;
+  padding-top: 24px;
 
   @media (max-width: 1200px) {
     display: none;
@@ -34,7 +38,7 @@ const SidebarTitle = styled.h3`
   gap: 8px;
 `;
 
-const ArticleCard = styled(motion.div)`
+const ArticleCard = styled.div`
   background: ${props => props.theme.cardBackground};
   border: 1px solid ${props => props.theme.border};
   border-radius: 12px;
@@ -192,7 +196,7 @@ const ButtonArea = styled.div`
   border-top: 1px solid ${props => props.theme.border};
 `;
 
-const ViewAllButton = styled(motion.button)`
+const ViewAllButton = styled.button`
   width: 100%;
   padding: 12px;
   background: ${props => props.theme.gradient};
@@ -217,7 +221,7 @@ const MuseumsGrid = styled.div`
   margin-bottom: 24px;
 `;
 
-const MuseumCard = styled(motion.div)`
+const MuseumCard = styled.div`
   background: ${props => props.theme.cardBackground};
   border: 1px solid ${props => props.theme.border};
   border-radius: 12px;
@@ -257,6 +261,8 @@ const MuseumVisitors = styled.p`
 
 
 const ArtistsSidebar = () => {
+  const navigate = useNavigate();
+  
   // Mock data for artist articles
   const articles = [
     {
@@ -353,14 +359,8 @@ const ArtistsSidebar = () => {
       </SidebarTitle>
 
       <MuseumsGrid>
-        {featuredMuseums.map((museum, index) => (
-          <MuseumCard
-            key={museum.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            whileHover={{ scale: 1.02 }}
-          >
+        {featuredMuseums.map((museum) => (
+          <MuseumCard key={museum.id}>
             <MuseumImage image={museum.image} />
             <MuseumName>{museum.name}</MuseumName>
             <MuseumVisitors>{museum.visitors}</MuseumVisitors>
@@ -374,14 +374,8 @@ const ArtistsSidebar = () => {
       </SidebarTitle>
 
       <ContentArea>
-        {articles.map((article, index) => (
-          <ArticleCard
-            key={article.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            whileHover={{ scale: 1.02 }}
-          >
+        {articles.map((article) => (
+          <ArticleCard key={article.id}>
             <ArticleHeader>
               <AuthorAvatar>
                 <img 
@@ -432,10 +426,7 @@ const ArtistsSidebar = () => {
       </ContentArea>
 
       <ButtonArea>
-        <ViewAllButton
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
+        <ViewAllButton onClick={() => navigate('/articles')}>
           Tüm Yazıları Gör
         </ViewAllButton>
       </ButtonArea>

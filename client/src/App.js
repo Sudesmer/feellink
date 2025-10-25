@@ -14,6 +14,7 @@ import LoadingSpinner from './components/LoadingSpinner';
 // Pages
 import Home from './pages/Home';
 import Explore from './pages/Explore';
+import Articles from './pages/Articles';
 import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
 import Saved from './pages/Saved';
@@ -245,6 +246,20 @@ function App() {
                       transition={pageTransition}
                     >
                       <Explore />
+                    </motion.div>
+                  } 
+                />
+                <Route 
+                  path="/articles" 
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                    >
+                      <Articles />
                     </motion.div>
                   } 
                 />

@@ -209,6 +209,12 @@ export const AuthProvider = ({ children }) => {
       } catch (apiError) {
         console.error('API register error:', apiError);
         
+        // Eğer bu e-posta zaten kayıtlı ise hata mesajını döndür
+        if (apiError.response?.status === 409) {
+          const errorMessage = apiError.response.data?.message || 'Bu e-posta adresi ile zaten bir hesap bulunmaktadır.';
+          return { success: false, message: errorMessage };
+        }
+        
         // Fallback: Mock registration (backend çalışmıyorsa)
         const token = 'mock-token-' + Date.now();
         const newUser = {

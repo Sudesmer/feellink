@@ -14,6 +14,7 @@ import {
   FiEdit3
 } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
+import axios from 'axios';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -318,32 +319,39 @@ const EditProfile = () => {
   const { theme } = useTheme();
   const { user } = useAuth();
   
-  // localStorage'dan profil verilerini yükle
+  // localStorage'dan profil verilerini yükle - her kullanıcı kendi bilgilerini girebilsin
+  const getUserKey = (key) => {
+    // Kullanıcı email'ini key'e ekle (her kullanıcı için ayrı localStorage)
+    const userEmail = user?.email || 'anonymous';
+    return `${key}_${userEmail}`;
+  };
+
   const getStoredProfileData = () => {
     try {
-      const storedProfile = localStorage.getItem('userProfile');
-      if (storedProfile) {
-        const parsedProfile = JSON.parse(storedProfile);
-        return {
-          fullName: parsedProfile.fullName || user?.fullName || '',
-          username: parsedProfile.username || user?.username || '',
-          email: parsedProfile.email || user?.email || '',
-          bio: parsedProfile.bio || user?.bio || '',
-          website: parsedProfile.website || user?.website || '',
-          location: parsedProfile.location || user?.location || ''
-        };
-      }
+      // Kullanıcıya özel localStorage key'leri kullan
+      const userBio = localStorage.getItem(getUserKey('userBio')) || '';
+      const userWebsite = localStorage.getItem(getUserKey('userWebsite')) || '';
+      const userLocation = localStorage.getItem(getUserKey('userLocation')) || '';
+      
+      return {
+        fullName: user?.fullName || '',
+        username: user?.username || user?.email?.split('@')[0] || '',
+        email: user?.email || '',
+        bio: userBio,
+        website: userWebsite,
+        location: userLocation
+      };
     } catch (error) {
       console.error('Profil verileri okuma hatası:', error);
+      return {
+        fullName: user?.fullName || '',
+        username: user?.username || user?.email?.split('@')[0] || '',
+        email: user?.email || '',
+        bio: '',
+        website: '',
+        location: ''
+      };
     }
-    return {
-      fullName: user?.fullName || '',
-      username: user?.username || '',
-      email: user?.email || '',
-      bio: user?.bio || '',
-      website: user?.website || '',
-      location: user?.location || ''
-    };
   };
 
   const [formData, setFormData] = useState(getStoredProfileData());
@@ -351,8 +359,8 @@ const EditProfile = () => {
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(() => {
-    // Önce localStorage'dan profil fotoğrafını kontrol et
-    const storedPhoto = localStorage.getItem('userProfilePhoto');
+    // Önce localStorage'dan kullanıcıya özel profil fotoğrafını kontrol et
+    const storedPhoto = localStorage.getItem(getUserKey('userProfilePhoto'));
     if (storedPhoto) {
       return storedPhoto;
     }
@@ -387,17 +395,8 @@ const EditProfile = () => {
 
   const handleSavePhoto = () => {
     if (selectedFile) {
-      // Fotoğrafı localStorage'a kaydet (Profile.js ile aynı key kullan)
-      localStorage.setItem('userProfilePhoto', previewUrl);
-      
-      // Profil verilerini de güncelle
-      const updatedProfile = {
-        ...user,
-        ...formData,
-        avatar: previewUrl
-      };
-      
-      localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+      // Fotoğrafı kullanıcıya özel localStorage'a kaydet
+      localStorage.setItem(getUserKey('userProfilePhoto'), previewUrl);
       
       console.log('Fotoğraf kaydediliyor:', selectedFile);
       setShowPhotoUpload(false);
@@ -416,24 +415,42 @@ const EditProfile = () => {
     setIsLoading(true);
     
     try {
-      // Profil verilerini localStorage'a kaydet
-      const updatedProfile = {
-        ...user,
-        ...formData,
-        avatar: previewUrl
-      };
+      // Backend'e profil bilgilerini gönder (kalıcı kayıt için)
+      const token = localStorage.getItem('feellink-token');
       
-      localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
-      
-      // Profil fotoğrafını da ayrı key'e kaydet
-      if (previewUrl) {
-        localStorage.setItem('userProfilePhoto', previewUrl);
+      try {
+        const response = await axios.put('http://localhost:5000/api/auth/profile', 
+          {
+            bio: formData.bio,
+            website: formData.website,
+            location: formData.location,
+            avatar: previewUrl || ''
+          },
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        
+        console.log('✅ Profil backend\'e kaydedildi:', response.data);
+      } catch (apiError) {
+        console.error('Backend kayıt hatası:', apiError);
+        // Backend hatası olsa bile localStorage'a kaydet (fallback)
       }
       
-      console.log('Profil güncelleniyor:', formData);
+      // Her kullanıcı kendi bilgilerini ayrı ayrı kaydet (kullanıcıya özel localStorage)
+      localStorage.setItem(getUserKey('userBio'), formData.bio);
+      localStorage.setItem(getUserKey('userWebsite'), formData.website);
+      localStorage.setItem(getUserKey('userLocation'), formData.location);
       
-      // Simüle edilmiş API çağrısı
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Profil fotoğrafını da kullanıcıya özel key'e kaydet
+      if (previewUrl) {
+        localStorage.setItem(getUserKey('userProfilePhoto'), previewUrl);
+      }
+      
+      console.log('✅ Profil localStorage\'a kaydedildi');
       
       // Başarılı güncelleme sonrası profil sayfasına yönlendir
       navigate('/profile');

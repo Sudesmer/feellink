@@ -376,21 +376,20 @@ const Explore = () => {
     }
   );
 
-  // Fetch works
+  // Fetch works - Gerçek zamanlı eserler için boş array (backend entegrasyonu için hazır)
   const { data: worksData, isLoading, isFetching } = useQuery(
     ['works', searchQuery, category, sortBy, page],
     async () => {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: '20',
-        sort: sortBy,
-      });
-
-      if (searchQuery) params.append('search', searchQuery);
-      if (category) params.append('category', category);
-
-      const response = await worksAPI.getWorks();
-      return response;
+      // Gerçek zamanlı eserler eklendikçe buraya backend entegrasyonu yapılacak
+      return {
+        success: true,
+        works: [],
+        pagination: {
+          current: 1,
+          pages: 1,
+          total: 0
+        }
+      };
     }
   );
 
