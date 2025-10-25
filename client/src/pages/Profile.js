@@ -1678,7 +1678,12 @@ const Profile = () => {
       const storedFollowersCount = localStorage.getItem(followersKey);
       console.log('🔍 localStorage takipçi sayısı:', storedFollowersCount);
       
-      if (storedFollowersCount) {
+      // Eğer değer "1" ise, onu "0" olarak ayarla (bir kerelik düzeltme)
+      if (storedFollowersCount === '1') {
+        console.log('⚠️ localStorage\'da takipçi sayısı 1, 0\'a düzeltiliyor');
+        localStorage.setItem(followersKey, '0');
+        setFollowersCount(0);
+      } else if (storedFollowersCount) {
         const count = parseInt(storedFollowersCount);
         console.log('✅ Parsed takipçi sayısı:', count);
         // Negatif değerleri engelle
