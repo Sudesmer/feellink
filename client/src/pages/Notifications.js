@@ -451,6 +451,7 @@ const Notifications = () => {
       case 'like': return <FiHeart />;
       case 'comment': return <FiMessageCircle />;
       case 'follow': return <FiUserPlus />;
+      case 'follow_request': return <FiUserPlus />;
       case 'award': return <FiAward />;
       default: return <FiTrendingUp />;
     }
