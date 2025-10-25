@@ -1676,11 +1676,18 @@ const Profile = () => {
       // Kendi profildeysek kendi takipçi sayımızı yükle
       const followersKey = `followersCount_${userEmail}`;
       const storedFollowersCount = localStorage.getItem(followersKey);
+      console.log('🔍 localStorage takipçi sayısı:', storedFollowersCount);
+      
       if (storedFollowersCount) {
-        setFollowersCount(parseInt(storedFollowersCount));
+        const count = parseInt(storedFollowersCount);
+        console.log('✅ Parsed takipçi sayısı:', count);
+        setFollowersCount(count);
       } else {
         // localStorage'da yoksa 0'a set et
+        console.log('⚠️ localStorage\'da takipçi sayısı yok, 0\'a set ediliyor');
         setFollowersCount(0);
+        // localStorage'a da 0 yaz
+        localStorage.setItem(followersKey, '0');
       }
     } else {
       // Başka kullanıcının profiline bakıyorsak onun takipçi sayısını yükle
