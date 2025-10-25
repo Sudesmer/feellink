@@ -1,0 +1,40 @@
+services:
+  # Frontend (React App)
+  - type: web
+    name: feellink-frontend
+    env: static
+    buildCommand: cd client && npm ci --legacy-peer-deps && npm run build
+    staticPublishPath: client/build
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      - key: NPM_FLAGS
+        value: --legacy-peer-deps
+
+  # Backend API
+  - type: web
+    name: feellink-api
+    runtime: node
+    plan: free
+    buildCommand: npm install --legacy-peer-deps
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: NODE_VERSION
+        value: 18
+      - key: DATABASE_URL
+        fromDatabase:
+          name: feellink-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NPM_FLAGS
+        value: --legacy-peer-deps
+
+databases:
+  # PostgreSQL Database
+  - name: feellink-db
+    plan: free
