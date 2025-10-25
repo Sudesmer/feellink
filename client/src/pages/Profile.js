@@ -1681,7 +1681,12 @@ const Profile = () => {
       if (storedFollowersCount) {
         const count = parseInt(storedFollowersCount);
         console.log('✅ Parsed takipçi sayısı:', count);
-        setFollowersCount(count);
+        // Negatif değerleri engelle
+        setFollowersCount(Math.max(0, count));
+        // Eğer localStorage'da negatif değer varsa, 0'a set et
+        if (count < 0) {
+          localStorage.setItem(followersKey, '0');
+        }
       } else {
         // localStorage'da yoksa 0'a set et
         console.log('⚠️ localStorage\'da takipçi sayısı yok, 0\'a set ediliyor');
@@ -1694,7 +1699,13 @@ const Profile = () => {
       const targetFollowersKey = `followersCount_user_${id}`;
       const storedFollowersCount = localStorage.getItem(targetFollowersKey);
       if (storedFollowersCount) {
-        setFollowersCount(parseInt(storedFollowersCount));
+        const count = parseInt(storedFollowersCount);
+        // Negatif değerleri engelle
+        setFollowersCount(Math.max(0, count));
+        // Eğer localStorage'da negatif değer varsa, 0'a set et
+        if (count < 0) {
+          localStorage.setItem(targetFollowersKey, '0');
+        }
       } else {
         // localStorage'da yoksa 0'a set et
         setFollowersCount(0);
@@ -1705,7 +1716,13 @@ const Profile = () => {
     const followingKey = `followingCount_${userEmail}`;
     const storedFollowingCount = localStorage.getItem(followingKey);
     if (storedFollowingCount) {
-      setFollowingCount(parseInt(storedFollowingCount));
+      const count = parseInt(storedFollowingCount);
+      // Negatif değerleri engelle
+      setFollowingCount(Math.max(0, count));
+      // Eğer localStorage'da negatif değer varsa, 0'a set et
+      if (count < 0) {
+        localStorage.setItem(followingKey, '0');
+      }
     } else {
       // localStorage'da yoksa 0'a set et
       setFollowingCount(0);
