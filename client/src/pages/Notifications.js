@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
+import axios from 'axios';
 import { 
   FiHeart, 
   FiMessageCircle, 
@@ -15,7 +16,8 @@ import {
   FiUser,
   FiHome,
   FiEye,
-  FiBookmark
+  FiBookmark,
+  FiX
 } from 'react-icons/fi';
 
 const Container = styled.div`
@@ -501,6 +503,126 @@ const Notifications = () => {
       return updated;
     });
   };
+
+  // Takip isteği kabul etme
+  const handleAcceptRequest = (notification) => {
+    console.log('✅ Takip isteği kabul edildi:', notification);
+    
+    try {
+      const token = localStorage.getItem('token');
+      const userData = localStorage.getItem('user');
+      
+      if (userData && token) {
+        const user = JSON.parse(userData);
+        const userId = user._id || user.id;
+        
+        // Gönderen kullanıcının ID'sini bul (bildirimden)
+        const senderName = notification.user.name;
+        
+        // Gönderen kullanıcıyı takipçi listesine ekle
+        const followersKey = `followersList_${userId}`;
+        const followersList = JSON.parse(localStorage.getItem(followersKey) || '[]');
+        
+        // Gönderen kullanıcıyı bul ve ekle
+        axios.get('http://localhost:5000/api/users')
+          .then(response => {
+            const allUsers = response.data.users || [];
+            const senderUser = allUsers.find(u => (u.fullName || u.email) === senderName);
+            
+            if (senderUser) {
+              const senderToAdd = {
+                _id: senderUser._id,
+                username: senderUser.username || senderUser.email?.split('@')[0] || 'unknown',
+                fullName: senderUser.fullName || '',
+                avatar: senderUser.avatar || null,
+                isFollowing: false
+              };
+              
+              const exists = followersList.find(u => u._id === senderUser._id);
+              if (!exists) {
+                followersList.push(senderToAdd);
+              }
+            }
+            
+            // Takipçi sayısını güncelle
+            const followersCountKey = `followersCount_user_${userId}`;
+            const currentCount = parseInt(localStorage.getItem(followersCountKey) || '0');
+            localStorage.setItem(followersCountKey, (currentCount + 1).toString());
+            
+            // Takipçi listesini kaydet
+            localStorage.setItem(followersKey, JSON.stringify(followersList));
+            
+            // Gönderen kullanıcının takip listesine bizi ekle
+            const senderFollowingKey = `followingList_${senderUser.email || 'unknown'}`;
+            const senderFollowingList = JSON.parse(localStorage.getItem(senderFollowingKey) || '[]');
+            
+            const meToAdd = {
+              _id: userId,
+              username: user.username || user.email?.split('@')[0] || 'unknown',
+              fullName: user.fullName || '',
+              avatar: user.avatar || null,
+              isFollowing: true
+            };
+            
+            const meExists = senderFollowingList.find(u => u._id === userId);
+            if (!meExists) {
+              senderFollowingList.push(meToAdd);
+            }
+            
+            // Gönderen kullanıcının takip sayısını güncelle
+            const senderFollowingCountKey = `followingCount_${senderUser.email || 'unknown'}`;
+            const senderCurrentCount = parseInt(localStorage.getItem(senderFollowingCountKey) || '0');
+            localStorage.setItem(senderFollowingCountKey, (senderCurrentCount + 1).toString());
+            
+            // Takip listesini kaydet
+            localStorage.setItem(senderFollowingKey, JSON.stringify(senderFollowingList));
+            
+            // Gönderen kullanıcıya başarı bildirimi gönder
+            const acceptNotification = {
+              id: Date.now(),
+              type: 'follow',
+              user: {
+                name: user.fullName || user.username || 'Bilinmeyen',
+                avatar: user.avatar || null
+              },
+              action: 'takip isteğinizi kabul etti',
+              time: 'şimdi',
+              read: false,
+              timestamp: new Date().toISOString()
+            };
+            
+            const senderNotificationsKey = `notifications_user_${senderUser._id}`;
+            const senderNotifications = JSON.parse(localStorage.getItem(senderNotificationsKey) || '[]');
+            senderNotifications.unshift(acceptNotification);
+            localStorage.setItem(senderNotificationsKey, JSON.stringify(senderNotifications.slice(0, 50)));
+            
+            console.log('✅ Takip isteği başarıyla kabul edildi ve işleme alındı');
+          })
+          .catch(error => {
+            console.error('Kullanıcı bilgisi alınamadı:', error);
+          });
+      }
+      
+      // Bildirimi okundu olarak işaretle
+      markAsRead(notification.id);
+      
+      // Bildirimi listeden kaldır
+      setNotifications(prev => prev.filter(n => n.id !== notification.id));
+    } catch (error) {
+      console.error('Takip isteği kabul etme hatası:', error);
+    }
+  };
+
+  // Takip isteği reddetme
+  const handleRejectRequest = (notification) => {
+    console.log('❌ Takip isteği reddedildi:', notification);
+    
+    // Bildirimi okundu olarak işaretle
+    markAsRead(notification.id);
+    
+    // Bildirimi listeden kaldır
+    setNotifications(prev => prev.filter(n => n.id !== notification.id));
+  };
   
   const filteredNotifications = notifications.filter(notification => {
     if (activeFilter === 'all') return true;
@@ -646,14 +768,35 @@ const Notifications = () => {
 
                   {!notification.read && (
                     <NotificationActions theme={theme}>
-                      <ActionButton 
-                        theme={theme} 
-                        primary
-                        onClick={() => markAsRead(notification.id)}
-                      >
-                        <FiCheck size={12} />
-                        Okundu
-                      </ActionButton>
+                      {notification.type === 'follow_request' ? (
+                        <>
+                          <ActionButton 
+                            theme={theme} 
+                            primary
+                            onClick={() => handleAcceptRequest(notification)}
+                          >
+                            <FiCheck size={12} />
+                            Kabul Et
+                          </ActionButton>
+                          <ActionButton 
+                            theme={theme}
+                            style={{ marginLeft: '8px', background: '#ff4444' }}
+                            onClick={() => handleRejectRequest(notification)}
+                          >
+                            <FiX size={12} />
+                            Reddet
+                          </ActionButton>
+                        </>
+                      ) : (
+                        <ActionButton 
+                          theme={theme} 
+                          primary
+                          onClick={() => markAsRead(notification.id)}
+                        >
+                          <FiCheck size={12} />
+                          Okundu
+                        </ActionButton>
+                      )}
                     </NotificationActions>
                   )}
                 </NotificationContent>
