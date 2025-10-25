@@ -407,6 +407,9 @@ const Notifications = () => {
       const notificationsKey = `notifications_user_${userId}`;
       const storedNotifications = localStorage.getItem(notificationsKey);
       
+      console.log('📬 Bildirimler yükleniyor - User ID:', userId, 'Key:', notificationsKey);
+      console.log('📬 Kaydedilmiş bildirimler:', storedNotifications);
+      
       return storedNotifications ? JSON.parse(storedNotifications) : [];
     } catch (error) {
       console.error('Bildirimler yüklenirken hata:', error);
@@ -415,6 +418,33 @@ const Notifications = () => {
   };
   
   const [notifications, setNotifications] = useState(loadNotifications());
+
+  // localStorage'da değişiklikleri dinle
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const updatedNotifications = loadNotifications();
+      setNotifications(updatedNotifications);
+    };
+
+    // Sayfa yüklendiğinde bildirimleri yükle
+    handleStorageChange();
+
+    // Custom event listener - storage değişikliklerini dinle
+    window.addEventListener('storage', handleStorageChange);
+
+    // Sayfa içi değişiklikleri de dinle (aynı window'da)
+    const interval = setInterval(() => {
+      const currentNotifications = loadNotifications();
+      if (JSON.stringify(currentNotifications) !== JSON.stringify(notifications)) {
+        setNotifications(currentNotifications);
+      }
+    }, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, [notifications]);
 
   const getNotificationIcon = (type) => {
     switch (type) {
