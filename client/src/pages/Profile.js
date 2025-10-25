@@ -1702,13 +1702,10 @@ const Profile = () => {
     const newFollowState = !isFollowing;
     setIsFollowing(newFollowState);
     
-    // TAKİP ET butonuna tıkladığımızda:
-    // - Sadece "takip" (following) sayısı değişir (benim kendi profitimde)
-    const newFollowingCount = newFollowState ? Math.max(0, followingCount + 1) : Math.max(0, followingCount - 1);
-    setFollowingCount(newFollowingCount);
-    
     // KARŞI TARAFIN takipçi sayısını güncelle (eğer karşı tarafın profiline bakıyorsak)
     const isOtherUserProfile = id && currentUser && currentUser._id !== id;
+    
+    // KARŞI TARAFIN takipçi sayısını güncelle
     if (isOtherUserProfile) {
       const newFollowersCount = newFollowState ? Math.max(0, followersCount + 1) : Math.max(0, followersCount - 1);
       setFollowersCount(newFollowersCount);
@@ -1717,13 +1714,29 @@ const Profile = () => {
       const targetUserFollowersKey = `followersCount_user_${id}`;
       localStorage.setItem(targetUserFollowersKey, Math.max(0, newFollowersCount).toString());
       
-      console.log('Karşı tarafın takipçi sayısı güncellendi:', newFollowersCount, 'User ID:', id);
+      console.log('✅ Karşı tarafın takipçi sayısı güncellendi:', newFollowersCount, 'User ID:', id);
     }
     
-    // Kullanıcıya özel takip bilgilerini localStorage'a kaydet
+    // BENİM KENDİ takip sayımı güncelle (HER ZAMAN, kendi profilde veya başka profilde olsun)
     const userEmail = currentUser?.email || 'anonymous';
-    const followKey = `userFollowState_${userEmail}`;
     const followingKey = `followingCount_${userEmail}`;
+    
+    // Mevcut takip sayısını localStorage'dan al
+    const currentFollowingCount = parseInt(localStorage.getItem(followingKey) || '0');
+    const newFollowingCount = newFollowState ? Math.max(0, currentFollowingCount + 1) : Math.max(0, currentFollowingCount - 1);
+    
+    // State'i güncelle (sadece kendi profildeysek)
+    if (!isOtherUserProfile) {
+      setFollowingCount(newFollowingCount);
+    }
+    
+    // localStorage'a kaydet (HER ZAMAN)
+    localStorage.setItem(followingKey, Math.max(0, newFollowingCount).toString());
+    
+    console.log('✅ Benim takip sayım güncellendi:', newFollowingCount);
+    
+    // Kullanıcıya özel takip bilgilerini localStorage'a kaydet
+    const followKey = `userFollowState_${userEmail}`;
     
     try {
       // Takip durumunu kaydet
