@@ -116,3 +116,5 @@ backups/
 *.bmp
 *.tiff
 *.svg
+
+/generated/prisma

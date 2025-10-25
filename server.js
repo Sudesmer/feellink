@@ -3,7 +3,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { mockUsers, mockCategories, mockWorks, mockComments } = require('./mock-data');
-require('dotenv').config({ path: './config.env' });
+const prisma = require('./config/prisma');
+require('dotenv').config({ path: './.env' });
 
 const app = express();
 
