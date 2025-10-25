@@ -396,23 +396,40 @@ const Notifications = () => {
     try {
       // currentUser'ı localStorage'dan al
       const token = localStorage.getItem('token');
-      if (!token) return [];
+      if (!token) {
+        console.log('📬 Token yok, boş dizi dönüyor');
+        return [];
+      }
       
       const userData = localStorage.getItem('user');
-      if (!userData) return [];
+      if (!userData) {
+        console.log('📬 User data yok, boş dizi dönüyor');
+        return [];
+      }
       
       const user = JSON.parse(userData);
+      console.log('📬 User objesi:', user);
+      
       const userId = user._id || user.id;
       
-      if (!userId) return [];
+      if (!userId) {
+        console.log('📬 User ID bulunamadı, boş dizi dönüyor');
+        return [];
+      }
       
       const notificationsKey = `notifications_user_${userId}`;
       const storedNotifications = localStorage.getItem(notificationsKey);
       
       console.log('📬 Bildirimler yükleniyor - User ID:', userId, 'Key:', notificationsKey);
-      console.log('📬 Kaydedilmiş bildirimler:', storedNotifications);
+      console.log('📬 Kaydedilmiş bildirimler (ham):', storedNotifications);
       
-      return storedNotifications ? JSON.parse(storedNotifications) : [];
+      // Tüm localStorage'ı kontrol et
+      console.log('📬 Tüm localStorage anahtarları:', Object.keys(localStorage).filter(key => key.includes('notifications')));
+      
+      const parsedNotifications = storedNotifications ? JSON.parse(storedNotifications) : [];
+      console.log('📬 Parse edilmiş bildirimler:', parsedNotifications);
+      
+      return parsedNotifications;
     } catch (error) {
       console.error('Bildirimler yüklenirken hata:', error);
       return [];
