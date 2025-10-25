@@ -1601,16 +1601,17 @@ const Profile = () => {
         if (stored) {
           return parseInt(stored);
         }
+        return 0; // Başka kullanıcı için varsayılan 0
       }
       
       // Aksi halde kendi takipçi sayımızı yükle
       const userEmail = currentUser?.email || 'anonymous';
       const followersKey = `followersCount_${userEmail}`;
       const stored = localStorage.getItem(followersKey);
-      return stored ? parseInt(stored) : profile.followers;
+      return stored ? parseInt(stored) : 0;
     } catch (error) {
       console.error('Takipçi sayısı okuma hatası:', error);
-      return profile.followers;
+      return 0;
     }
   };
   
@@ -1622,10 +1623,10 @@ const Profile = () => {
       const userEmail = currentUser?.email || 'anonymous';
       const followingKey = `followingCount_${userEmail}`;
       const stored = localStorage.getItem(followingKey);
-      return stored ? parseInt(stored) : profile.following;
+      return stored ? parseInt(stored) : 0;
     } catch (error) {
       console.error('Takip edilen sayısı okuma hatası:', error);
-      return profile.following;
+      return 0;
     }
   };
   
@@ -1677,6 +1678,9 @@ const Profile = () => {
       const storedFollowersCount = localStorage.getItem(followersKey);
       if (storedFollowersCount) {
         setFollowersCount(parseInt(storedFollowersCount));
+      } else {
+        // localStorage'da yoksa 0'a set et
+        setFollowersCount(0);
       }
     } else {
       // Başka kullanıcının profiline bakıyorsak onun takipçi sayısını yükle
@@ -1684,6 +1688,9 @@ const Profile = () => {
       const storedFollowersCount = localStorage.getItem(targetFollowersKey);
       if (storedFollowersCount) {
         setFollowersCount(parseInt(storedFollowersCount));
+      } else {
+        // localStorage'da yoksa 0'a set et
+        setFollowersCount(0);
       }
     }
     
@@ -1692,6 +1699,9 @@ const Profile = () => {
     const storedFollowingCount = localStorage.getItem(followingKey);
     if (storedFollowingCount) {
       setFollowingCount(parseInt(storedFollowingCount));
+    } else {
+      // localStorage'da yoksa 0'a set et
+      setFollowingCount(0);
     }
     
     // localStorage'dan takip verilerini yükle
