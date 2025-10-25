@@ -1845,12 +1845,46 @@ const Profile = () => {
     // Eğer gizli hesapsa ve henüz takip isteği gönderilmemişse
     if (isPrivateAccount && !isFollowing && !requestSent) {
       setRequestSent(true);
+      
+      // Karşı tarafa takip isteği bildirimi gönder
+      const requestNotification = {
+        id: Date.now(),
+        type: 'follow_request',
+        user: {
+          name: currentUser?.fullName || currentUser?.username || 'Bilinmeyen',
+          avatar: currentUser?.avatar || null
+        },
+        action: 'sana takip isteği gönderdi',
+        time: 'şimdi',
+        read: false,
+        timestamp: new Date().toISOString()
+      };
+      
+      // Karşı tarafın bildirimlerine ekle (ID'ye göre)
+      const targetNotificationsKey = `notifications_user_${id}`;
+      const existingNotifications = JSON.parse(localStorage.getItem(targetNotificationsKey) || '[]');
+      existingNotifications.unshift(requestNotification);
+      localStorage.setItem(targetNotificationsKey, JSON.stringify(existingNotifications.slice(0, 50))); // En son 50 bildirim
+      
+      console.log('✅ Takip isteği bildirimi eklendi:', requestNotification);
+      
       return; // İstek gönderildi durumuna geç
     }
     
     // Eğer gizli hesapsa ve istek gönderilmişse, geri al (istek iptal)
     if (isPrivateAccount && requestSent && !isFollowing) {
       setRequestSent(false);
+      
+      // Karşı tarafın bildirimlerinden istek bildirimini kaldır (en son eklenen)
+      const targetNotificationsKey = `notifications_user_${id}`;
+      const existingNotifications = JSON.parse(localStorage.getItem(targetNotificationsKey) || '[]');
+      const filteredNotifications = existingNotifications.filter(notif => 
+        !(notif.type === 'follow_request' && notif.user.name === (currentUser?.fullName || currentUser?.username))
+      );
+      localStorage.setItem(targetNotificationsKey, JSON.stringify(filteredNotifications));
+      
+      console.log('✅ Takip isteği bildirimi iptal edildi');
+      
       return;
     }
     
