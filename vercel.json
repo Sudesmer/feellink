@@ -3,7 +3,7 @@
   "buildCommand": "cd client && npm install && npm run build",
   "outputDirectory": "client/build",
   "installCommand": "npm install",
-  "framework": "create-react-app",
+  "framework": null,
   "functions": {
     "api/index.js": {
       "runtime": "nodejs18.x"

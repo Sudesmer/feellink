@@ -4,7 +4,7 @@ const mockUsers = [
     _id: '1',
     username: 'testuser',
     email: 'test@example.com',
-    password: 'password',
+    password: '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password: password
     fullName: 'Test User',
     bio: 'Test kullanıcısı',
     avatar: '',
@@ -18,7 +18,7 @@ const mockUsers = [
     _id: '2',
     username: 'admin',
     email: 'admin@feellink.com',
-    password: 'password',
+    password: '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password: password
     fullName: 'Admin User',
     bio: 'Feellink yöneticisi',
     avatar: '',
@@ -32,7 +32,7 @@ const mockUsers = [
     _id: '3',
     username: 'designer',
     email: 'designer@feellink.com',
-    password: 'password',
+    password: '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password: password
     fullName: 'Creative Designer',
     bio: 'Profesyonel grafik tasarımcı',
     avatar: '',
@@ -71,11 +71,11 @@ const mockCategories = [
 const mockWorks = [
   {
     _id: '1',
-    title: '',
-    description: '',
+    title: 'The Birth of Venus',
+    description: 'Sandro Botticelli\'nin ünlü rönesans eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&h=600&fit=crop',
         alt: 'The Birth of Venus',
         isMain: true
       }
@@ -94,8 +94,8 @@ const mockWorks = [
       followers: 18000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 3200,
+    views: 75000,
     isPublished: true,
     isFeatured: true,
     tags: ['resim', 'rönesans', 'venus'],
@@ -105,11 +105,11 @@ const mockWorks = [
   },
   {
     _id: '2',
-    title: '',
-    description: '',
+    title: 'The Persistence of Memory',
+    description: 'Salvador Dalí\'nin sürrealist başyapıtı',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop',
         alt: 'The Persistence of Memory',
         isMain: true
       }
@@ -128,8 +128,8 @@ const mockWorks = [
       followers: 28000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 4500,
+    views: 95000,
     isPublished: true,
     isFeatured: true,
     tags: ['resim', 'sürrealizm', 'saat'],
@@ -139,11 +139,11 @@ const mockWorks = [
   },
   {
     _id: '3',
-    title: '',
-    description: '',
+    title: 'The Kiss',
+    description: 'Gustav Klimt\'in art nouveau başyapıtı',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&h=600&fit=crop',
         alt: 'The Kiss',
         isMain: true
       }
@@ -162,8 +162,8 @@ const mockWorks = [
       followers: 25000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 3800,
+    views: 85000,
     isPublished: true,
     isFeatured: true,
     tags: ['resim', 'art nouveau', 'öpmek'],
@@ -173,11 +173,11 @@ const mockWorks = [
   },
   {
     _id: '4',
-    title: '',
-    description: '',
+    title: 'Poster Tasarım',
+    description: 'Yaratıcı poster tasarım çalışması',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
         alt: 'Poster Tasarım',
         isMain: true
       }
@@ -197,7 +197,7 @@ const mockWorks = [
     },
     likes: [],
     likeCount: 0,
-    views: 0,
+    views: 67,
     isPublished: true,
     isFeatured: false,
     tags: ['poster', 'tasarım', 'grafik'],
@@ -207,11 +207,11 @@ const mockWorks = [
   },
   {
     _id: '5',
-    title: '',
-    description: '',
+    title: 'Dashboard Tasarım',
+    description: 'Modern dashboard arayüz tasarımı',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&h=600&fit=crop',
         alt: 'Dashboard Tasarım',
         isMain: true
       }
@@ -231,7 +231,7 @@ const mockWorks = [
     },
     likes: [],
     likeCount: 0,
-    views: 0,
+    views: 189,
     isPublished: true,
     isFeatured: true,
     tags: ['dashboard', 'ui', 'data'],
@@ -242,11 +242,11 @@ const mockWorks = [
   // Sanatçı Tabloları - 5x5 Grid için 25 eser
   {
     _id: '4',
-    title: '',
-    description: '',
+    title: 'Mona Lisa',
+    description: 'Leonardo da Vinci\'nin ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop',
         alt: 'Mona Lisa',
         isMain: true
       }
@@ -265,8 +265,8 @@ const mockWorks = [
       followers: 15000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 2500,
+    views: 50000,
     isPublished: true,
     isFeatured: true,
     tags: ['resim', 'rönesans', 'portre'],
@@ -276,11 +276,11 @@ const mockWorks = [
   },
   {
     _id: '5',
-    title: '',
-    description: '',
+    title: 'Yıldızlı Gece',
+    description: 'Vincent van Gogh\'un ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop',
         alt: 'Yıldızlı Gece',
         isMain: true
       }
@@ -299,8 +299,8 @@ const mockWorks = [
       followers: 20000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 3200,
+    views: 75000,
     isPublished: true,
     isFeatured: true,
     tags: ['resim', 'post-empresyonizm', 'gece'],
@@ -310,11 +310,11 @@ const mockWorks = [
   },
   {
     _id: '6',
-    title: '',
-    description: '',
+    title: 'Guernica',
+    description: 'Pablo Picasso\'nun savaş karşıtı eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=800&h=600&fit=crop',
         alt: 'Guernica',
         isMain: true
       }
@@ -333,8 +333,8 @@ const mockWorks = [
       followers: 30000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 4500,
+    views: 100000,
     isPublished: true,
     isFeatured: true,
     tags: ['resim', 'kübizm', 'savaş'],
@@ -344,11 +344,11 @@ const mockWorks = [
   },
   {
     _id: '7',
-    title: '',
-    description: '',
+    title: 'Scream',
+    description: 'Edvard Munch\'un ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1549887534-1541e9326642?w=800&h=600&fit=crop',
         alt: 'Scream',
         isMain: true
       }
@@ -367,8 +367,8 @@ const mockWorks = [
       followers: 18000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 2800,
+    views: 65000,
     isPublished: true,
     isFeatured: true,
     tags: ['resim', 'ekspresyonizm', 'çığlık'],
@@ -378,11 +378,11 @@ const mockWorks = [
   },
   {
     _id: '8',
-    title: '',
-    description: '',
+    title: 'The Great Wave',
+    description: 'Katsushika Hokusai\'nin ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?w=800&h=600&fit=crop',
         alt: 'The Great Wave',
         isMain: true
       }
@@ -401,8 +401,8 @@ const mockWorks = [
       followers: 12000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 1900,
+    views: 45000,
     isPublished: true,
     isFeatured: true,
     tags: ['japon', 'ahşap baskı', 'dalga'],
@@ -413,11 +413,11 @@ const mockWorks = [
   // Daha fazla sanatçı eseri - 5x5 grid için 20 eser daha
   {
     _id: '9',
-    title: '',
-    description: '',
+    title: 'The Persistence of Memory',
+    description: 'Salvador Dalí\'nin ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1557672172-298e090bd0f1?w=800&h=600&fit=crop',
         alt: 'The Persistence of Memory',
         isMain: true
       }
@@ -436,8 +436,8 @@ const mockWorks = [
       followers: 25000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 3800,
+    views: 85000,
     isPublished: true,
     isFeatured: true,
     tags: ['resim', 'sürrealizm', 'saat'],
@@ -447,11 +447,11 @@ const mockWorks = [
   },
   {
     _id: '10',
-    title: '',
-    description: '',
+    title: 'The Birth of Venus',
+    description: 'Sandro Botticelli\'nin ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1547891654-e66ed7ebb968?w=800&h=600&fit=crop',
         alt: 'The Birth of Venus',
         isMain: true
       }
@@ -470,8 +470,8 @@ const mockWorks = [
       followers: 16000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 2200,
+    views: 55000,
     isPublished: true,
     isFeatured: true,
     tags: ['resim', 'rönesans', 'venus'],
@@ -481,11 +481,11 @@ const mockWorks = [
   },
   {
     _id: '11',
-    title: '',
-    description: '',
+    title: 'The Kiss',
+    description: 'Gustav Klimt\'in ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=800&h=600&fit=crop',
         alt: 'The Kiss',
         isMain: true
       }
@@ -504,8 +504,8 @@ const mockWorks = [
       followers: 22000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 3100,
+    views: 70000,
     isPublished: true,
     isFeatured: true,
     tags: ['resim', 'art nouveau', 'öpmek'],
@@ -515,11 +515,11 @@ const mockWorks = [
   },
   {
     _id: '12',
-    title: '',
-    description: '',
+    title: 'Water Lilies',
+    description: 'Claude Monet\'nin ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=800&h=600&fit=crop',
         alt: 'Water Lilies',
         isMain: true
       }
@@ -538,8 +538,8 @@ const mockWorks = [
       followers: 28000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 4200,
+    views: 95000,
     isPublished: true,
     isFeatured: true,
     tags: ['resim', 'empresyonizm', 'nilüfer'],
@@ -549,11 +549,11 @@ const mockWorks = [
   },
   {
     _id: '13',
-    title: '',
-    description: '',
+    title: 'The Last Supper',
+    description: 'Leonardo da Vinci\'nin ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=800&h=600&fit=crop',
         alt: 'The Last Supper',
         isMain: true
       }
@@ -572,8 +572,8 @@ const mockWorks = [
       followers: 15000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 5000,
+    views: 120000,
     isPublished: true,
     isFeatured: true,
     tags: ['resim', 'rönesans', 'son akşam yemeği'],
@@ -583,11 +583,11 @@ const mockWorks = [
   },
   {
     _id: '14',
-    title: '',
-    description: '',
+    title: 'The Great Wave off Kanagawa',
+    description: 'Katsushika Hokusai\'nin ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1536924940846-227afb31e2a5?w=800&h=600&fit=crop',
         alt: 'The Great Wave off Kanagawa',
         isMain: true
       }
@@ -606,8 +606,8 @@ const mockWorks = [
       followers: 12000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 2100,
+    views: 50000,
     isPublished: true,
     isFeatured: true,
     tags: ['japon', 'ahşap baskı', 'dalga'],
@@ -617,11 +617,11 @@ const mockWorks = [
   },
   {
     _id: '15',
-    title: '',
-    description: '',
+    title: 'The Scream',
+    description: 'Edvard Munch\'un ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&h=600&fit=crop',
         alt: 'The Scream',
         isMain: true
       }
@@ -640,8 +640,8 @@ const mockWorks = [
       followers: 18000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 2900,
+    views: 68000,
     isPublished: true,
     isFeatured: true,
     tags: ['resim', 'ekspresyonizm', 'çığlık'],
@@ -651,11 +651,11 @@ const mockWorks = [
   },
   {
     _id: '16',
-    title: '',
-    description: '',
+    title: 'The Starry Night',
+    description: 'Vincent van Gogh\'un ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?w=800&h=600&fit=crop',
         alt: 'The Starry Night',
         isMain: true
       }
@@ -674,8 +674,8 @@ const mockWorks = [
       followers: 20000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 3500,
+    views: 80000,
     isPublished: true,
     isFeatured: true,
     tags: ['resim', 'post-empresyonizm', 'gece'],
@@ -685,11 +685,11 @@ const mockWorks = [
   },
   {
     _id: '17',
-    title: '',
-    description: '',
+    title: 'Girl with a Pearl Earring',
+    description: 'Johannes Vermeer\'in ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1561214078-f3247647fc5e?w=800&h=600&fit=crop',
         alt: 'Girl with a Pearl Earring',
         isMain: true
       }
@@ -708,8 +708,8 @@ const mockWorks = [
       followers: 14000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 2600,
+    views: 60000,
     isPublished: true,
     isFeatured: true,
     tags: ['resim', 'barok', 'portre'],
@@ -719,11 +719,11 @@ const mockWorks = [
   },
   {
     _id: '18',
-    title: '',
-    description: '',
+    title: 'The Creation of Adam',
+    description: 'Michelangelo\'nin ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=800&h=600&fit=crop',
         alt: 'The Creation of Adam',
         isMain: true
       }
@@ -742,8 +742,8 @@ const mockWorks = [
       followers: 35000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 6000,
+    views: 150000,
     isPublished: true,
     isFeatured: true,
     tags: ['fresk', 'rönesans', 'yaratılış'],
@@ -753,11 +753,11 @@ const mockWorks = [
   },
   {
     _id: '19',
-    title: '',
-    description: '',
+    title: 'The Night Watch',
+    description: 'Rembrandt\'ın ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?w=800&h=600&fit=crop',
         alt: 'The Night Watch',
         isMain: true
       }
@@ -776,8 +776,8 @@ const mockWorks = [
       followers: 19000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 2800,
+    views: 65000,
     isPublished: true,
     isFeatured: true,
     tags: ['resim', 'barok', 'gece'],
@@ -787,11 +787,11 @@ const mockWorks = [
   },
   {
     _id: '20',
-    title: '',
-    description: '',
+    title: 'The Garden of Earthly Delights',
+    description: 'Hieronymus Bosch\'un ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1549887534-1541e9326642?w=800&h=600&fit=crop',
         alt: 'The Garden of Earthly Delights',
         isMain: true
       }
@@ -810,8 +810,8 @@ const mockWorks = [
       followers: 13000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 1900,
+    views: 45000,
     isPublished: true,
     isFeatured: true,
     tags: ['resim', 'gotik', 'cennet'],
@@ -821,11 +821,11 @@ const mockWorks = [
   },
   {
     _id: '21',
-    title: '',
-    description: '',
+    title: 'The Arnolfini Portrait',
+    description: 'Jan van Eyck\'in ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1557672172-298e090bd0f1?w=800&h=600&fit=crop',
         alt: 'The Arnolfini Portrait',
         isMain: true
       }
@@ -844,8 +844,8 @@ const mockWorks = [
       followers: 11000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 1700,
+    views: 40000,
     isPublished: true,
     isFeatured: true,
     tags: ['resim', 'flaman', 'portre'],
@@ -855,11 +855,11 @@ const mockWorks = [
   },
   {
     _id: '22',
-    title: '',
-    description: '',
+    title: 'The School of Athens',
+    description: 'Raphael\'in ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=800&h=600&fit=crop',
         alt: 'The School of Athens',
         isMain: true
       }
@@ -878,8 +878,8 @@ const mockWorks = [
       followers: 17000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 2400,
+    views: 55000,
     isPublished: true,
     isFeatured: true,
     tags: ['fresk', 'rönesans', 'atina'],
@@ -889,11 +889,11 @@ const mockWorks = [
   },
   {
     _id: '23',
-    title: '',
-    description: '',
+    title: 'The Birth of Venus',
+    description: 'Sandro Botticelli\'nin ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&h=600&fit=crop',
         alt: 'The Birth of Venus',
         isMain: true
       }
@@ -912,8 +912,8 @@ const mockWorks = [
       followers: 16000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 2300,
+    views: 52000,
     isPublished: true,
     isFeatured: true,
     tags: ['resim', 'rönesans', 'venus'],
@@ -923,11 +923,11 @@ const mockWorks = [
   },
   {
     _id: '24',
-    title: '',
-    description: '',
+    title: 'The Great Wave',
+    description: 'Katsushika Hokusai\'nin ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop',
         alt: 'The Great Wave',
         isMain: true
       }
@@ -946,8 +946,8 @@ const mockWorks = [
       followers: 12000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 2000,
+    views: 48000,
     isPublished: true,
     isFeatured: true,
     tags: ['japon', 'ahşap baskı', 'dalga'],
@@ -957,11 +957,11 @@ const mockWorks = [
   },
   {
     _id: '25',
-    title: '',
-    description: '',
+    title: 'The Mona Lisa',
+    description: 'Leonardo da Vinci\'nin ünlü eseri',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&h=600&fit=crop',
         alt: 'The Mona Lisa',
         isMain: true
       }
@@ -980,8 +980,8 @@ const mockWorks = [
       followers: 15000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 2700,
+    views: 62000,
     isPublished: true,
     isFeatured: true,
     tags: ['resim', 'rönesans', 'portre'],
@@ -991,11 +991,11 @@ const mockWorks = [
   },
   {
     _id: '26',
-    title: '',
-    description: '',
+    title: 'Modern UI Design',
+    description: 'Contemporary user interface design',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
         alt: 'Modern UI Design',
         isMain: true
       }
@@ -1014,8 +1014,8 @@ const mockWorks = [
       followers: 12000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 1800,
+    views: 35000,
     isPublished: true,
     isFeatured: true,
     tags: ['ui', 'design', 'modern'],
@@ -1025,11 +1025,11 @@ const mockWorks = [
   },
   {
     _id: '27',
-    title: '',
-    description: '',
+    title: 'Abstract Art',
+    description: 'Contemporary abstract painting',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&h=600&fit=crop',
         alt: 'Abstract Art',
         isMain: true
       }
@@ -1048,8 +1048,8 @@ const mockWorks = [
       followers: 5000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 1200,
+    views: 25000,
     isPublished: true,
     isFeatured: false,
     tags: ['abstract', 'art', 'contemporary'],
@@ -1059,11 +1059,11 @@ const mockWorks = [
   },
   {
     _id: '28',
-    title: '',
-    description: '',
+    title: 'Logo Design',
+    description: 'Creative logo design for modern brand',
     images: [
       {
-        url: '',
+        url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop',
         alt: 'Logo Design',
         isMain: true
       }
@@ -1082,8 +1082,8 @@ const mockWorks = [
       followers: 8000
     },
     likes: [],
-    likeCount: 0,
-    views: 0,
+    likeCount: 900,
+    views: 18000,
     isPublished: true,
     isFeatured: false,
     tags: ['logo', 'branding', 'design'],

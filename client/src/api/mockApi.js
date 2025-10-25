@@ -1,7 +1,7 @@
 // Mock API for GitHub Pages deployment
 // This replaces the backend API calls with static data
 
-import { mockUsers, mockCategories, mockWorks, mockComments } from '../../mock-data';
+import { mockUsers, mockCategories, mockWorks, mockComments } from '../mock-data';
 
 // Simulate API delay
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
