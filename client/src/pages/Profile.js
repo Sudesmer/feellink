@@ -1923,7 +1923,7 @@ const Profile = () => {
     }
   };
 
-  // Takip edilenler modal'ındaki takip işlemi
+  // Takip edilenler modal'ındaki takip işlemi (toggle)
   const handleFollowingUnfollow = (followingId) => {
     const userEmail = currentUser?.email || 'anonymous';
     const followingKey = `followingCount_${userEmail}`;
@@ -1938,8 +1938,50 @@ const Profile = () => {
     // Kullanıcının listede olup olmadığını kontrol et
     const userInList = followingList.some(u => u._id === followingId);
     
-    // Eğer listede varsa, sayıyı azalt
-    if (userInList) {
+    // Kullanıcının mevcut durumunu bul
+    const currentUserState = following.find(u => u._id === followingId);
+    const newIsFollowing = !currentUserState?.isFollowing;
+    
+    if (newIsFollowing) {
+      // Takip et
+      const newFollowingCount = Math.max(0, currentFollowingCount + 1);
+      
+      // State'i güncelle
+      setFollowingCount(newFollowingCount);
+      
+      // Takip listesine ekle
+      const updatedFollowing = following.map(user => 
+        user._id === followingId 
+          ? { ...user, isFollowing: true }
+          : user
+      );
+      
+      // localStorage'a kaydet
+      setFollowing(updatedFollowing);
+      localStorage.setItem('followingData', JSON.stringify(updatedFollowing));
+      
+      // localStorage'daki takip edilenler listesine ekle
+      const userToAdd = {
+        _id: followingId,
+        email: currentUserState?.email,
+        fullName: currentUserState?.fullName,
+        avatar: currentUserState?.avatar,
+        isFollowing: true
+      };
+      
+      // Duplicate kontrolü
+      const exists = followingList.find(u => u._id === followingId);
+      if (!exists) {
+        followingList.push(userToAdd);
+        localStorage.setItem(followingListKey, JSON.stringify(followingList));
+      }
+      
+      // Takip sayısını güncelle
+      localStorage.setItem(followingKey, newFollowingCount.toString());
+      
+      console.log('✅ Kullanıcı tekrar takip ediliyor:', followingId, 'Yeni sayı:', newFollowingCount);
+    } else {
+      // Takibi bırak
       const newFollowingCount = Math.max(0, currentFollowingCount - 1);
       
       // State'i güncelle
@@ -1956,7 +1998,7 @@ const Profile = () => {
       setFollowing(updatedFollowing);
       localStorage.setItem('followingData', JSON.stringify(updatedFollowing));
       
-      // localStorage'daki takip edilenler listesini güncelle
+      // localStorage'daki takip edilenler listesinden çıkar
       const newFollowingList = followingList.filter(u => u._id !== followingId);
       localStorage.setItem(followingListKey, JSON.stringify(newFollowingList));
       
@@ -1964,8 +2006,6 @@ const Profile = () => {
       localStorage.setItem(followingKey, newFollowingCount.toString());
       
       console.log('✅ Takip edilen kullanıcı takipten çıkarıldı:', followingId, 'Yeni sayı:', newFollowingCount);
-    } else {
-      console.log('⚠️ Kullanıcı zaten listede değil:', followingId);
     }
   };
 
