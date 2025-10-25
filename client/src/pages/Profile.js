@@ -1464,15 +1464,28 @@ const Profile = () => {
       const userProfilePhoto = getStoredProfilePhoto();
       
       if (currentUser) {
+        // Kullanıcıya özel profil verilerini localStorage'dan yükle
+        const userProfileKey = getUserKey('userProfile');
+        const storedProfileData = localStorage.getItem(userProfileKey);
+        let parsedProfileData = {};
+        
+        if (storedProfileData) {
+          try {
+            parsedProfileData = JSON.parse(storedProfileData);
+          } catch (e) {
+            console.error('Profil verisi parse hatası:', e);
+          }
+        }
+        
         return {
-          username: currentUser.username || currentUser.email?.split('@')[0] || '',
-          fullName: currentUser.fullName || '',
-          bio: localStorage.getItem(getUserKey('userBio')) || '',
-          website: localStorage.getItem(getUserKey('userWebsite')) || '',
-          location: localStorage.getItem(getUserKey('userLocation')) || '',
-          avatar: userProfilePhoto || '',
-          followers: 0,
-          following: 0,
+          username: parsedProfileData.username || currentUser.username || currentUser.email?.split('@')[0] || '',
+          fullName: parsedProfileData.fullName || currentUser.fullName || '',
+          bio: parsedProfileData.bio || localStorage.getItem(getUserKey('userBio')) || '',
+          website: parsedProfileData.website || localStorage.getItem(getUserKey('userWebsite')) || '',
+          location: parsedProfileData.location || localStorage.getItem(getUserKey('userLocation')) || '',
+          avatar: parsedProfileData.avatar || userProfilePhoto || '',
+          followers: parsedProfileData.followers || 0,
+          following: parsedProfileData.following || 0,
           posts: works.length,
           isFollowing: false,
           isOwnProfile: true
@@ -2320,10 +2333,11 @@ const Profile = () => {
 
   const handleSavePhoto = () => {
     if (selectedFile) {
-      // localStorage'a profil fotoğrafını kaydet
+      // localStorage'a profil fotoğrafını kaydet (kullanıcıya özel key)
       try {
-        localStorage.setItem('userProfilePhoto', previewUrl);
-        console.log('Profil fotoğrafı localStorage\'a kaydedildi');
+        const userKey = getUserKey('userProfilePhoto');
+        localStorage.setItem(userKey, previewUrl);
+        console.log('Profil fotoğrafı localStorage\'a kaydedildi:', userKey);
         
         // Profil state'ini güncelle
         setProfile(prevProfile => ({
@@ -2334,12 +2348,13 @@ const Profile = () => {
         // Mock profil fotoğrafını güncelle
         mockProfile.avatar = previewUrl;
         
-        // Profil verilerini de güncelle (EditProfile.js ile aynı key kullan)
+        // Profil verilerini de güncelle (kullanıcıya özel key)
+        const userProfileKey = getUserKey('userProfile');
         const updatedProfile = {
           ...profile,
           avatar: previewUrl
         };
-        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+        localStorage.setItem(userProfileKey, JSON.stringify(updatedProfile));
         
         // Modal'ı kapat ve formu temizle
         setShowPhotoUpload(false);
