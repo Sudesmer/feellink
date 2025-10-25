@@ -1,6 +1,7 @@
 [build]
-  publish = "client/build"
-  command = "cd client && npm run build"
+  publish = "build"
+  command = "echo 'Using existing build folder'"
+  base = "."
 
 [[redirects]]
   from = "/*"
