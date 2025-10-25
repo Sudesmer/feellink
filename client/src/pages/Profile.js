@@ -1198,10 +1198,22 @@ const Profile = () => {
   // Mock takipçi ve takip edilen kullanıcı verileri
   const mockFollowers = [];
   
+  // localStorage'dan takip edilenler listesini yükle
+  const getStoredFollowingList = () => {
+    try {
+      const userEmail = currentUser?.email || 'anonymous';
+      const stored = localStorage.getItem(`followingList_${userEmail}`);
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      console.error('Takip edilenler listesi okuma hatası:', error);
+      return [];
+    }
+  };
+  
   const mockFollowing = [];
   
   const [followers, setFollowers] = useState(mockFollowers);
-  const [following, setFollowing] = useState(mockFollowing);
+  const [following, setFollowing] = useState(getStoredFollowingList());
   const [hoveredWorkId, setHoveredWorkId] = useState(null);
   const [message, setMessage] = useState({ text: '', type: '', show: false });
   const [confirmModal, setConfirmModal] = useState({ show: false, title: '', message: '', onConfirm: null });
@@ -1689,9 +1701,10 @@ const Profile = () => {
         setFollowers(JSON.parse(storedFollowers));
       }
       
-      const storedFollowing = localStorage.getItem('followingData');
-      if (storedFollowing) {
-        setFollowing(JSON.parse(storedFollowing));
+      // Takip edilenler listesini localStorage'dan yükle
+      const followingList = localStorage.getItem(`followingList_${userEmail}`);
+      if (followingList) {
+        setFollowing(JSON.parse(followingList));
       }
     } catch (error) {
       console.error('localStorage takip verileri yükleme hatası:', error);
@@ -2990,28 +3003,39 @@ const Profile = () => {
             <FollowModalList>
               {following.map((user) => (
                 <FollowUserItem key={user._id} theme={theme}>
-                  <FollowUserAvatar 
-                    style={{
-                      backgroundImage: user.avatar ? `url(${process.env.PUBLIC_URL}${user.avatar})` : 'none',
-                      backgroundColor: user.avatar ? 'transparent' : '#FF6B35'
+                  <div 
+                    style={{ display: 'flex', alignItems: 'center', flex: 1, cursor: 'pointer' }}
+                    onClick={() => {
+                      navigate(`/profile/${user._id}`);
+                      setShowFollowingModal(false);
                     }}
                   >
-                    {!user.avatar && user.username.charAt(0).toUpperCase()}
-                  </FollowUserAvatar>
-                  <FollowUserInfo>
-                    <FollowUsername theme={theme}>
-                      {user.username}
-                      {user.isVerified && <span>✓</span>}
-                    </FollowUsername>
-                    <FollowFullName theme={theme}>{user.fullName}</FollowFullName>
-                  </FollowUserInfo>
-                    <FollowButton 
-                      theme={theme} 
-                      isFollowing={user.isFollowing}
-                      onClick={() => handleFollowingUnfollow(user._id)}
+                    <FollowUserAvatar 
+                      style={{
+                        backgroundImage: user.avatar ? `url(${process.env.PUBLIC_URL}${user.avatar})` : 'none',
+                        backgroundColor: user.avatar ? 'transparent' : '#FF6B35'
+                      }}
                     >
-                      {user.isFollowing ? 'Takibi Bırak' : 'Takip Et'}
-                    </FollowButton>
+                      {!user.avatar && user.fullName?.charAt(0).toUpperCase()}
+                    </FollowUserAvatar>
+                    <FollowUserInfo>
+                      <FollowUsername theme={theme}>
+                        {user.username || user.fullName}
+                        {user.isVerified && <span>✓</span>}
+                      </FollowUsername>
+                      <FollowFullName theme={theme}>{user.fullName}</FollowFullName>
+                    </FollowUserInfo>
+                  </div>
+                  <FollowButton 
+                    theme={theme} 
+                    isFollowing={user.isFollowing}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleFollowingUnfollow(user._id);
+                    }}
+                  >
+                    {user.isFollowing ? 'Takibi Bırak' : 'Takip Et'}
+                  </FollowButton>
                 </FollowUserItem>
               ))}
             </FollowModalList>
