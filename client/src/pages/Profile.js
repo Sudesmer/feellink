@@ -1914,6 +1914,10 @@ const Profile = () => {
     // KARŞI TARAFIN takipçi sayısını güncelle (eğer karşı tarafın profiline bakıyorsak)
     const isOtherUserProfile = id && currentUser && currentUser._id !== id;
     
+    console.log('🔍 Yeni follow state:', newFollowState);
+    console.log('🔍 isOtherUserProfile:', isOtherUserProfile);
+    console.log('🔍 targetUserId:', targetUserId);
+    
     // KARŞI TARAFIN takipçi sayısını güncelle
     if (isOtherUserProfile) {
       // localStorage'dan mevcut takipçi sayısını al
@@ -1998,32 +2002,34 @@ const Profile = () => {
         if (!exists) {
           followingList.push(userToAdd);
           localStorage.setItem(`followingList_${userEmail}`, JSON.stringify(followingList));
+        }
+        
+        // Instagram tarzı bildirim ekle (HER ZAMAN - başka bir kullanıcıyı takip ettiğimizde)
+        if (isOtherUserProfile && targetUserId) {
+          const newNotification = {
+            id: Date.now(),
+            type: 'follow',
+            user: {
+              name: currentUser?.fullName || currentUser?.username || 'Bilinmeyen',
+              avatar: currentUser?.avatar || null
+            },
+            action: 'sizi takip etti',
+            time: 'şimdi',
+            read: false,
+            timestamp: new Date().toISOString()
+          };
           
-          // Instagram tarzı bildirim ekle (sadece başka bir kullanıcıyı takip ediyorsak)
-          if (isOtherUserProfile) {
-            const newNotification = {
-              id: Date.now(),
-              type: 'follow',
-              user: {
-                name: currentUser?.fullName || currentUser?.username || 'Bilinmeyen',
-                avatar: currentUser?.avatar || null
-              },
-              action: 'sizi takip etti',
-              time: 'şimdi',
-              read: false,
-              timestamp: new Date().toISOString()
-            };
-            
-            // Karşı tarafın bildirimlerine ekle (ID'ye göre)
-            const targetNotificationsKey = `notifications_user_${targetUserId}`;
-            const existingNotifications = JSON.parse(localStorage.getItem(targetNotificationsKey) || '[]');
-            existingNotifications.unshift(newNotification);
-            localStorage.setItem(targetNotificationsKey, JSON.stringify(existingNotifications.slice(0, 50))); // En son 50 bildirim
-            
-            console.log('✅ Takip bildirimi eklendi:', newNotification);
-            console.log('📬 Target User ID (follow):', targetUserId);
-            console.log('📬 Notification Key (follow):', targetNotificationsKey);
-          }
+          // Karşı tarafın bildirimlerine ekle (ID'ye göre)
+          const targetNotificationsKey = `notifications_user_${targetUserId}`;
+          const existingNotifications = JSON.parse(localStorage.getItem(targetNotificationsKey) || '[]');
+          existingNotifications.unshift(newNotification);
+          localStorage.setItem(targetNotificationsKey, JSON.stringify(existingNotifications.slice(0, 50))); // En son 50 bildirim
+          
+          console.log('✅✅✅ Takip bildirimi eklendi:', newNotification);
+          console.log('📬 Target User ID (follow):', targetUserId);
+          console.log('📬 Notification Key (follow):', targetNotificationsKey);
+          console.log('📬 Mevcut bildirim sayısı:', existingNotifications.length);
+        }
           
           // Karşı tarafın takipçi listesine ekle (sadece başka bir kullanıcıyı takip ediyorsak)
           if (isOtherUserProfile) {
