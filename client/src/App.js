@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import styled, { ThemeProvider } from 'styled-components';
 import { useTheme } from './contexts/ThemeContext';
@@ -79,7 +79,8 @@ const pageTransition = {
 function App() {
   const { theme } = useTheme();
   const { loading, user } = useAuth();
-  const location = window.location.pathname;
+  const location = useLocation();
+  const pathname = location.pathname;
 
   console.log('App - user:', user); // Debug log
 
@@ -88,14 +89,14 @@ function App() {
   }
 
   // Show different navbar for login/register pages
-  const isAuthPage = location === '/login' || location === '/register';
-  const isAdminPage = location === '/admin' || location === '/admin-login';
-  const isMuseumPage = location === '/museum-login' || location === '/museum-dashboard' || location === '/museum-panel';
+  const isAuthPage = pathname === '/login' || pathname === '/register';
+  const isAdminPage = pathname === '/admin' || pathname === '/admin-login';
+  const isMuseumPage = pathname === '/museum-login' || pathname === '/museum-dashboard' || pathname === '/museum-panel';
 
   // Show auth pages if user is not authenticated
   if (!user && (isAuthPage || isAdminPage || isMuseumPage)) {
     // Show appropriate auth page
-    if (location === '/register') {
+    if (pathname === '/register') {
       return (
         <ThemeProvider theme={theme}>
           <GlobalStyles>
@@ -141,8 +142,8 @@ function App() {
         <AppContainer>
           {isAuthPage ? <LoginNavbar /> : isAdminPage ? null : <Navbar />}
           {isAdminPage ? (
-            <AnimatePresence mode="wait">
-              <Routes>
+            <AnimatePresence mode="wait" key={location.key}>
+              <Routes location={location}>
                 <Route 
                   path="/admin-login" 
                   element={
@@ -217,8 +218,8 @@ function App() {
             </AnimatePresence>
           ) : (
             <MainContent user={user} isAuthPage={isAuthPage}>
-            <AnimatePresence mode="wait">
-              <Routes>
+            <AnimatePresence mode="wait" key={location.key}>
+              <Routes location={location}>
                 <Route 
                   path="/" 
                   element={
