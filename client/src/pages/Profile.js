@@ -1579,6 +1579,19 @@ const Profile = () => {
   // Takipçi sayısını localStorage'dan yükle (kullanıcıya özel)
   const getStoredFollowersCount = () => {
     try {
+      // Eğer başka bir kullanıcının profiline bakıyorsak (id var ve currentUser'ın id'si farklıysa)
+      const isOtherUserProfile = id && currentUser && currentUser._id !== id;
+      
+      if (isOtherUserProfile) {
+        // O kullanıcının ID'sine göre saklanan sayıyı yükle
+        const targetUserFollowersKey = `followersCount_user_${id}`;
+        const stored = localStorage.getItem(targetUserFollowersKey);
+        if (stored) {
+          return parseInt(stored);
+        }
+      }
+      
+      // Aksi halde kendi takipçi sayımızı yükle
       const userEmail = currentUser?.email || 'anonymous';
       const followersKey = `followersCount_${userEmail}`;
       const stored = localStorage.getItem(followersKey);
@@ -1690,10 +1703,22 @@ const Profile = () => {
     setIsFollowing(newFollowState);
     
     // TAKİP ET butonuna tıkladığımızda:
-    // - Takipçi sayısı DEĞİŞMEZ (karşı taraf bizi takip etmediği için)
     // - Sadece "takip" (following) sayısı değişir (benim kendi profitimde)
     const newFollowingCount = newFollowState ? Math.max(0, followingCount + 1) : Math.max(0, followingCount - 1);
     setFollowingCount(newFollowingCount);
+    
+    // KARŞI TARAFIN takipçi sayısını güncelle (eğer karşı tarafın profiline bakıyorsak)
+    const isOtherUserProfile = id && currentUser && currentUser._id !== id;
+    if (isOtherUserProfile) {
+      const newFollowersCount = newFollowState ? Math.max(0, followersCount + 1) : Math.max(0, followersCount - 1);
+      setFollowersCount(newFollowersCount);
+      
+      // Karşı tarafın takipçi sayısını localStorage'a kaydet (kullanıcı ID'sine göre)
+      const targetUserFollowersKey = `followersCount_user_${id}`;
+      localStorage.setItem(targetUserFollowersKey, Math.max(0, newFollowersCount).toString());
+      
+      console.log('Karşı tarafın takipçi sayısı güncellendi:', newFollowersCount, 'User ID:', id);
+    }
     
     // Kullanıcıya özel takip bilgilerini localStorage'a kaydet
     const userEmail = currentUser?.email || 'anonymous';
