@@ -226,6 +226,24 @@ const UserDropdown = styled(motion.div)`
   overflow: visible;
 `;
 
+const DropdownHeader = styled.div`
+  padding: 12px 16px;
+  border-bottom: 1px solid ${props => props.theme.border};
+  margin-bottom: 4px;
+`;
+
+const DropdownUserName = styled.div`
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: ${props => props.theme.text};
+  margin-bottom: 4px;
+`;
+
+const DropdownUserEmail = styled.div`
+  font-size: 0.8rem;
+  color: ${props => props.theme.textSecondary};
+`;
+
 const DropdownItem = styled.div`
   display: flex;
   align-items: center;
@@ -717,7 +735,7 @@ const Navbar = () => {
           )}
           
           <UserMenu className="user-menu">
-            <UserIcon onClick={() => setShowUserDropdown(!showUserDropdown)}>
+            <UserIcon onClick={() => setShowUserDropdown(!showUserDropdown)} title={user?.fullName || user?.username || 'Kullanıcı'}>
               <FiUser size={20} />
             </UserIcon>
               
@@ -729,6 +747,16 @@ const Navbar = () => {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
                   >
+                    {user && (
+                      <DropdownHeader>
+                        <DropdownUserName>{user.fullName || user.username || 'Kullanıcı'}</DropdownUserName>
+                        <DropdownUserEmail>{user.email}</DropdownUserEmail>
+                      </DropdownHeader>
+                    )}
+                    <DropdownItem onClick={() => navigate('/profile')}>
+                      <FiUser size={16} />
+                      Profilim
+                    </DropdownItem>
                     <DropdownItem onClick={handleLogout}>
                       <FiLogOut size={16} />
                       Çıkış Yap
