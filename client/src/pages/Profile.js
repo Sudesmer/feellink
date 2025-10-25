@@ -2030,9 +2030,9 @@ const Profile = () => {
           console.log('📬 Notification Key (follow):', targetNotificationsKey);
           console.log('📬 Mevcut bildirim sayısı:', existingNotifications.length);
         }
-          
-          // Karşı tarafın takipçi listesine ekle (sadece başka bir kullanıcıyı takip ediyorsak)
-          if (isOtherUserProfile) {
+        
+        // Karşı tarafın takipçi listesine ekle (sadece başka bir kullanıcıyı takip ediyorsak)
+        if (isOtherUserProfile) {
             const targetFollowersListKey = `followersList_${targetUserId}`;
             const targetFollowersList = JSON.parse(localStorage.getItem(targetFollowersListKey) || '[]');
             const followerToAdd = {
