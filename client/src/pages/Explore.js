@@ -8,6 +8,7 @@ import axios from 'axios';
 import WorkCard from '../components/WorkCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useTheme } from '../contexts/ThemeContext';
+import { worksAPI, categoriesAPI } from '../api/mockApi';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -370,8 +371,8 @@ const Explore = () => {
   const { data: categories } = useQuery(
     'categories',
     async () => {
-      const response = await axios.get('/api/categories');
-      return response.data.categories;
+      const response = await categoriesAPI.getCategories();
+      return response.categories;
     }
   );
 
@@ -388,8 +389,8 @@ const Explore = () => {
       if (searchQuery) params.append('search', searchQuery);
       if (category) params.append('category', category);
 
-      const response = await axios.get(`/api/works?${params}`);
-      return response.data;
+      const response = await worksAPI.getWorks();
+      return response;
     }
   );
 

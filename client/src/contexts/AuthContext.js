@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { authAPI, worksAPI } from '../api/mockApi';
 
 const AuthContext = createContext();
 
@@ -243,12 +244,13 @@ export const AuthProvider = ({ children }) => {
 
   const likeWork = async (workId) => {
     try {
-      const response = await axios.post(`/api/works/${workId}/like`);
-      if (response.data.success) {
-        return { success: true, data: response.data };
+      const response = await worksAPI.likeWork(workId);
+      if (response.success) {
+        toast.success(response.message);
+        return { success: true, data: response };
       }
     } catch (error) {
-      const message = error.response?.data?.message || 'Beğeni işlemi sırasında hata oluştu';
+      const message = error.message || 'Beğeni işlemi sırasında hata oluştu';
       toast.error(message);
       return { success: false, message };
     }
@@ -256,13 +258,13 @@ export const AuthProvider = ({ children }) => {
 
   const saveWork = async (workId) => {
     try {
-      const response = await axios.post(`/api/works/${workId}/save`);
-      if (response.data.success) {
-        toast.success(response.data.message);
-        return { success: true, data: response.data };
+      const response = await worksAPI.saveWork(workId);
+      if (response.success) {
+        toast.success(response.message);
+        return { success: true, data: response };
       }
     } catch (error) {
-      const message = error.response?.data?.message || 'Kaydetme işlemi sırasında hata oluştu';
+      const message = error.message || 'Kaydetme işlemi sırasında hata oluştu';
       toast.error(message);
       return { success: false, message };
     }
