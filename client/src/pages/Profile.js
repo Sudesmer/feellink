@@ -1400,13 +1400,13 @@ const Profile = () => {
 
   const filterCounts = getFilterCounts();
 
-  // localStorage'dan profil fotoğrafını yükle
+  // localStorage'dan profil fotoğrafını yükle, yoksa boş string döndür
   const getStoredProfilePhoto = () => {
     try {
-      return localStorage.getItem('userProfilePhoto') || mockProfile.avatar;
+      return localStorage.getItem('userProfilePhoto') || '';
     } catch (error) {
       console.error('Profil fotoğrafı okuma hatası:', error);
-      return mockProfile.avatar;
+      return '';
     }
   };
 
@@ -1496,7 +1496,7 @@ const Profile = () => {
     };
   }, [userComments]);
   
-  // localStorage'dan eserleri yükle, yoksa orijinal mock data'yı kullan
+  // localStorage'dan eserleri yükle, yoksa boş array döndür (yeni kullanıcılar için)
   const getStoredWorks = () => {
     try {
       const stored = localStorage.getItem('userWorks');
@@ -1506,7 +1506,8 @@ const Profile = () => {
     } catch (error) {
       console.error('localStorage okuma hatası:', error);
     }
-    return originalMockWorks;
+    // Yeni kullanıcılar için boş array döndür
+    return [];
   };
   
   const [works, setWorks] = useState(getStoredWorks());
