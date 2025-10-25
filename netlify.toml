@@ -1,6 +1,6 @@
 [build]
   publish = "client/build"
-  command = "cd client && npm install && npm run build"
+  command = "cd client && npm ci --legacy-peer-deps && npm run build"
   base = "."
 
 [[redirects]]
@@ -12,6 +12,14 @@
   NODE_VERSION = "18"
   NPM_FLAGS = "--legacy-peer-deps"
   CI = "false"
+
+# Cache ayarları - build'i hızlandırır
+[[plugins]]
+  package = "@netlify/plugin-lighthouse"
+
+[context.production.environment]
+  # Production environment variables
+  NODE_ENV = "production"
 
 
 
