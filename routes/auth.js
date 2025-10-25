@@ -1,42 +1,8 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const fs = require('fs').promises;
-const path = require('path');
+const prisma = require('../config/prisma');
 const router = express.Router();
-
-// Kalıcı veri dosyası
-const USERS_FILE = path.join(__dirname, '../data/users.json');
-
-// Kullanıcıları dosyadan oku
-const readUsers = async () => {
-  try {
-    const data = await fs.readFile(USERS_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    console.error('Users file read error:', error);
-    return [];
-  }
-};
-
-// Kullanıcıları dosyaya yaz
-const writeUsers = async (users) => {
-  try {
-    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2), 'utf8');
-    return true;
-  } catch (error) {
-    console.error('Users file write error:', error);
-    return false;
-  }
-};
-
-// En yüksek ID'yi bul
-const getNextUserId = async () => {
-  const users = await readUsers();
-  if (users.length === 0) return '1';
-  const maxId = Math.max(...users.map(u => parseInt(u._id) || 0));
-  return (maxId + 1).toString();
-};
 
 // Simple token generation
 const generateToken = (userId) => {
@@ -79,18 +45,15 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    // Dosyadan kullanıcıları oku
-    const users = await readUsers();
-
-    // Kullanıcı adı ve e-posta benzersizliğini kontrol et
-    const existingUser = users.find(u => u.email === email || u.username === username);
+    // Veritabanında kullanıcı var mı kontrol et
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    });
 
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: existingUser.email === email 
-          ? 'Bu e-posta adresi zaten kullanılıyor'
-          : 'Bu kullanıcı adı zaten alınmış'
+        message: 'Bu e-posta adresi zaten kullanılıyor'
       });
     }
 
@@ -98,44 +61,33 @@ router.post('/register', async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Yeni kullanıcı oluştur
-    const newUserId = await getNextUserId();
-    const newUser = {
-      _id: newUserId,
-      username,
-      email,
-      fullName,
-      password: hashedPassword, // Hashlenmiş şifre
-      bio: '',
-      avatar: '',
-      followers: [],
-      following: [],
-      savedWorks: [],
-      isVerified: false,
-      createdAt: new Date().toISOString()
-    };
-
-    // Kullanıcıyı listeye ekle ve dosyaya kaydet
-    users.push(newUser);
-    await writeUsers(users);
+    // Veritabanına yeni kullanıcı oluştur
+    const newUser = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        fullName: fullName || username
+      }
+    });
 
     console.log('✅ Yeni kullanıcı kaydedildi:', email);
 
     // Token oluştur
-    const token = generateToken(newUser._id);
+    const token = generateToken(newUser.id.toString());
 
     res.status(201).json({
       success: true,
       message: 'Kayıt başarılı',
       token,
       user: {
-        _id: newUser._id,
-        username: newUser.username,
+        _id: newUser.id.toString(),
+        username: newUser.fullName,
+        email: newUser.email,
         fullName: newUser.fullName,
-        bio: newUser.bio,
-        avatar: newUser.avatar,
-        followers: newUser.followers.length,
-        following: newUser.following.length,
+        bio: newUser.bio || '',
+        avatar: newUser.avatar || '',
+        followers: 0,
+        following: 0,
         isVerified: newUser.isVerified,
         createdAt: newUser.createdAt
       }
@@ -165,32 +117,25 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Dosyadan kullanıcıları oku
-    const users = await readUsers();
-
-    // Kullanıcıyı bul
-    const user = users.find(u => u.email === email);
-    console.log('👤 Found user:', user ? `${user.fullName} (${user.email})` : 'Not found');
+    // Veritabanında kullanıcıyı bul
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
 
     if (!user) {
+      console.log('User not found:', email);
       return res.status(401).json({
         success: false,
         message: 'Geçersiz e-posta veya şifre'
       });
     }
+
+    console.log('👤 Found user:', user.fullName || user.email);
 
     // Şifre kontrolü
-    if (!user.password) {
-      console.log('User has no password hash');
-      return res.status(401).json({
-        success: false,
-        message: 'Geçersiz e-posta veya şifre'
-      });
-    }
-
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.log('Password mismatch');
+      console.log('Password mismatch for:', email);
       return res.status(401).json({
         success: false,
         message: 'Geçersiz e-posta veya şifre'
@@ -198,22 +143,22 @@ router.post('/login', async (req, res) => {
     }
 
     // Token oluştur
-    const token = generateToken(user._id);
-    console.log('✅ Login successful for:', user.fullName);
+    const token = generateToken(user.id.toString());
+    console.log('✅ Login successful for:', user.fullName || user.email);
 
     const responseData = {
       success: true,
       message: 'Giriş başarılı',
       token,
       user: {
-        _id: user._id,
-        username: user.username,
+        _id: user.id.toString(),
+        username: user.fullName,
         email: user.email,
         fullName: user.fullName,
-        bio: user.bio,
-        avatar: user.avatar,
-        followers: user.followers.length,
-        following: user.following.length,
+        bio: user.bio || '',
+        avatar: user.avatar || '',
+        followers: 0,
+        following: 0,
         isVerified: user.isVerified,
         createdAt: user.createdAt
       }
@@ -244,11 +189,13 @@ router.get('/me', async (req, res) => {
       });
     }
 
-    // Dosyadan kullanıcıları oku
-    const users = await readUsers();
-
+    // Token'dan user ID'yi al
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_super_secret_jwt_key_here_change_in_production');
-    const user = users.find(u => u._id === decoded.userId);
+    
+    // Veritabanından kullanıcıyı bul
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(decoded.userId) }
+    });
 
     if (!user) {
       return res.status(401).json({
@@ -260,13 +207,14 @@ router.get('/me', async (req, res) => {
     res.json({
       success: true,
       user: {
-        _id: user._id,
-        username: user.username,
+        _id: user.id.toString(),
+        username: user.fullName,
+        email: user.email,
         fullName: user.fullName,
-        bio: user.bio,
-        avatar: user.avatar,
-        followers: user.followers.length,
-        following: user.following.length,
+        bio: user.bio || '',
+        avatar: user.avatar || '',
+        followers: 0,
+        following: 0,
         isVerified: user.isVerified,
         createdAt: user.createdAt
       }
@@ -294,11 +242,13 @@ router.post('/refresh', async (req, res) => {
       });
     }
 
-    // Dosyadan kullanıcıları oku
-    const users = await readUsers();
-
+    // Token'dan user ID'yi al
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_super_secret_jwt_key_here_change_in_production');
-    const user = users.find(u => u._id === decoded.userId);
+    
+    // Veritabanından kullanıcıyı bul
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(decoded.userId) }
+    });
 
     if (!user) {
       return res.status(401).json({
@@ -307,7 +257,7 @@ router.post('/refresh', async (req, res) => {
       });
     }
 
-    const newToken = generateToken(user._id);
+    const newToken = generateToken(user.id.toString());
     
     res.json({
       success: true,
@@ -329,12 +279,14 @@ router.post('/verify-email', async (req, res) => {
   try {
     const { token } = req.body;
     
-    // Dosyadan kullanıcıları oku
-    const users = await readUsers();
-    
-    // Basit token doğrulama (production'da daha güvenli olmalı)
+    // Token'dan user ID'yi al
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_super_secret_jwt_key_here_change_in_production');
-    const user = users.find(u => u._id === decoded.userId);
+    
+    // Veritabanından kullanıcıyı bul ve isVerified'ı güncelle
+    const user = await prisma.user.update({
+      where: { id: parseInt(decoded.userId) },
+      data: { isVerified: true }
+    });
 
     if (!user) {
       return res.status(400).json({
@@ -342,9 +294,6 @@ router.post('/verify-email', async (req, res) => {
         message: 'Geçersiz doğrulama linki'
       });
     }
-
-    user.isVerified = true;
-    await writeUsers(users); // Değişikliği kaydet
 
     res.json({
       success: true,
