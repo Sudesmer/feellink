@@ -1781,11 +1781,18 @@ const Profile = () => {
     
     // KARŞI TARAFIN takipçi sayısını güncelle
     if (isOtherUserProfile) {
-      const newFollowersCount = newFollowState ? Math.max(0, followersCount + 1) : Math.max(0, followersCount - 1);
+      // localStorage'dan mevcut takipçi sayısını al
+      const targetUserFollowersKey = `followersCount_user_${id}`;
+      const currentTargetFollowersCount = parseInt(localStorage.getItem(targetUserFollowersKey) || '0');
+      
+      // Yeni takipçi sayısını hesapla
+      const newFollowersCount = newFollowState 
+        ? Math.max(0, currentTargetFollowersCount + 1) 
+        : Math.max(0, currentTargetFollowersCount - 1);
+      
       setFollowersCount(newFollowersCount);
       
       // Karşı tarafın takipçi sayısını localStorage'a kaydet (kullanıcı ID'sine göre)
-      const targetUserFollowersKey = `followersCount_user_${id}`;
       localStorage.setItem(targetUserFollowersKey, Math.max(0, newFollowersCount).toString());
       
       console.log('✅ Karşı tarafın takipçi sayısı güncellendi:', newFollowersCount, 'User ID:', id);
@@ -1797,7 +1804,33 @@ const Profile = () => {
     
     // Mevcut takip sayısını localStorage'dan al
     const currentFollowingCount = parseInt(localStorage.getItem(followingKey) || '0');
-    const newFollowingCount = newFollowState ? Math.max(0, currentFollowingCount + 1) : Math.max(0, currentFollowingCount - 1);
+    
+    // YENİ: Takip edilen listeden kontrol et
+    const followingList = JSON.parse(localStorage.getItem(`followingList_${userEmail}`) || '[]');
+    const alreadyFollowing = followingList.some(u => u._id === id);
+    
+    // Eğer zaten takip ediyorsa ve takibe devam ediyorsa, sayıyı artırma
+    // Eğer takibi bırakıyorsa, sayıyı azalt
+    let newFollowingCount;
+    if (newFollowState) {
+      // Takip ediyor
+      if (alreadyFollowing) {
+        // Zaten listede var, sayıyı değiştirme
+        newFollowingCount = Math.max(0, currentFollowingCount);
+      } else {
+        // Listede yok, ekle ve sayıyı artır
+        newFollowingCount = Math.max(0, currentFollowingCount + 1);
+      }
+    } else {
+      // Takibi bırakıyor
+      if (alreadyFollowing) {
+        // Listede var, çıkar ve sayıyı azalt
+        newFollowingCount = Math.max(0, currentFollowingCount - 1);
+      } else {
+        // Zaten listede yok, sayıyı değiştirme
+        newFollowingCount = Math.max(0, currentFollowingCount);
+      }
+    }
     
     // localStorage'a kaydet (HER ZAMAN)
     localStorage.setItem(followingKey, Math.max(0, newFollowingCount).toString());
