@@ -1379,6 +1379,7 @@ const Profile = () => {
   };
   
   const [isFollowing, setIsFollowing] = useState(getStoredFollowState());
+  const [requestSent, setRequestSent] = useState(false); // İstek gönderildi durumu
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -1828,6 +1829,18 @@ const Profile = () => {
   }, [id, currentUser, isOtherUserProfile]);
 
   const handleFollow = () => {
+    // Eğer gizli hesapsa ve henüz takip isteği gönderilmemişse
+    if (isPrivateAccount && !isFollowing && !requestSent) {
+      setRequestSent(true);
+      return; // İstek gönderildi durumuna geç
+    }
+    
+    // Eğer gizli hesapsa ve istek gönderilmişse, geri al (istek iptal)
+    if (isPrivateAccount && requestSent && !isFollowing) {
+      setRequestSent(false);
+      return;
+    }
+    
     const newFollowState = !isFollowing;
     setIsFollowing(newFollowState);
     
@@ -2530,13 +2543,18 @@ const Profile = () => {
                 <>
                   <ActionButton 
                     theme={theme} 
-                    primary={!isFollowing}
+                    primary={!isFollowing && !requestSent}
                     onClick={handleFollow}
                   >
                     {isFollowing ? (
                       <>
                         <FiUserMinus size={14} />
                         Takibi Bırak
+                      </>
+                    ) : requestSent ? (
+                      <>
+                        <FiUserPlus size={14} />
+                        İstek Gönderildi
                       </>
                     ) : (
                       <>
