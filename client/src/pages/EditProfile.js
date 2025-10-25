@@ -508,8 +508,8 @@ const EditProfile = () => {
       localStorage.setItem(getUserKey('isPrivate'), isPrivate.toString());
       
       // Ayrıca kullanıcı ID'sine göre de kaydet
-      if (currentUser?._id) {
-        const isPrivateUserIdKey = `isPrivate_user_${currentUser._id}`;
+      if (user?._id) {
+        const isPrivateUserIdKey = `isPrivate_user_${user._id}`;
         localStorage.setItem(isPrivateUserIdKey, isPrivate.toString());
       }
       
