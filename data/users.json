@@ -40,5 +40,15 @@
     "savedWorks": [],
     "isVerified": true,
     "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "_id": "4",
+    "email": "newuser@example.com",
+    "password": "$2a$10$cehEzH9sbEcduSfPmtzK4etyFNrRlpwSmREdZLX/7yo6Sv1YNX6au",
+    "fullName": "New User",
+    "bio": "",
+    "avatar": "",
+    "isVerified": false,
+    "createdAt": "2025-10-25T14:10:57.885Z"
   }
 ]

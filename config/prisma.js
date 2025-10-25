@@ -1,4 +1,4 @@
-const { PrismaClient } = require('../prisma/@prisma/client');
+const { PrismaClient } = require('@prisma/client');
 
 // Singleton pattern - tek bir Prisma instance kullan
 let prisma;
