@@ -1861,12 +1861,13 @@ const Profile = () => {
       };
       
       // Karşı tarafın bildirimlerine ekle (ID'ye göre)
-      const targetNotificationsKey = `notifications_user_${id}`;
+      const targetUserId = userToDisplay?._id || id; // Eğer userToDisplay varsa onun ID'sini kullan, yoksa URL'den gelen id'yi kullan
+      const targetNotificationsKey = `notifications_user_${targetUserId}`;
       const existingNotifications = JSON.parse(localStorage.getItem(targetNotificationsKey) || '[]');
       existingNotifications.unshift(requestNotification);
       localStorage.setItem(targetNotificationsKey, JSON.stringify(existingNotifications.slice(0, 50))); // En son 50 bildirim
       
-      console.log('✅ Takip isteği bildirimi eklendi:', requestNotification);
+      console.log('✅ Takip isteği bildirimi eklendi:', requestNotification, 'Target User ID:', targetUserId);
       
       return; // İstek gönderildi durumuna geç
     }
@@ -1876,14 +1877,15 @@ const Profile = () => {
       setRequestSent(false);
       
       // Karşı tarafın bildirimlerinden istek bildirimini kaldır (en son eklenen)
-      const targetNotificationsKey = `notifications_user_${id}`;
+      const targetUserId = userToDisplay?._id || id; // Eğer userToDisplay varsa onun ID'sini kullan, yoksa URL'den gelen id'yi kullan
+      const targetNotificationsKey = `notifications_user_${targetUserId}`;
       const existingNotifications = JSON.parse(localStorage.getItem(targetNotificationsKey) || '[]');
       const filteredNotifications = existingNotifications.filter(notif => 
         !(notif.type === 'follow_request' && notif.user.name === (currentUser?.fullName || currentUser?.username))
       );
       localStorage.setItem(targetNotificationsKey, JSON.stringify(filteredNotifications));
       
-      console.log('✅ Takip isteği bildirimi iptal edildi');
+      console.log('✅ Takip isteği bildirimi iptal edildi, Target User ID:', targetUserId);
       
       return;
     }
