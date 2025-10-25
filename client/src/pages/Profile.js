@@ -2513,43 +2513,6 @@ const Profile = () => {
                 )}
               </BioText>
             </Bio>
-
-            {/* Gizli Hesap Uyarısı */}
-            {isOtherUserProfile && isPrivateAccount && !isFollower && (
-              <div style={{
-                background: theme.isDark ? 'rgba(255, 107, 53, 0.1)' : 'rgba(255, 107, 53, 0.05)',
-                border: `1px solid ${theme.isDark ? 'rgba(255, 107, 53, 0.3)' : 'rgba(255, 107, 53, 0.2)'}`,
-                borderRadius: '12px',
-                padding: '24px',
-                marginTop: '20px',
-                marginBottom: '20px',
-                textAlign: 'center',
-                color: theme.text
-              }}>
-                <div style={{ 
-                  fontSize: '48px', 
-                  marginBottom: '12px',
-                  filter: 'drop-shadow(0 4px 8px rgba(255, 107, 53, 0.3))'
-                }}>
-                  🔒
-                </div>
-                <div style={{ 
-                  fontSize: '18px', 
-                  fontWeight: '600', 
-                  marginBottom: '8px',
-                  color: '#FF6B35'
-                }}>
-                  Bu Hesap Gizli
-                </div>
-                <div style={{ 
-                  fontSize: '14px', 
-                  color: theme.textSecondary,
-                  lineHeight: '1.5'
-                }}>
-                  Bu kullanıcının gönderilerini görmek için takip isteği göndermeniz gerekir.
-                </div>
-              </div>
-            )}
             
             <ActionButtons>
               {isOwnProfile ? (
