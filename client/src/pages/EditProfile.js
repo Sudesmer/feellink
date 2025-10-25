@@ -11,7 +11,9 @@ import {
   FiMail,
   FiMapPin,
   FiGlobe,
-  FiEdit3
+  FiEdit3,
+  FiLock,
+  FiUnlock
 } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
@@ -314,6 +316,53 @@ const HiddenFileInput = styled.input`
   display: none;
 `;
 
+const ToggleSection = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid ${props => props.theme.border};
+  border-radius: 8px;
+  background: ${props => props.theme.background};
+`;
+
+const ToggleLabel = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: ${props => props.theme.text};
+  font-weight: 500;
+  cursor: pointer;
+  
+  svg {
+    font-size: 1.2rem;
+    color: ${props => props.isPrivate ? '#FF6B35' : props.theme.textSecondary};
+  }
+`;
+
+const ToggleSwitch = styled.button`
+  position: relative;
+  width: 48px;
+  height: 26px;
+  border-radius: 13px;
+  border: none;
+  background: ${props => props.isActive ? '#FF6B35' : props.theme.border};
+  cursor: pointer;
+  transition: background 0.3s ease;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: ${props => props.isActive ? '22px' : '2px'};
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: white;
+    transition: left 0.3s ease;
+  }
+`;
+
 const EditProfile = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
@@ -368,6 +417,11 @@ const EditProfile = () => {
     return user?.avatar || null;
   });
   const [isLoading, setIsLoading] = useState(false);
+  // Gizli hesap durumu
+  const [isPrivate, setIsPrivate] = useState(() => {
+    const stored = localStorage.getItem(getUserKey('isPrivate'));
+    return stored ? JSON.parse(stored) : false;
+  });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -450,7 +504,11 @@ const EditProfile = () => {
         localStorage.setItem(getUserKey('userProfilePhoto'), previewUrl);
       }
       
+      // Gizli hesap ayarını kaydet
+      localStorage.setItem(getUserKey('isPrivate'), JSON.stringify(isPrivate));
+      
       console.log('✅ Profil localStorage\'a kaydedildi');
+      console.log('✅ Gizli hesap durumu:', isPrivate);
       
       // Başarılı güncelleme sonrası profil sayfasına yönlendir
       navigate('/profile');
@@ -573,6 +631,32 @@ const EditProfile = () => {
                 placeholder="Şehir, Ülke"
               />
             </FormGroup>
+          </Section>
+          
+          <Section>
+            <SectionTitle theme={theme}>Hesap Gizliliği</SectionTitle>
+            <ToggleSection theme={theme}>
+              <ToggleLabel 
+                theme={theme} 
+                isPrivate={isPrivate}
+                onClick={() => setIsPrivate(!isPrivate)}
+              >
+                {isPrivate ? <FiLock /> : <FiUnlock />}
+                Gizli Hesap
+              </ToggleLabel>
+              <ToggleSwitch 
+                isActive={isPrivate} 
+                onClick={() => setIsPrivate(!isPrivate)}
+              />
+            </ToggleSection>
+            <p style={{ 
+              color: theme.textSecondary, 
+              fontSize: '0.875rem',
+              marginTop: '8px',
+              margin: '8px 0 0 0'
+            }}>
+              Gizli hesapta, sadece onayladığınız kişiler profilinizi, eserlerinizi ve yorumlarınızı görebilir.
+            </p>
           </Section>
         </Form>
       </Content>
