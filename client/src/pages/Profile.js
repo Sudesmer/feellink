@@ -1353,10 +1353,12 @@ const Profile = () => {
     return [...pinned, ...filterComments(unpinned)];
   };
 
-  // localStorage'dan takip durumunu yükle
+  // localStorage'dan takip durumunu yükle (kullanıcıya özel)
   const getStoredFollowState = () => {
     try {
-      const stored = localStorage.getItem('userFollowState');
+      const userEmail = currentUser?.email || 'anonymous';
+      const followKey = `userFollowState_${userEmail}`;
+      const stored = localStorage.getItem(followKey);
       return stored ? JSON.parse(stored) : mockProfile.isFollowing;
     } catch (error) {
       console.error('Takip durumu okuma hatası:', error);
@@ -1574,9 +1576,24 @@ const Profile = () => {
   
   const [works, setWorks] = useState(getStoredWorks());
   const [savedWorksCount, setSavedWorksCount] = useState(0);
-  const [followersCount, setFollowersCount] = useState(profile.followers);
+  // Takipçi sayısını localStorage'dan yükle (kullanıcıya özel)
+  const getStoredFollowersCount = () => {
+    try {
+      const userEmail = currentUser?.email || 'anonymous';
+      const followersKey = `followersCount_${userEmail}`;
+      const stored = localStorage.getItem(followersKey);
+      return stored ? parseInt(stored) : profile.followers;
+    } catch (error) {
+      console.error('Takipçi sayısı okuma hatası:', error);
+      return profile.followers;
+    }
+  };
+  
+  const [followersCount, setFollowersCount] = useState(getStoredFollowersCount());
   const [followingCount, setFollowingCount] = useState(profile.following);
-  const isOwnProfile = mockProfile.isOwnProfile || (currentUser && currentUser.username === username);
+  
+  // isOwnProfile kontrolü: eğer id yoksa (kendi profili) veya currentUser'ın id'si id ile eşleşiyorsa
+  const isOwnProfile = !id || (currentUser && currentUser._id === id);
   
   // Kaydedilen eser sayısını hesapla
   const getSavedWorksCount = () => {
@@ -1662,10 +1679,38 @@ const Profile = () => {
     const newFollowersCount = newFollowState ? followersCount + 1 : followersCount - 1;
     setFollowersCount(newFollowersCount);
     
-    // localStorage'a takip durumunu ve sayıları kaydet
+    // Kullanıcıya özel takip bilgilerini localStorage'a kaydet
+    const userEmail = currentUser?.email || 'anonymous';
+    const followKey = `userFollowState_${userEmail}`;
+    const followersKey = `followersCount_${userEmail}`;
+    
     try {
-      localStorage.setItem('userFollowState', JSON.stringify(newFollowState));
-      localStorage.setItem('followersCount', newFollowersCount.toString());
+      // Takip durumunu kaydet
+      localStorage.setItem(followKey, JSON.stringify(newFollowState));
+      
+      // Takipçi sayısını kaydet
+      localStorage.setItem(followersKey, newFollowersCount.toString());
+      
+      // Takip edilenler listesini de kaydet
+      if (newFollowState) {
+        // Takip edilen listesine ekle
+        const followingList = JSON.parse(localStorage.getItem(`followingList_${userEmail}`) || '[]');
+        const userToAdd = {
+          _id: id,
+          email: userToDisplay?.email,
+          fullName: userToDisplay?.fullName,
+          avatar: userToDisplay?.avatar,
+          isFollowing: true
+        };
+        followingList.push(userToAdd);
+        localStorage.setItem(`followingList_${userEmail}`, JSON.stringify(followingList));
+      } else {
+        // Takip edilen listesinden çıkar
+        const followingList = JSON.parse(localStorage.getItem(`followingList_${userEmail}`) || '[]');
+        const updatedList = followingList.filter(u => u._id !== id);
+        localStorage.setItem(`followingList_${userEmail}`, JSON.stringify(updatedList));
+      }
+      
       console.log('Takip durumu ve sayıları localStorage\'a kaydedildi:', newFollowState, newFollowersCount);
     } catch (error) {
       console.error('Takip durumu kaydetme hatası:', error);
