@@ -1845,6 +1845,16 @@ const Profile = () => {
     // Karşı tarafın kullanıcı ID'sini belirle (userToDisplay varsa onun ID'sini kullan, yoksa URL'den gelen id'yi kullan)
     const targetUserId = userToDisplay?._id || id;
     
+    console.log('🔍 handleFollow - Debug bilgileri:');
+    console.log('  - currentUser._id:', currentUser?._id);
+    console.log('  - userToDisplay:', userToDisplay);
+    console.log('  - userToDisplay._id:', userToDisplay?._id);
+    console.log('  - id (URL):', id);
+    console.log('  - targetUserId:', targetUserId);
+    console.log('  - isPrivateAccount:', isPrivateAccount);
+    console.log('  - isFollowing:', isFollowing);
+    console.log('  - requestSent:', requestSent);
+    
     // Eğer gizli hesapsa ve henüz takip isteği gönderilmemişse
     if (isPrivateAccount && !isFollowing && !requestSent) {
       setRequestSent(true);
