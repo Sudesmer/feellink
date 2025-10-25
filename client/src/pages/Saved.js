@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FiBookmark, FiGrid, FiList, FiSearch, FiHome, FiEye, FiBell, FiUser, FiPlus, FiEdit3, FiTrash2, FiFolder } from 'react-icons/fi';
 import axios from 'axios';
+import { worksAPI } from '../api/mockApi';
 import WorkCard from '../components/WorkCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useTheme } from '../contexts/ThemeContext';
@@ -624,8 +625,8 @@ const Saved = () => {
     'saved-works',
     async () => {
       try {
-        const response = await axios.get('/api/works/saved');
-        return response.data;
+        const response = await worksAPI.getSavedWorks();
+        return response;
       } catch (error) {
         // If API fails, return mock data
         return { works: mockSavedWorks };

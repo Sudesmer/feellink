@@ -16,6 +16,7 @@ import {
   FiX
 } from 'react-icons/fi';
 import axios from 'axios';
+import { worksAPI, commentsAPI } from '../api/mockApi';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
@@ -455,8 +456,8 @@ const WorkDetail = () => {
   const { data: workData, isLoading } = useQuery(
     ['work', id],
     async () => {
-      const response = await axios.get(`/api/works/${id}`);
-      return response.data;
+      const response = await worksAPI.getWorkById(id);
+      return response;
     },
     {
       enabled: !!id,
