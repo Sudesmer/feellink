@@ -1802,6 +1802,31 @@ const Profile = () => {
     }
   }, [currentUser]);
 
+  // Gizli hesap ve takipçi kontrolü
+  React.useEffect(() => {
+    // Gizli hesap durumunu her seferinde güncelle
+    const updatedPrivateStatus = getIsPrivateStatus();
+    setIsPrivateAccount(updatedPrivateStatus);
+    
+    // Eğer başka birinin hesabına bakıyorsak ve gizli hesaplarsa
+    if (isOtherUserProfile && updatedPrivateStatus) {
+      // Takipçi olup olmadığını kontrol et
+      const userEmail = currentUser?.email || 'anonymous';
+      const followingList = JSON.parse(localStorage.getItem(`followingList_${userEmail}`) || '[]');
+      const isFollowingUser = followingList.some(u => u._id === id);
+      setIsFollower(isFollowingUser);
+      
+      console.log('🔒 Gizli hesap kontrolü:', {
+        isPrivate: updatedPrivateStatus,
+        isOtherUser: isOtherUserProfile,
+        isFollower: isFollowingUser
+      });
+    } else {
+      // Kendi hesabımız veya gizli değil
+      setIsFollower(true); // Kendi hesabımız her zaman erişilebilir
+    }
+  }, [id, currentUser, isOtherUserProfile]);
+
   const handleFollow = () => {
     const newFollowState = !isFollowing;
     setIsFollowing(newFollowState);
