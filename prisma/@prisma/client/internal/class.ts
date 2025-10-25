@@ -45,18 +45,18 @@ const config: runtime.GetPrismaClientConfig = {
   "datasourceNames": [
     "db"
   ],
-  "activeProvider": "postgresql",
+  "activeProvider": "sqlite",
   "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
-        "fromEnvVar": "DATABASE_URL",
-        "value": null
+        "fromEnvVar": null,
+        "value": "file:./dev.db"
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"@prisma/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id         Int      @id @default(autoincrement())\n  email      String   @unique\n  password   String // bcrypt hashlenmiş şifre\n  fullName   String?\n  bio        String?  @default(\"\")\n  avatar     String?  @default(\"\")\n  isVerified Boolean  @default(false)\n  createdAt  DateTime @default(now())\n  updatedAt  DateTime @updatedAt\n\n  // İlişkiler\n  followers User[] @relation(\"UserFollows\")\n  following User[] @relation(\"UserFollows\")\n\n  @@map(\"users\")\n}\n",
-  "inlineSchemaHash": "0c99e628922d6f5f9257c7a4fb5f5544e37e3e95978cee87d8d7a35752c5bcc4",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"@prisma/client\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n  url      = \"file:./dev.db\"\n}\n\nmodel User {\n  id         Int      @id @default(autoincrement())\n  email      String   @unique\n  password   String // bcrypt hashlenmiş şifre\n  fullName   String?\n  bio        String?  @default(\"\")\n  avatar     String?  @default(\"\")\n  isVerified Boolean  @default(false)\n  createdAt  DateTime @default(now())\n  updatedAt  DateTime @updatedAt\n\n  // İlişkiler\n  followers User[] @relation(\"UserFollows\")\n  following User[] @relation(\"UserFollows\")\n\n  @@map(\"users\")\n}\n",
+  "inlineSchemaHash": "ff9c385d2ee4fd4e98987545572da537fd2df1a0ec1cb40de857f59dca566eef",
   "copyEngine": true,
   "runtimeDataModel": {
     "models": {},

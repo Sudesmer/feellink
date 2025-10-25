@@ -3,7 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { mockUsers, mockCategories, mockWorks, mockComments } = require('./mock-data');
-const prisma = require('./config/prisma');
+// Prisma client will be initialized in routes
 require('dotenv').config({ path: './.env' });
 
 const app = express();
