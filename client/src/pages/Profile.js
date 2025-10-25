@@ -1167,17 +1167,17 @@ const EmptyDescription = styled.p`
   line-height: 1.4;
 `;
 
-// Mock data for Instagram-like profile
+// Mock data for Instagram-like profile - sıfırlanmış
 const mockProfile = {
-  username: 'zeynep_esmer',
-  fullName: 'Zeynep Esmer',
-  bio: '🎨 Sanatçı & Tasarımcı\n📍 İstanbul, Türkiye\n✨ Dijital sanat ve geleneksel tekniklerin buluştuğu nokta',
-  website: 'zeynepesmer.com',
-  location: 'İstanbul, Türkiye',
-  avatar: '/zeynep.jpg',
+  username: '',
+  fullName: '',
+  bio: '',
+  website: '',
+  location: '',
+  avatar: '',
   followers: 0,
   following: 0,
-  posts: 42,
+  posts: 0,
   isFollowing: false,
   isOwnProfile: true
 };
@@ -1400,10 +1400,17 @@ const Profile = () => {
 
   const filterCounts = getFilterCounts();
 
-  // localStorage'dan profil fotoğrafını yükle, yoksa boş string döndür
+  // Kullanıcıya özel localStorage key oluştur
+  const getUserKey = (key) => {
+    const userEmail = currentUser?.email || 'anonymous';
+    return `${key}_${userEmail}`;
+  };
+
+  // localStorage'dan profil fotoğrafını yükle, yoksa boş string döndür (kullanıcıya özel)
   const getStoredProfilePhoto = () => {
     try {
-      return localStorage.getItem('userProfilePhoto') || '';
+      const userKey = getUserKey('userProfilePhoto');
+      return localStorage.getItem(userKey) || '';
     } catch (error) {
       console.error('Profil fotoğrafı okuma hatası:', error);
       return '';
@@ -1421,21 +1428,31 @@ const Profile = () => {
     }
   };
 
-  // localStorage'dan profil verilerini yükle
+  // localStorage'dan profil verilerini yükle - sadece kullanıcı verileri
   const getStoredProfileData = () => {
     try {
-      const storedProfile = localStorage.getItem('userProfile');
-      if (storedProfile) {
-        const parsedProfile = JSON.parse(storedProfile);
+      // currentUser'dan profil verilerini al
+      const userProfilePhoto = getStoredProfilePhoto();
+      
+      if (currentUser) {
         return {
-          ...mockProfile,
-          ...parsedProfile,
-          avatar: getStoredProfilePhoto() // Fotoğrafı ayrı key'den al
+          username: currentUser.username || currentUser.email?.split('@')[0] || '',
+          fullName: currentUser.fullName || '',
+          bio: localStorage.getItem(getUserKey('userBio')) || '',
+          website: localStorage.getItem(getUserKey('userWebsite')) || '',
+          location: localStorage.getItem(getUserKey('userLocation')) || '',
+          avatar: userProfilePhoto || '',
+          followers: 0,
+          following: 0,
+          posts: works.length,
+          isFollowing: false,
+          isOwnProfile: true
         };
       }
     } catch (error) {
       console.error('Profil verileri okuma hatası:', error);
     }
+    // Eğer kullanıcı yoksa tamamen boş profil döndür
     return {
       ...mockProfile,
       avatar: getStoredProfilePhoto()
@@ -1570,21 +1587,27 @@ const Profile = () => {
     }
   }, [updateCounts]);
 
-  // localStorage'dan güncellenmiş profil verilerini yükle
+  // localStorage'dan güncellenmiş profil verilerini yükle - eski userProfile verisini kullanma
   React.useEffect(() => {
     try {
-      const storedProfile = localStorage.getItem('userProfile');
-      if (storedProfile) {
-        const updatedProfile = JSON.parse(storedProfile);
+      // Eski userProfile'ı sil
+      localStorage.removeItem('userProfile');
+      
+      // Sadece currentUser ve localStorage'daki kullanıcı verilerini kullan (kullanıcıya özel)
+      if (currentUser) {
         setProfile(prevProfile => ({
           ...prevProfile,
-          ...updatedProfile
+          username: currentUser.username || currentUser.email?.split('@')[0] || '',
+          fullName: currentUser.fullName || '',
+          bio: localStorage.getItem(getUserKey('userBio')) || '',
+          website: localStorage.getItem(getUserKey('userWebsite')) || '',
+          location: localStorage.getItem(getUserKey('userLocation')) || '',
         }));
       }
     } catch (error) {
       console.error('localStorage profil verileri yükleme hatası:', error);
     }
-  }, []);
+  }, [currentUser]);
 
   const handleFollow = () => {
     const newFollowState = !isFollowing;
@@ -1752,9 +1775,9 @@ const Profile = () => {
           workImage: selectedWork.imageUrl,
           author: {
             _id: currentUser?._id || '1',
-            username: currentUser?.username || 'zeynep_esmer',
-            fullName: currentUser?.fullName || 'Zeynep Esmer',
-            avatar: currentUser?.avatar || '/zeynep.jpg'
+            username: currentUser?.username || currentUser?.email?.split('@')[0] || 'user',
+            fullName: currentUser?.fullName || 'Kullanıcı',
+            avatar: currentUser?.avatar || ''
           },
           createdAt: new Date(),
           isApproved: true,
@@ -1868,9 +1891,9 @@ const Profile = () => {
         imageUrl: workPreviewUrl,
         author: {
           _id: currentUser?._id || '1',
-          username: currentUser?.username || 'zeynep_esmer',
-          fullName: currentUser?.fullName || 'Zeynep Esmer',
-          avatar: currentUser?.avatar || '/zeynep.jpg'
+          username: currentUser?.username || currentUser?.email?.split('@')[0] || 'user',
+          fullName: currentUser?.fullName || 'Kullanıcı',
+          avatar: currentUser?.avatar || ''
         },
         likes: 0,
         comments: [],
@@ -2025,54 +2048,35 @@ const Profile = () => {
 
           <ProfileInfo>
             <ProfileTop>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <Username theme={theme}>{profile.username}</Username>
                 <div 
                   style={{ 
                     position: 'relative',
-                    fontSize: '16px',
-                    backgroundColor: '#4CAF50',
+                    fontSize: '18px',
+                    background: 'linear-gradient(135deg, #FF6B35 0%, #FF8E53 100%)',
                     borderRadius: '50%',
-                    width: '24px',
-                    height: '24px',
+                    width: '28px',
+                    height: '28px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
-                    boxShadow: '0 2px 8px rgba(76, 175, 80, 0.4)'
+                    boxShadow: '0 4px 12px rgba(255, 107, 53, 0.25)',
+                    border: '2px solid rgba(255, 255, 255, 0.8)'
                   }}
                   title="Kullanıcı Rozeti"
                   onMouseEnter={(e) => {
-                    const tooltip = document.createElement('div');
-                    tooltip.id = 'user-badge-tooltip';
-                    tooltip.style.cssText = `
-                      position: absolute;
-                      bottom: 35px;
-                      left: 50%;
-                      transform: translateX(-50%);
-                      background: rgba(0, 0, 0, 0.9);
-                      color: white;
-                      padding: 8px 12px;
-                      border-radius: 6px;
-                      font-size: 12px;
-                      font-weight: 500;
-                      white-space: nowrap;
-                      z-index: 1000;
-                      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-                      animation: fadeIn 0.3s ease;
-                    `;
-                    tooltip.textContent = 'Kullanıcı Rozeti';
-                    e.target.appendChild(tooltip);
+                    e.target.style.transform = 'scale(1.1)';
+                    e.target.style.boxShadow = '0 6px 20px rgba(255, 107, 53, 0.4)';
                   }}
                   onMouseLeave={(e) => {
-                    const tooltip = document.getElementById('user-badge-tooltip');
-                    if (tooltip) {
-                      tooltip.remove();
-                    }
+                    e.target.style.transform = 'scale(1)';
+                    e.target.style.boxShadow = '0 4px 12px rgba(255, 107, 53, 0.25)';
                   }}
                 >
-                  👤
+                  ✨
                 </div>
               </div>
             </ProfileTop>
@@ -2242,7 +2246,6 @@ const Profile = () => {
               </WorksGrid>
             ) : (
               <EmptyState theme={theme}>
-                <EmptyIcon>📷</EmptyIcon>
                 <EmptyTitle theme={theme}>Henüz eser yok</EmptyTitle>
                 <EmptyDescription theme={theme}>
                   {isOwnProfile 

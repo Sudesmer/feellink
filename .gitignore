@@ -95,7 +95,8 @@ jspm_packages/
 
 # Backup files
 *.backup
-backups/
+# Keep backup directory structure but ignore backup files
+data/backups/*.json
 
 # Large media files - exclude from git
 *.mp3

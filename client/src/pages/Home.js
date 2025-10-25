@@ -65,12 +65,12 @@ const MainLayout = styled.div`
 const MainContent = styled.div`
   flex: 1;
   min-width: 0;
-  width: calc(100vw - 680px);
+  width: calc(100vw - 760px);
   height: 100vh;
   overflow-y: auto;
   padding: 20px;
   margin-left: 280px;
-  margin-right: 0;
+  margin-right: 480px;
   background: ${props => props.theme.surface};
 
   @media (max-width: 1200px) {
@@ -108,13 +108,15 @@ const LeftSidebar = styled.div`
 
 const SidebarWrapper = styled.div`
   position: fixed;
-  top: 0px;
+  top: 80px;
   right: 0;
   width: 480px;
-  height: 100vh;
-  z-index: 100;
+  height: calc(100vh - 80px);
+  z-index: 500;
   overflow-y: auto;
   background: ${props => props.theme.surface};
+  display: block;
+  visibility: visible;
 
   @media (max-width: 1200px) {
     display: none;
@@ -298,6 +300,13 @@ const SectionTitle = styled.h2`
   display: flex;
   align-items: center;
   gap: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    color: ${props => props.theme.primary};
+    transform: translateX(5px);
+  }
 
   @media (max-width: 768px) {
     font-size: 1.2rem;
@@ -819,141 +828,8 @@ const Home = () => {
   const [filteredWorks, setFilteredWorks] = useState([]);
 
   useEffect(() => {
-    // Mock data for featured works
-    const mockWorks = [
-      {
-        _id: '1',
-        title: 'Günbatımında İstanbul',
-        description: 'Boğaz\'ın büyüleyici günbatımı manzarası',
-        images: [{ url: '/t1.jpg', isMain: true }],
-        author: { name: 'Ahmet Yılmaz', username: 'ahmet_art', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop' },
-        category: { name: 'Resim', color: '#FF6B35' },
-        likeCount: 0,
-        viewCount: 0,
-        isTrending: true,
-        createdAt: new Date('2024-01-15')
-      },
-      {
-        _id: '3',
-        title: 'Soyut Düşler',
-        description: 'Renklerin dansı',
-        images: [{ url: '/t2.webp', isMain: true }],
-        author: { name: 'Can Soyut', username: 'can_abstract', avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop' },
-        category: { name: 'Dijital Sanat', color: '#2196F3' },
-        likeCount: 0,
-        viewCount: 0,
-        isTrending: true,
-        createdAt: new Date('2024-01-10')
-      },
-      {
-        _id: '4',
-        title: 'Minimalist Düşünce',
-        description: 'Sadelikte güzellik',
-        images: [{ url: '/t11.jpeg', isMain: true }],
-        author: { name: 'Arda Minimal', username: 'arda_minimal', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop' },
-        category: { name: 'Dijital Sanat', color: '#607D8B' },
-        likeCount: 0,
-        viewCount: 0,
-        isTrending: false,
-        createdAt: new Date('2024-01-20')
-      },
-      {
-        _id: '5',
-        title: 'Gece Şehri',
-        description: 'Işıkların büyüsü',
-        images: [{ url: '/t4.jpg', isMain: true }],
-        author: { name: 'Elif Gece', username: 'elif_night', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop' },
-        category: { name: 'Fotoğraf', color: '#9C27B0' },
-        likeCount: 0,
-        viewCount: 0,
-        isTrending: false,
-        createdAt: new Date('2024-01-18')
-      },
-      {
-        _id: '6',
-        title: 'Renkli Hayaller',
-        description: 'Hayal gücünün sınırları',
-        images: [{ url: '/t6.jpg', isMain: true }],
-        author: { name: 'Deniz Renk', username: 'deniz_color', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop' },
-        category: { name: 'Resim', color: '#E91E63' },
-        likeCount: 0,
-        viewCount: 0,
-        isTrending: false,
-        createdAt: new Date('2024-01-16')
-      },
-      {
-        _id: '7',
-        title: 'Dijital Rüyalar',
-        description: 'Teknoloji ve sanatın buluşması',
-        images: [{ url: '/leo1.jpg', isMain: true }],
-        author: { name: 'Tekin Dijital', username: 'tekin_digital', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop' },
-        category: { name: 'Dijital Sanat', color: '#00BCD4' },
-        likeCount: 0,
-        viewCount: 0,
-        isTrending: false,
-        createdAt: new Date('2024-01-14')
-      },
-      {
-        _id: '8',
-        title: 'Doğanın Sesi',
-        description: 'Tabiatın büyüleyici güzelliği',
-        images: [{ url: '/t12.jpeg', isMain: true }],
-        author: { name: 'Ayşe Doğa', username: 'ayse_nature', avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop' },
-        category: { name: 'Fotoğraf', color: '#4CAF50' },
-        likeCount: 0,
-        viewCount: 0,
-        isTrending: false,
-        createdAt: new Date('2024-01-12')
-      },
-      {
-        _id: '9',
-        title: 'Geometrik Düşler',
-        description: 'Matematik ve sanatın uyumu',
-        images: [{ url: '/leo2.jpeg', isMain: true }],
-        author: { name: 'Matematik Sanat', username: 'math_art', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop' },
-        category: { name: 'Dijital Sanat', color: '#FF9800' },
-        likeCount: 0,
-        viewCount: 0,
-        isTrending: false,
-        createdAt: new Date('2024-01-08')
-      },
-      {
-        _id: '10',
-        title: 'Şehir Işıkları',
-        description: 'Metropolün gece manzarası',
-        images: [{ url: '/t10.jpg', isMain: true }],
-        author: { name: 'Şehir Fotoğrafçısı', username: 'city_photo', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop' },
-        category: { name: 'Fotoğraf', color: '#9C27B0' },
-        likeCount: 0,
-        viewCount: 0,
-        isTrending: true,
-        createdAt: new Date('2024-01-06')
-      },
-      {
-        _id: '11',
-        title: 'Soyut Duygular',
-        description: 'İç dünyanın dışa vurumu',
-        images: [{ url: '/picasso.webp', isMain: true }],
-        author: { name: 'Duygu Sanat', username: 'emotion_art', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop' },
-        category: { name: 'Resim', color: '#F44336' },
-        likeCount: 0,
-        viewCount: 0,
-        isTrending: false,
-        createdAt: new Date('2024-01-04')
-      },
-      {
-        _id: '12',
-        title: 'Minimalist Yaşam',
-        description: 'Sadelikte güzellik',
-        images: [{ url: '/t3.jpg', isMain: true }],
-        author: { name: 'Minimal Yaşam', username: 'minimal_life', avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop' },
-        category: { name: 'Dijital Sanat', color: '#607D8B' },
-        likeCount: 0,
-        viewCount: 0,
-        isTrending: false,
-        createdAt: new Date('2024-01-02')
-      }
-    ];
+    // Gerçek zamanlı eserler için boş array (backend entegrasyonu için hazır)
+    const mockWorks = [];
     
     setFeaturedWorks(mockWorks);
     setFilteredWorks(mockWorks);
@@ -1045,63 +921,67 @@ const Home = () => {
               </HighlightsHeader>
 
           <HighlightsGrid>
-            {/* First set of cards */}
-                       <HighlightCard
-                         backgroundImage="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=400&fit=crop"
-                       >
-                         <HighlightOverlay>
-                           <HighlightInfo>
-                             <HighlightDescription>⭐ Ayın Müzesi</HighlightDescription>
-                             <HighlightName>İstanbul Modern</HighlightName>
-                             <HighlightStats>2.4K ziyaretçi</HighlightStats>
-                           </HighlightInfo>
-                         </HighlightOverlay>
-                       </HighlightCard>
-
-                       <HighlightCard
-                         backgroundImage="/sude.jpg"
-                       >
-                         <HighlightOverlay>
-                           <HighlightInfo>
-                             <HighlightDescription>⭐ Ayın Sanatçısı</HighlightDescription>
-                             <HighlightName>Sude Esmer</HighlightName>
-                             <HighlightStats>1.8K takipçi</HighlightStats>
-                           </HighlightInfo>
-                         </HighlightOverlay>
-                       </HighlightCard>
-
+            {/* Ayın Müzesi */}
             <HighlightCard
-              backgroundImage="https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=400&h=400&fit=crop"
+              backgroundImage="#"
+            >
+              <HighlightOverlay>
+                <HighlightInfo>
+                  <HighlightDescription>⭐ Ayın Müzesi</HighlightDescription>
+                  <HighlightName>-</HighlightName>
+                  <HighlightStats>-</HighlightStats>
+                </HighlightInfo>
+              </HighlightOverlay>
+            </HighlightCard>
+
+            {/* Ayın Sanatçısı */}
+            <HighlightCard
+              backgroundImage="#"
+            >
+              <HighlightOverlay>
+                <HighlightInfo>
+                  <HighlightDescription>⭐ Ayın Sanatçısı</HighlightDescription>
+                  <HighlightName>-</HighlightName>
+                  <HighlightStats>-</HighlightStats>
+                </HighlightInfo>
+              </HighlightOverlay>
+            </HighlightCard>
+
+            {/* Ayın Eseri */}
+            <HighlightCard
+              backgroundImage="#"
             >
               <HighlightOverlay>
                 <HighlightInfo>
                   <HighlightDescription>⭐ Ayın Eseri</HighlightDescription>
-                  <HighlightName>Günbatımında İstanbul</HighlightName>
-                  <HighlightStats>3.2K beğeni</HighlightStats>
+                  <HighlightName>-</HighlightName>
+                  <HighlightStats>-</HighlightStats>
                 </HighlightInfo>
               </HighlightOverlay>
             </HighlightCard>
 
+            {/* Ayın Yorumu */}
             <HighlightCard
-              backgroundImage="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=400&fit=crop"
+              backgroundImage="#"
             >
               <HighlightOverlay>
                 <HighlightInfo>
                   <HighlightDescription>⭐ Ayın Yorumu</HighlightDescription>
-                  <HighlightName>"Bu eser bana huzur veriyor"</HighlightName>
-                  <HighlightStats>1.5K beğeni</HighlightStats>
+                  <HighlightName>-</HighlightName>
+                  <HighlightStats>-</HighlightStats>
                 </HighlightInfo>
               </HighlightOverlay>
             </HighlightCard>
 
+            {/* Ayın Koleksiyoneri */}
             <HighlightCard
-              backgroundImage="/zeynep.jpg"
+              backgroundImage="#"
             >
               <HighlightOverlay>
                 <HighlightInfo>
                   <HighlightDescription>⭐ Ayın Koleksiyoneri</HighlightDescription>
-                  <HighlightName>Zeynep Esmer</HighlightName>
-                  <HighlightStats>2.8K takipçi</HighlightStats>
+                  <HighlightName>-</HighlightName>
+                  <HighlightStats>-</HighlightStats>
                 </HighlightInfo>
               </HighlightOverlay>
             </HighlightCard>
@@ -1113,7 +993,7 @@ const Home = () => {
                  <FeaturedSection>
                    <SectionContainer>
                      <SectionHeader>
-                       <SectionTitle>
+                       <SectionTitle onClick={() => navigate('/explore')}>
                          <ModernEyeIcon />
                          Keşfet
                        </SectionTitle>

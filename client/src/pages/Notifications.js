@@ -343,123 +343,45 @@ const MoreButton = styled.button`
 
 const EmptyState = styled.div`
   text-align: center;
-  padding: 60px 20px;
+  padding: 80px 20px;
   color: ${props => props.theme.textSecondary};
 `;
 
 const EmptyIcon = styled.div`
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
-  background: ${props => props.theme.surface};
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8E53 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 20px;
-  color: ${props => props.theme.textSecondary};
-  font-size: 2rem;
+  margin: 0 auto 24px;
+  color: white;
+  font-size: 3rem;
+  box-shadow: 0 8px 30px rgba(255, 107, 53, 0.3);
 `;
 
 const EmptyText = styled.h3`
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin: 0 0 8px 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 12px 0;
   color: ${props => props.theme.text};
+  background: ${props => props.theme.gradient};
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 `;
 
 const EmptySubtext = styled.p`
-  font-size: 0.9rem;
+  font-size: 1rem;
   margin: 0;
   color: ${props => props.theme.textSecondary};
+  line-height: 1.6;
 `;
 
 // Mock notification data
-const mockNotifications = [
-  {
-    id: 1,
-    type: 'like',
-    user: {
-      name: 'Zeynep Esmer',
-      avatar: '/zeynep.jpg',
-      username: 'zeynep_esmer'
-    },
-    action: 'beğendi',
-    target: 'Günbatımında İstanbul',
-    targetImage: '/t1.jpg',
-    time: '2 dakika önce',
-    read: false
-  },
-  {
-    id: 2,
-    type: 'comment',
-    user: {
-      name: 'Ahmet Yılmaz',
-      avatar: '/can.jpg',
-      username: 'ahmet_yilmaz'
-    },
-    action: 'yorum yaptı',
-    target: 'Soyut Düşler',
-    targetImage: '/t2.webp',
-    time: '15 dakika önce',
-    read: false
-  },
-  {
-    id: 3,
-    type: 'follow',
-    user: {
-      name: 'Sude Esmer',
-      avatar: '/sude.jpg',
-      username: 'sude_esmer'
-    },
-    action: 'seni takip etmeye başladı',
-    target: null,
-    targetImage: null,
-    time: '1 saat önce',
-    read: true
-  },
-  {
-    id: 4,
-    type: 'like',
-    user: {
-      name: 'Can Soyut',
-      avatar: '/can.jpg',
-      username: 'can_soyut'
-    },
-    action: 'beğendi',
-    target: 'Geometrik Düşler',
-    targetImage: '/leo2.jpeg',
-    time: '2 saat önce',
-    read: true
-  },
-  {
-    id: 5,
-    type: 'award',
-    user: {
-      name: 'Feellink',
-      avatar: null,
-      username: 'feellink'
-    },
-    action: 'seni Ayın Sanatçısı seçti!',
-    target: null,
-    targetImage: null,
-    time: '1 gün önce',
-    read: true
-  },
-  {
-    id: 6,
-    type: 'comment',
-    user: {
-      name: 'Arda Minimal',
-      avatar: '/t11.jpeg',
-      username: 'arda_minimal'
-    },
-    action: 'yorum yaptı',
-    target: 'Minimalist Düşünce',
-    targetImage: '/t3.jpg',
-    time: '2 gün önce',
-    read: true
-  }
-];
+// Gerçek zamanlı bildirimler için boş array (ileride backend'den çekilecek)
+const mockNotifications = [];
 
 const Notifications = () => {
   const navigate = useNavigate();

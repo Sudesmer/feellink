@@ -50,5 +50,38 @@
     "avatar": "",
     "isVerified": false,
     "createdAt": "2025-10-25T14:10:57.885Z"
+  },
+  {
+    "_id": "5",
+    "email": "yeni@test.com",
+    "password": "$2a$10$KeToQlwGXjwTaZuuvYMqnuFz06LoR/t3Z0DvlDuQOGLsPf8t0V0iG",
+    "fullName": "Yeni Kullanıcı",
+    "bio": "",
+    "avatar": "",
+    "isVerified": false,
+    "createdAt": "2025-10-25T14:33:03.046Z"
+  },
+  {
+    "_id": "6",
+    "email": "sudesmer001@gmail.com",
+    "password": "$2a$10$5KuaPv6y61t0ubqpBcZyyOfnRaIHDa6tkQ5dJBS1UjmvyzXgGc5ZG",
+    "fullName": "Sude Esmer",
+    "bio": "",
+    "avatar": "",
+    "website": "",
+    "location": "",
+    "isVerified": false,
+    "createdAt": "2025-10-25T14:33:45.134Z",
+    "updatedAt": "2025-10-25T14:33:45.134Z"
+  },
+  {
+    "_id": "7",
+    "email": "testuser@example.com",
+    "password": "$2a$10$h.B93IX8nfqsMComtF0QsuZkCKBomyuOqj2eGdf4EA6fj.gQFyOvG",
+    "fullName": "Test User",
+    "bio": "",
+    "avatar": "",
+    "isVerified": false,
+    "createdAt": "2025-10-25T15:32:25.699Z"
   }
 ]
