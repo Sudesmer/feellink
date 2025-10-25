@@ -1842,6 +1842,9 @@ const Profile = () => {
   }, [id, currentUser, isOtherUserProfile]);
 
   const handleFollow = () => {
+    // Karşı tarafın kullanıcı ID'sini belirle (userToDisplay varsa onun ID'sini kullan, yoksa URL'den gelen id'yi kullan)
+    const targetUserId = userToDisplay?._id || id;
+    
     // Eğer gizli hesapsa ve henüz takip isteği gönderilmemişse
     if (isPrivateAccount && !isFollowing && !requestSent) {
       setRequestSent(true);
@@ -1861,13 +1864,19 @@ const Profile = () => {
       };
       
       // Karşı tarafın bildirimlerine ekle (ID'ye göre)
-      const targetUserId = userToDisplay?._id || id; // Eğer userToDisplay varsa onun ID'sini kullan, yoksa URL'den gelen id'yi kullan
       const targetNotificationsKey = `notifications_user_${targetUserId}`;
       const existingNotifications = JSON.parse(localStorage.getItem(targetNotificationsKey) || '[]');
       existingNotifications.unshift(requestNotification);
       localStorage.setItem(targetNotificationsKey, JSON.stringify(existingNotifications.slice(0, 50))); // En son 50 bildirim
       
-      console.log('✅ Takip isteği bildirimi eklendi:', requestNotification, 'Target User ID:', targetUserId);
+      console.log('✅ Takip isteği bildirimi eklendi:', requestNotification);
+      console.log('📬 Target User ID:', targetUserId);
+      console.log('📬 Notification Key:', targetNotificationsKey);
+      console.log('📬 Saved to localStorage:', localStorage.getItem(targetNotificationsKey));
+      
+      // localStorage'dan doğrulama
+      const verify = JSON.parse(localStorage.getItem(targetNotificationsKey) || '[]');
+      console.log('📬 Verification - Bildirim localStorage\'da var mı?:', verify.length > 0);
       
       return; // İstek gönderildi durumuna geç
     }
@@ -1877,7 +1886,6 @@ const Profile = () => {
       setRequestSent(false);
       
       // Karşı tarafın bildirimlerinden istek bildirimini kaldır (en son eklenen)
-      const targetUserId = userToDisplay?._id || id; // Eğer userToDisplay varsa onun ID'sini kullan, yoksa URL'den gelen id'yi kullan
       const targetNotificationsKey = `notifications_user_${targetUserId}`;
       const existingNotifications = JSON.parse(localStorage.getItem(targetNotificationsKey) || '[]');
       const filteredNotifications = existingNotifications.filter(notif => 
@@ -1996,15 +2004,17 @@ const Profile = () => {
           };
           
           // Karşı tarafın bildirimlerine ekle (ID'ye göre)
-          const targetNotificationsKey = `notifications_user_${id}`;
+          const targetNotificationsKey = `notifications_user_${targetUserId}`;
           const existingNotifications = JSON.parse(localStorage.getItem(targetNotificationsKey) || '[]');
           existingNotifications.unshift(newNotification);
           localStorage.setItem(targetNotificationsKey, JSON.stringify(existingNotifications.slice(0, 50))); // En son 50 bildirim
           
           console.log('✅ Takip bildirimi eklendi:', newNotification);
+          console.log('📬 Target User ID (follow):', targetUserId);
+          console.log('📬 Notification Key (follow):', targetNotificationsKey);
           
           // Karşı tarafın takipçi listesine ekle
-          const targetFollowersListKey = `followersList_${id}`;
+          const targetFollowersListKey = `followersList_${targetUserId}`;
           const targetFollowersList = JSON.parse(localStorage.getItem(targetFollowersListKey) || '[]');
           const followerToAdd = {
             _id: currentUser?._id,
@@ -2027,7 +2037,7 @@ const Profile = () => {
         localStorage.setItem(`followingList_${userEmail}`, JSON.stringify(updatedList));
         
         // Karşı tarafın takipçi listesinden çıkar
-        const targetFollowersListKey = `followersList_${id}`;
+        const targetFollowersListKey = `followersList_${targetUserId}`;
         const targetFollowersList = JSON.parse(localStorage.getItem(targetFollowersListKey) || '[]');
         const updatedFollowersList = targetFollowersList.filter(u => u._id !== currentUser?._id);
         localStorage.setItem(targetFollowersListKey, JSON.stringify(updatedFollowersList));
