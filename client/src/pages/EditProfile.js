@@ -504,8 +504,14 @@ const EditProfile = () => {
         localStorage.setItem(getUserKey('userProfilePhoto'), previewUrl);
       }
       
-      // Gizli hesap ayarını kaydet
-      localStorage.setItem(getUserKey('isPrivate'), JSON.stringify(isPrivate));
+      // Gizli hesap ayarını kaydet (email ve kullanıcı ID'sine göre)
+      localStorage.setItem(getUserKey('isPrivate'), isPrivate.toString());
+      
+      // Ayrıca kullanıcı ID'sine göre de kaydet
+      if (currentUser?._id) {
+        const isPrivateUserIdKey = `isPrivate_user_${currentUser._id}`;
+        localStorage.setItem(isPrivateUserIdKey, isPrivate.toString());
+      }
       
       console.log('✅ Profil localStorage\'a kaydedildi');
       console.log('✅ Gizli hesap durumu:', isPrivate);

@@ -1635,6 +1635,36 @@ const Profile = () => {
   // isOwnProfile kontrolü: eğer id yoksa (kendi profili) veya currentUser'ın id'si id ile eşleşiyorsa
   const isOwnProfile = !id || (currentUser && currentUser._id === id);
   
+  // Gizli hesap durumunu kontrol et
+  const getIsPrivateStatus = () => {
+    try {
+      // Eğer başka bir kullanıcının profiline bakıyorsak
+      if (id && currentUser && currentUser._id !== id) {
+        // O kullanıcının gizlilik durumunu kontrol et
+        const targetUserPrivateKey = `isPrivate_user_${id}`;
+        const stored = localStorage.getItem(targetUserPrivateKey);
+        return stored === 'true';
+      }
+      
+      // Aksi halde kendi gizlilik durumumuzu kontrol et
+      const userEmail = currentUser?.email || 'anonymous';
+      const isPrivateKey = `isPrivate_${userEmail}`;
+      const stored = localStorage.getItem(isPrivateKey);
+      return stored === 'true';
+    } catch (error) {
+      console.error('Gizli hesap durumu okuma hatası:', error);
+      return false;
+    }
+  };
+  
+  const [isPrivateAccount, setIsPrivateAccount] = useState(getIsPrivateStatus());
+  
+  // Başka birinin hesabını görüntülüyoruz mu kontrolü
+  const isOtherUserProfile = !isOwnProfile;
+  
+  // Kullanıcı takipçi mi kontrolü
+  const [isFollower, setIsFollower] = useState(false);
+  
   // Kaydedilen eser sayısını hesapla
   const getSavedWorksCount = () => {
     try {
@@ -2434,6 +2464,43 @@ const Profile = () => {
               </StatItem>
             </Stats>
 
+            {/* Gizli Hesap Uyarısı */}
+            {isOtherUserProfile && isPrivateAccount && !isFollower && (
+              <div style={{
+                background: theme.isDark ? 'rgba(255, 107, 53, 0.1)' : 'rgba(255, 107, 53, 0.05)',
+                border: `1px solid ${theme.isDark ? 'rgba(255, 107, 53, 0.3)' : 'rgba(255, 107, 53, 0.2)'}`,
+                borderRadius: '12px',
+                padding: '24px',
+                marginTop: '20px',
+                marginBottom: '20px',
+                textAlign: 'center',
+                color: theme.text
+              }}>
+                <div style={{ 
+                  fontSize: '48px', 
+                  marginBottom: '12px',
+                  filter: 'drop-shadow(0 4px 8px rgba(255, 107, 53, 0.3))'
+                }}>
+                  🔒
+                </div>
+                <div style={{ 
+                  fontSize: '18px', 
+                  fontWeight: '600', 
+                  marginBottom: '8px',
+                  color: '#FF6B35'
+                }}>
+                  Bu Hesap Gizli
+                </div>
+                <div style={{ 
+                  fontSize: '14px', 
+                  color: theme.textSecondary,
+                  lineHeight: '1.5'
+                }}>
+                  Bu kullanıcının gönderilerini görmek için takip isteği göndermeniz gerekir.
+                </div>
+              </div>
+            )}
+
             <Bio theme={theme}>
               <BioText theme={theme}>
                 {profile.fullName}
@@ -2537,7 +2604,16 @@ const Profile = () => {
 
         {activeTab === 'posts' && (
           <>
-            {works.length > 0 ? (
+            {/* Gizli hesap uyarısı - gönderiler sekmesinde */}
+            {isOtherUserProfile && isPrivateAccount && !isFollower ? (
+              <EmptyState theme={theme}>
+                <EmptyIcon>🔒</EmptyIcon>
+                <EmptyTitle theme={theme}>Bu Hesap Gizli</EmptyTitle>
+                <EmptyDescription theme={theme}>
+                  Bu kullanıcının gönderilerini görmek için takip isteği göndermeniz gerekir.
+                </EmptyDescription>
+              </EmptyState>
+            ) : works.length > 0 ? (
               <WorksGrid>
                 {works.map((work) => (
                   <WorkItem 
