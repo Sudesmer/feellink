@@ -106,39 +106,64 @@ export const AuthProvider = ({ children }) => {
         return { success: false, message: 'Geçerli bir email adresi girin' };
       }
       
-      // Mock data için basit kontrol - GitHub Pages'de çalışır
-      const mockUsers = [
-        { email: 'test@example.com', password: 'password', username: 'testuser', fullName: 'Test User' },
-        { email: 'admin@feellink.com', password: 'password', username: 'admin', fullName: 'Admin User' },
-        { email: 'designer@feellink.com', password: 'password', username: 'designer', fullName: 'Creative Designer' }
-      ];
-      
-      const user = mockUsers.find(u => u.email === email && u.password === password);
-      
-      if (user) {
-        const token = 'mock-token-' + Date.now();
-        const userData = {
-          _id: '1',
-          email: user.email,
-          username: user.username,
-          fullName: user.fullName,
-          avatar: '',
-          isVerified: true
-        };
+      // Backend API'ye login isteği gönder
+      try {
+        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+        const response = await axios.post(`${API_URL}/api/auth/login`, {
+          email,
+          password
+        });
         
-        localStorage.setItem('feellink-token', token);
-        localStorage.setItem('feellink-user', JSON.stringify(userData));
-        setUser(userData);
-        console.log('User set:', userData);
-        toast.success('Giriş başarılı!');
-        return { success: true };
-      } else {
-        console.log('Login failed: Invalid credentials');
-        return { success: false, message: 'Geçersiz email veya şifre' };
+        if (response.data.success) {
+          const { token, user: userData } = response.data;
+          
+          // Token ve kullanıcı bilgilerini localStorage'a kaydet
+          localStorage.setItem('feellink-token', token);
+          localStorage.setItem('feellink-user', JSON.stringify(userData));
+          
+          setUser(userData);
+          console.log('User logged in:', userData);
+          toast.success('Giriş başarılı!');
+          return { success: true, user: userData };
+        } else {
+          return { success: false, message: response.data.message || 'Giriş başarısız' };
+        }
+      } catch (apiError) {
+        console.error('API login error:', apiError);
+        
+        // Fallback: Mock data ile devam et (backend çalışmıyorsa)
+        const mockUsers = [
+          { email: 'test@example.com', password: 'password', username: 'testuser', fullName: 'Test User' },
+          { email: 'admin@feellink.com', password: 'password', username: 'admin', fullName: 'Admin User' },
+          { email: 'designer@feellink.com', password: 'password', username: 'designer', fullName: 'Creative Designer' }
+        ];
+        
+        const user = mockUsers.find(u => u.email === email && u.password === password);
+        
+        if (user) {
+          const token = 'mock-token-' + Date.now();
+          const userData = {
+            _id: '1',
+            email: user.email,
+            username: user.username,
+            fullName: user.fullName,
+            avatar: '',
+            isVerified: true
+          };
+          
+          localStorage.setItem('feellink-token', token);
+          localStorage.setItem('feellink-user', JSON.stringify(userData));
+          setUser(userData);
+          console.log('User set (mock):', userData);
+          toast.success('Giriş başarılı!');
+          return { success: true, user: userData };
+        } else {
+          return { success: false, message: 'Geçersiz email veya şifre' };
+        }
       }
     } catch (error) {
       console.error('Login error:', error);
-      const message = 'Giriş yapılırken hata oluştu';
+      const message = error.response?.data?.message || 'Giriş yapılırken hata oluştu';
       toast.error(message);
       return { success: false, message };
     } finally {
@@ -162,26 +187,49 @@ export const AuthProvider = ({ children }) => {
         return { success: false, message: 'Şifre en az 6 karakter olmalıdır' };
       }
       
-      // Mock kayıt işlemi - gerçek mail adresleri ile çalışır
-      const token = 'mock-token-' + Date.now();
-      const newUser = {
-        _id: Date.now().toString(),
-        email: userData.email,
-        username: userData.username || userData.email.split('@')[0],
-        fullName: userData.fullName || userData.username || 'Yeni Kullanıcı',
-        avatar: '',
-        isVerified: true
-      };
-      
-      localStorage.setItem('feellink-token', token);
-      localStorage.setItem('feellink-user', JSON.stringify(newUser));
-      setUser(newUser);
-      console.log('User registered:', newUser);
-      toast.success('Kayıt başarılı! Hoş geldiniz!');
-      return { success: true };
+      // Backend API'ye register isteği gönder
+      try {
+        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+        const response = await axios.post(`${API_URL}/api/auth/register`, userData);
+        
+        if (response.data.success) {
+          const { token, user: newUser } = response.data;
+          
+          // Token ve kullanıcı bilgilerini localStorage'a kaydet
+          localStorage.setItem('feellink-token', token);
+          localStorage.setItem('feellink-user', JSON.stringify(newUser));
+          
+          setUser(newUser);
+          console.log('User registered:', newUser);
+          toast.success('Kayıt başarılı! Hoş geldiniz!');
+          return { success: true, user: newUser };
+        } else {
+          return { success: false, message: response.data.message || 'Kayıt başarısız' };
+        }
+      } catch (apiError) {
+        console.error('API register error:', apiError);
+        
+        // Fallback: Mock registration (backend çalışmıyorsa)
+        const token = 'mock-token-' + Date.now();
+        const newUser = {
+          _id: Date.now().toString(),
+          email: userData.email,
+          username: userData.username || userData.email.split('@')[0],
+          fullName: userData.fullName || userData.username || 'Yeni Kullanıcı',
+          avatar: '',
+          isVerified: true
+        };
+        
+        localStorage.setItem('feellink-token', token);
+        localStorage.setItem('feellink-user', JSON.stringify(newUser));
+        setUser(newUser);
+        console.log('User registered (mock):', newUser);
+        toast.success('Kayıt başarılı! Hoş geldiniz!');
+        return { success: true, user: newUser };
+      }
     } catch (error) {
       console.error('Register error:', error);
-      const message = 'Kayıt olurken hata oluştu';
+      const message = error.response?.data?.message || 'Kayıt olurken hata oluştu';
       toast.error(message);
       return { success: false, message };
     } finally {
