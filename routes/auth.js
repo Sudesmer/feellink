@@ -1,5 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const router = express.Router();
 
 // Mock database (imported from server.js)
@@ -68,12 +69,17 @@ router.post('/register', async (req, res) => {
       });
     }
 
+    // Şifreyi hashle
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     // Yeni kullanıcı oluştur
     const newUser = {
       _id: (++currentUserId).toString(),
       username,
       email,
       fullName,
+      password: hashedPassword, // Hashlenmiş şifre
       bio: '',
       avatar: '',
       followers: [],
@@ -140,9 +146,18 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Basit şifre kontrolü (demo için)
-    if (password !== 'password') {
-      console.log('Password mismatch:', password, '!== password');
+    // Şifre kontrolü
+    if (!user.password) {
+      console.log('User has no password hash');
+      return res.status(401).json({
+        success: false,
+        message: 'Geçersiz e-posta veya şifre'
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      console.log('Password mismatch');
       return res.status(401).json({
         success: false,
         message: 'Geçersiz e-posta veya şifre'
@@ -264,6 +279,40 @@ router.post('/refresh', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Token yenilenirken hata oluştu'
+    });
+  }
+});
+
+// @route   POST /api/auth/verify-email
+// @desc    E-posta doğrulama
+// @access  Private
+router.post('/verify-email', async (req, res) => {
+  try {
+    const { token } = req.body;
+    
+    // Basit token doğrulama (production'da daha güvenli olmalı)
+    // Şimdilik kullanıcı ID'sini token olarak kullanıyoruz
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_super_secret_jwt_key_here_change_in_production');
+    const user = users.find(u => u._id === decoded.userId);
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Geçersiz doğrulama linki'
+      });
+    }
+
+    user.isVerified = true;
+
+    res.json({
+      success: true,
+      message: 'E-posta başarıyla doğrulandı'
+    });
+  } catch (error) {
+    console.error('Verify email error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'E-posta doğrulanırken hata oluştu'
     });
   }
 });
