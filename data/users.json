@@ -1,0 +1,44 @@
+[
+  {
+    "_id": "1",
+    "username": "testuser",
+    "email": "test@example.com",
+    "password": "$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
+    "fullName": "Test User",
+    "bio": "Test kullanıcısı",
+    "avatar": "",
+    "followers": [],
+    "following": [],
+    "savedWorks": [],
+    "isVerified": false,
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "_id": "2",
+    "username": "admin",
+    "email": "admin@feellink.com",
+    "password": "$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
+    "fullName": "Admin User",
+    "bio": "Feellink yöneticisi",
+    "avatar": "",
+    "followers": [],
+    "following": [],
+    "savedWorks": [],
+    "isVerified": true,
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "_id": "3",
+    "username": "designer",
+    "email": "designer@feellink.com",
+    "password": "$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi",
+    "fullName": "Creative Designer",
+    "bio": "Profesyonel grafik tasarımcı",
+    "avatar": "",
+    "followers": [],
+    "following": [],
+    "savedWorks": [],
+    "isVerified": true,
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  }
+]
