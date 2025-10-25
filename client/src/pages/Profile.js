@@ -2049,7 +2049,6 @@ const Profile = () => {
               console.log('✅ Takipçi listesine eklendi:', followerToAdd);
             }
           }
-        }
       } else {
         // Takip edilen listesinden çıkar
         const followingList = JSON.parse(localStorage.getItem(`followingList_${userEmail}`) || '[]');
