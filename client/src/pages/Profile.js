@@ -1761,6 +1761,28 @@ const Profile = () => {
         if (!exists) {
           followingList.push(userToAdd);
           localStorage.setItem(`followingList_${userEmail}`, JSON.stringify(followingList));
+          
+          // Instagram tarzı bildirim ekle
+          const newNotification = {
+            id: Date.now(),
+            type: 'follow',
+            user: {
+              name: currentUser?.fullName || currentUser?.username || 'Bilinmeyen',
+              avatar: currentUser?.avatar || null
+            },
+            action: 'sizi takip etti',
+            time: 'şimdi',
+            read: false,
+            timestamp: new Date().toISOString()
+          };
+          
+          // Karşı tarafın bildirimlerine ekle (ID'ye göre)
+          const targetNotificationsKey = `notifications_user_${id}`;
+          const existingNotifications = JSON.parse(localStorage.getItem(targetNotificationsKey) || '[]');
+          existingNotifications.unshift(newNotification);
+          localStorage.setItem(targetNotificationsKey, JSON.stringify(existingNotifications.slice(0, 50))); // En son 50 bildirim
+          
+          console.log('✅ Takip bildirimi eklendi:', newNotification);
         }
       } else {
         // Takip edilen listesinden çıkar

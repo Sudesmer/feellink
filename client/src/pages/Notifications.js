@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
@@ -388,7 +388,33 @@ const Notifications = () => {
   const location = useLocation();
   const { theme } = useTheme();
   const [activeFilter, setActiveFilter] = useState('all');
-  const [notifications, setNotifications] = useState(mockNotifications);
+  
+  // localStorage'dan kullanıcının bildirimlerini yükle
+  const loadNotifications = () => {
+    try {
+      // currentUser'ı localStorage'dan al
+      const token = localStorage.getItem('token');
+      if (!token) return [];
+      
+      const userData = localStorage.getItem('user');
+      if (!userData) return [];
+      
+      const user = JSON.parse(userData);
+      const userId = user._id || user.id;
+      
+      if (!userId) return [];
+      
+      const notificationsKey = `notifications_user_${userId}`;
+      const storedNotifications = localStorage.getItem(notificationsKey);
+      
+      return storedNotifications ? JSON.parse(storedNotifications) : [];
+    } catch (error) {
+      console.error('Bildirimler yüklenirken hata:', error);
+      return [];
+    }
+  };
+  
+  const [notifications, setNotifications] = useState(loadNotifications());
 
   const getNotificationIcon = (type) => {
     switch (type) {
@@ -417,14 +443,34 @@ const Notifications = () => {
     }
   };
 
-  const markAsRead = (id) => {
-    setNotifications(prev => 
-      prev.map(notif => 
+    const markAsRead = (id) => {
+    setNotifications(prev => {
+      const updated = prev.map(notif => 
         notif.id === id ? { ...notif, read: true } : notif
-      )
-    );
+      );
+      
+      // localStorage'a kaydet
+      try {
+        const token = localStorage.getItem('token');
+        if (token) {
+          const userData = localStorage.getItem('user');
+          if (userData) {
+            const user = JSON.parse(userData);
+            const userId = user._id || user.id;
+            if (userId) {
+              const notificationsKey = `notifications_user_${userId}`;
+              localStorage.setItem(notificationsKey, JSON.stringify(updated));
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Bildirim güncelleme hatası:', error);
+      }
+      
+      return updated;
+    });
   };
-
+  
   const filteredNotifications = notifications.filter(notification => {
     if (activeFilter === 'all') return true;
     if (activeFilter === 'unread') return !notification.read;
