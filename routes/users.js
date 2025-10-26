@@ -3,7 +3,11 @@ const { mockUsers, mockWorks } = require('../mock-data');
 const { authenticateToken, optionalAuth } = require('../middleware/auth');
 const fs = require('fs').promises;
 const path = require('path');
+const User = require('../models/User');
 const router = express.Router();
+
+console.log('🔍 routes/users.js yüklendi, mockUsers sayısı:', mockUsers.length);
+console.log('🔍 mockUsers array:', mockUsers);
 
 // Read users from JSON file
 const readUsers = async () => {
@@ -22,8 +26,28 @@ const readUsers = async () => {
 // @access  Public
 router.get('/', async (req, res) => {
   try {
-    // Mock data kullan
-    const users = mockUsers;
+    let users = [];
+    
+    console.log('🔍 /api/users endpoint çağrıldı');
+    console.log('🔍 mockUsers array:', mockUsers);
+    console.log('🔍 mockUsers length:', mockUsers.length);
+    
+    // MongoDB'den kullanıcıları çek
+    try {
+      users = await User.find({}, '-password').lean();
+      console.log('📊 MongoDB\'den kullanıcılar alındı:', users.length);
+      
+      // MongoDB'de kullanıcı yoksa mock data kullan
+      if (users.length === 0) {
+        console.log('⚠️ MongoDB\'de kullanıcı yok, mock data kullanılıyor');
+        users = mockUsers;
+        console.log('📊 Mock data kullanıcı sayısı:', users.length);
+      }
+    } catch (mongoError) {
+      console.log('⚠️ MongoDB hatası, mock data kullanılıyor:', mongoError.message);
+      users = mockUsers;
+      console.log('📊 Mock data kullanıcı sayısı:', users.length);
+    }
     
     // Map to public user info
     const publicUsers = users.map(user => ({
@@ -33,10 +57,13 @@ router.get('/', async (req, res) => {
       fullName: user.fullName,
       avatar: user.avatar || '',
       isVerified: user.isVerified || false,
+      isActive: user.isActive !== false, // isActive field'ı ekle
       followers: user.followers || [],
       following: user.following || [],
       createdAt: user.createdAt
     }));
+    
+    console.log('📊 Public users sayısı:', publicUsers.length);
     
     res.json({
       success: true,

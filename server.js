@@ -75,7 +75,7 @@ app.use(limiter);
 // CORS configuration
 // CORS configuration
 const allowedOrigins = process.env.NODE_ENV === 'production' 
-  ? ['https://feellink.com', 'https://www.feellink.com']
+    ? ['https://feellink.com', 'https://www.feellink.com']
   : [
       'http://localhost:3000', 
       'http://localhost:3001',
@@ -519,6 +519,18 @@ app.post('/api/works/:workId/comments', (req, res) => {
     work.comments.push(newComment);
     work.commentCount = (work.commentCount || 0) + 1;
     
+    // Socket.IO ile admin paneline real-time bildirim gönder
+    io.emit('comment_added', {
+      _id: newComment._id,
+      workId: workId,
+      workTitle: work.title,
+      userId: userId,
+      userName: userName,
+      content: content,
+      commentCount: work.commentCount,
+      timestamp: new Date()
+    });
+    
     res.json({
       success: true,
       message: 'Yorum eklendi',
@@ -912,7 +924,318 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/auth', require('./routes/auth'));
+console.log('🔍 routes/users.js import ediliyor...');
 app.use('/api/users', require('./routes/users'));
+console.log('✅ routes/users.js import edildi');
+
+// Kullanıcı tanıma ve admin paneline kaydetme endpoint'i
+app.post('/api/users/recognize', async (req, res) => {
+  try {
+    const { email, fullName, source } = req.body;
+    
+    console.log('🔍 Kullanıcı tanıma isteği:', { email, fullName, source });
+    
+    // Email formatını kontrol et
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Geçerli bir email adresi girin'
+      });
+    }
+    
+    const normalizedEmail = email.toLowerCase().trim();
+    
+    // MongoDB'de kullanıcı var mı kontrol et
+    let existingUser = null;
+    try {
+      existingUser = await User.findOne({ email: normalizedEmail });
+    } catch (mongoError) {
+      console.log('⚠️ MongoDB hatası, mock data kontrol ediliyor:', mongoError.message);
+    }
+    
+    // MongoDB'de yoksa mock data'da kontrol et
+    if (!existingUser) {
+      const fs = require('fs');
+      const usersData = JSON.parse(fs.readFileSync('./data/users.json', 'utf8'));
+      existingUser = usersData.find(u => u.email.toLowerCase().trim() === normalizedEmail);
+    }
+    
+    if (existingUser) {
+      console.log('✅ Mevcut kullanıcı tanındı:', existingUser.fullName);
+      
+      // Admin paneline bildirim gönder
+      if (io) {
+        io.emit('user_recognized', {
+          _id: existingUser._id,
+          email: existingUser.email,
+          fullName: existingUser.fullName,
+          source: source || 'manual',
+          timestamp: new Date(),
+          action: 'existing_user_found'
+        });
+      }
+      
+      return res.json({
+        success: true,
+        message: 'Kullanıcı başarıyla tanındı',
+        user: {
+          _id: existingUser._id,
+          email: existingUser.email,
+          fullName: existingUser.fullName,
+          isVerified: existingUser.isVerified,
+          isActive: existingUser.isActive !== false
+        },
+        isNewUser: false
+      });
+    } else {
+      // Yeni kullanıcı oluştur
+      const newUserId = Date.now().toString();
+      const newUser = {
+        _id: newUserId,
+        email: normalizedEmail,
+        fullName: fullName || email.split('@')[0],
+        bio: '',
+        avatar: '',
+        website: '',
+        location: '',
+        isVerified: false,
+        isActive: true,
+        followers: [],
+        following: [],
+        savedWorks: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        source: source || 'manual_recognition'
+      };
+      
+      // MongoDB'ye kaydet
+      try {
+        const savedUser = await User.create(newUser);
+        console.log('✅ Yeni kullanıcı MongoDB\'ye kaydedildi:', savedUser.fullName);
+      } catch (mongoError) {
+        console.log('⚠️ MongoDB kayıt hatası, mock data\'ya kaydediliyor:', mongoError.message);
+        
+        // Mock data'ya kaydet
+        const fs = require('fs');
+        const usersData = JSON.parse(fs.readFileSync('./data/users.json', 'utf8'));
+        usersData.push(newUser);
+        fs.writeFileSync('./data/users.json', JSON.stringify(usersData, null, 2));
+        console.log('✅ Yeni kullanıcı mock data\'ya kaydedildi:', newUser.fullName);
+      }
+      
+      // Admin paneline bildirim gönder
+      if (io) {
+        io.emit('user_registered', {
+          _id: newUser._id,
+          email: newUser.email,
+          fullName: newUser.fullName,
+          source: source || 'manual_recognition',
+          createdAt: newUser.createdAt,
+          timestamp: new Date(),
+          action: 'new_user_created'
+        });
+      }
+      
+      return res.json({
+        success: true,
+        message: 'Yeni kullanıcı oluşturuldu ve admin paneline kaydedildi',
+        user: {
+          _id: newUser._id,
+          email: newUser.email,
+          fullName: newUser.fullName,
+          isVerified: newUser.isVerified,
+          isActive: newUser.isActive
+        },
+        isNewUser: true
+      });
+    }
+    
+  } catch (error) {
+    console.error('❌ Kullanıcı tanıma hatası:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Kullanıcı tanıma sırasında hata oluştu'
+    });
+  }
+});
+
+// Toplu kullanıcı tanıma endpoint'i
+app.post('/api/users/recognize-bulk', async (req, res) => {
+  try {
+    const { users } = req.body;
+    
+    if (!Array.isArray(users) || users.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Kullanıcı listesi gerekli'
+      });
+    }
+    
+    console.log('📋 Toplu kullanıcı tanıma isteği:', users.length, 'kullanıcı');
+    
+    const results = [];
+    let newUsersCount = 0;
+    
+    for (const userData of users) {
+      const { email, fullName, source } = userData;
+      
+      if (!email) {
+        results.push({
+          email: email || 'N/A',
+          success: false,
+          message: 'Email adresi gerekli'
+        });
+        continue;
+      }
+      
+      const normalizedEmail = email.toLowerCase().trim();
+      
+      // MongoDB'de kontrol et
+      let existingUser = null;
+      try {
+        existingUser = await User.findOne({ email: normalizedEmail });
+      } catch (mongoError) {
+        // MongoDB hatası, mock data'da kontrol et
+        const fs = require('fs');
+        const usersData = JSON.parse(fs.readFileSync('./data/users.json', 'utf8'));
+        existingUser = usersData.find(u => u.email.toLowerCase().trim() === normalizedEmail);
+      }
+      
+      if (existingUser) {
+        results.push({
+          email: normalizedEmail,
+          success: true,
+          message: 'Mevcut kullanıcı tanındı',
+          user: existingUser,
+          isNewUser: false
+        });
+      } else {
+        // Yeni kullanıcı oluştur
+        const newUserId = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+        const newUser = {
+          _id: newUserId,
+          email: normalizedEmail,
+          fullName: fullName || email.split('@')[0],
+          bio: '',
+          avatar: '',
+          website: '',
+          location: '',
+          isVerified: false,
+          isActive: true,
+          followers: [],
+          following: [],
+          savedWorks: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          source: source || 'bulk_recognition'
+        };
+        
+        // MongoDB'ye kaydet
+        try {
+          const savedUser = await User.create(newUser);
+          console.log('✅ Yeni kullanıcı MongoDB\'ye kaydedildi:', savedUser.fullName);
+        } catch (mongoError) {
+          // Mock data'ya kaydet
+          const fs = require('fs');
+          const usersData = JSON.parse(fs.readFileSync('./data/users.json', 'utf8'));
+          usersData.push(newUser);
+          fs.writeFileSync('./data/users.json', JSON.stringify(usersData, null, 2));
+          console.log('✅ Yeni kullanıcı mock data\'ya kaydedildi:', newUser.fullName);
+        }
+        
+        results.push({
+          email: normalizedEmail,
+          success: true,
+          message: 'Yeni kullanıcı oluşturuldu',
+          user: newUser,
+          isNewUser: true
+        });
+        
+        newUsersCount++;
+      }
+    }
+    
+    // Admin paneline toplu işlem bildirimi gönder
+    if (io) {
+      io.emit('bulk_users_processed', {
+        totalProcessed: users.length,
+        newUsersCount: newUsersCount,
+        results: results,
+        timestamp: new Date(),
+        action: 'bulk_user_recognition'
+      });
+    }
+    
+    res.json({
+      success: true,
+      message: `${users.length} kullanıcı işlendi, ${newUsersCount} yeni kullanıcı oluşturuldu`,
+      results: results,
+      summary: {
+        totalProcessed: users.length,
+        newUsersCount: newUsersCount,
+        existingUsersCount: users.length - newUsersCount
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ Toplu kullanıcı tanıma hatası:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Toplu kullanıcı tanıma sırasında hata oluştu'
+    });
+  }
+});
+
+// GET /api/admin/users - Admin panel için kullanıcıları getir (MongoDB + Mock Data)
+app.get('/api/admin/users', async (req, res) => {
+  try {
+    let users = [];
+    
+    // Önce MongoDB'den kullanıcıları getir
+    try {
+      users = await User.find({})
+        .select('-password') // Şifreleri hariç tut
+        .sort({ createdAt: -1 });
+      console.log('📊 MongoDB\'den admin kullanıcıları alındı:', users.length);
+    } catch (mongoError) {
+      console.log('⚠️ MongoDB hatası, mock data kullanılıyor:', mongoError.message);
+    }
+    
+    // Eğer MongoDB'de kullanıcı yoksa mock data kullan
+    if (users.length === 0) {
+      const fs = require('fs');
+      const usersData = JSON.parse(fs.readFileSync('./data/users.json', 'utf8'));
+      users = usersData.map(user => ({
+        ...user,
+        password: undefined // Şifreyi kaldır
+      }));
+      console.log('📊 Mock data admin kullanıcıları alındı:', users.length);
+    }
+
+    // İstatistikleri hesapla
+    const stats = {
+      totalUsers: users.length,
+      verifiedUsers: users.filter(user => user.isVerified).length,
+      unverifiedUsers: users.filter(user => !user.isVerified).length,
+      totalFollowers: users.reduce((sum, user) => sum + (user.followers?.length || 0), 0),
+      totalFollowing: users.reduce((sum, user) => sum + (user.following?.length || 0), 0)
+    };
+
+    res.json({
+      success: true,
+      users: users,
+      stats: stats
+    });
+  } catch (error) {
+    console.error('Admin kullanıcıları alınırken hata:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Kullanıcılar alınırken hata oluştu'
+    });
+  }
+});
+
 app.use('/api/works', require('./routes/works'));
 app.use('/api/categories', require('./routes/categories'));
 
@@ -1774,16 +2097,74 @@ io.on('connection', (socket) => {
   console.log(`🔌 Kullanıcı bağlandı: ${socket.id}`);
   
   // Kullanıcı giriş yaptığında
-  socket.on('user_login', (userId) => {
+  socket.on('user_login', async (userId) => {
     connectedUsers.set(userId, socket.id);
     socket.join(`user_${userId}`); // Kullanıcı kendi odasına katıl
     console.log(`👤 Kullanıcı ${userId} giriş yaptı`);
+    
+    // Kullanıcı bilgilerini al
+    let userInfo = { userId, fullName: 'Bilinmeyen Kullanıcı' };
+    try {
+      // Önce JSON dosyasından al (mock data kullanıyoruz)
+      const fs = require('fs');
+      const usersData = JSON.parse(fs.readFileSync('./data/users.json', 'utf8'));
+      const jsonUser = usersData.find(u => u._id === userId);
+      if (jsonUser) {
+        userInfo = { userId, fullName: jsonUser.fullName || jsonUser.username || 'Kullanıcı' };
+        console.log(`✅ Kullanıcı bilgisi bulundu: ${userInfo.fullName}`);
+      } else {
+        // MongoDB'den de dene (ObjectId formatında)
+        try {
+          const user = await User.findById(userId);
+          if (user) {
+            userInfo = { userId, fullName: user.fullName || user.username || 'Kullanıcı' };
+            console.log(`✅ MongoDB'den kullanıcı bilgisi bulundu: ${userInfo.fullName}`);
+          }
+        } catch (mongoError) {
+          console.log('MongoDB ObjectId hatası:', mongoError.message);
+        }
+      }
+    } catch (error) {
+      console.log('Kullanıcı bilgisi alınamadı:', error.message);
+    }
+    
+    // Admin paneline real-time bildirim gönder
+    io.emit('user_login', { ...userInfo, timestamp: new Date() });
   });
   
   // Kullanıcı çıkış yaptığında
-  socket.on('user_logout', (userId) => {
+  socket.on('user_logout', async (userId) => {
     connectedUsers.delete(userId);
     console.log(`👋 Kullanıcı ${userId} çıkış yaptı`);
+    
+    // Kullanıcı bilgilerini al
+    let userInfo = { userId, fullName: 'Bilinmeyen Kullanıcı' };
+    try {
+      // Önce JSON dosyasından al (mock data kullanıyoruz)
+      const fs = require('fs');
+      const usersData = JSON.parse(fs.readFileSync('./data/users.json', 'utf8'));
+      const jsonUser = usersData.find(u => u._id === userId);
+      if (jsonUser) {
+        userInfo = { userId, fullName: jsonUser.fullName || jsonUser.username || 'Kullanıcı' };
+        console.log(`✅ Çıkış yapan kullanıcı bilgisi bulundu: ${userInfo.fullName}`);
+      } else {
+        // MongoDB'den de dene (ObjectId formatında)
+        try {
+          const user = await User.findById(userId);
+          if (user) {
+            userInfo = { userId, fullName: user.fullName || user.username || 'Kullanıcı' };
+            console.log(`✅ MongoDB'den çıkış yapan kullanıcı bilgisi bulundu: ${userInfo.fullName}`);
+          }
+        } catch (mongoError) {
+          console.log('MongoDB ObjectId hatası:', mongoError.message);
+        }
+      }
+    } catch (error) {
+      console.log('Kullanıcı bilgisi alınamadı:', error.message);
+    }
+    
+    // Admin paneline real-time bildirim gönder
+    io.emit('user_logout', { ...userInfo, timestamp: new Date() });
   });
   
   // Mesajlaşma event'leri
@@ -1856,7 +2237,27 @@ io.on('connection', (socket) => {
         createdAt: notification.createdAt
       });
       
+      // Admin paneline bildirim oluşturma event'i gönder
+      io.emit('notification_created', {
+        _id: notification._id,
+        userId: notification.userId,
+        fromUserId: notification.fromUserId,
+        type: notification.type,
+        message: notification.message,
+        timestamp: new Date()
+      });
+      
       console.log(`👥 Takip isteği gönderildi: ${followerId} -> ${followingId}`);
+      
+      // Admin paneline real-time bildirim gönder
+      io.emit('follow_request', { 
+        followerId, 
+        followingId, 
+        timestamp: new Date(),
+        requestId: followRequest._id,
+        followerName: follower.fullName || follower.username || 'Kullanıcı',
+        followingName: following.fullName || following.username || 'Kullanıcı'
+      });
     } catch (error) {
       console.error('Takip isteği gönderme hatası:', error);
       socket.emit('follow_error', { error: 'Takip isteği gönderilemedi' });
@@ -2413,213 +2814,24 @@ app.post('/api/test-notification', (req, res) => {
 global.io = io;
 global.connectedUsers = connectedUsers;
 
-// GET /api/admin/users - Admin panel için kullanıcıları getir (MongoDB)
-app.get('/api/admin/users', async (req, res) => {
-  try {
-    // MongoDB'den kullanıcıları getir
-    const users = await User.find({})
-      .select('-password') // Şifreleri hariç tut
-      .sort({ createdAt: -1 });
-
-    // İstatistikleri hesapla
-    const stats = {
-      totalUsers: users.length,
-      verifiedUsers: users.filter(user => user.isVerified).length,
-      unverifiedUsers: users.filter(user => !user.isVerified).length,
-      totalFollowers: users.reduce((sum, user) => sum + (user.followers?.length || 0), 0),
-      totalFollowing: users.reduce((sum, user) => sum + (user.following?.length || 0), 0)
-    };
-
-    res.json({
-      success: true,
-      users: users,
-      stats: stats
-    });
-  } catch (error) {
-    console.error('Admin kullanıcıları alınırken hata:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Kullanıcılar alınırken hata oluştu'
-    });
-  }
-});
-
-// GET /api/notifications/realtime - Gerçek zamanlı bildirimler (MongoDB)
-app.get('/api/notifications/realtime', async (req, res) => {
-  try {
-    const userId = req.headers['x-user-id'] || '1';
-    const { limit = 50, type } = req.query;
-
-    // MongoDB'den bildirimleri getir
-    let query = { userId: userId, isActive: true };
-    if (type && type !== 'all') {
-      query.type = type;
-    }
-
-    const notifications = await Notification.find(query)
-      .populate('fromUserId', 'username fullName avatar')
-      .populate('userId', 'username fullName')
-      .sort({ createdAt: -1 })
-      .limit(parseInt(limit));
-
-    // Bildirimleri frontend formatına dönüştür
-    const formattedNotifications = notifications.map(notif => ({
-      _id: notif._id,
-      userId: notif.userId._id,
-      type: notif.type,
-      fromUserId: notif.fromUserId._id,
-      fromUserName: notif.fromUserId.fullName,
-      fromUserAvatar: notif.fromUserId.avatar,
-      message: notif.message,
-      relatedId: notif.relatedId,
-      status: notif.status,
-      createdAt: notif.createdAt,
-      fromUser: {
-        _id: notif.fromUserId._id,
-        username: notif.fromUserId.username,
-        fullName: notif.fromUserId.fullName,
-        avatar: notif.fromUserId.avatar
-      }
-    }));
-
-    // Okunmamış bildirim sayısını hesapla
-    const unreadCount = await Notification.countDocuments({ 
-      userId: userId, 
-      status: 'unread', 
-      isActive: true 
-    });
-
-    res.json({
-      success: true,
-      notifications: formattedNotifications,
-      total: formattedNotifications.length,
-      unreadCount: unreadCount
-    });
-  } catch (error) {
-    console.error('Gerçek zamanlı bildirimler alınırken hata:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Bildirimler alınırken hata oluştu'
-    });
-  }
-});
-
-// Mesajlaşma API Endpoints
-// GET /api/messages/:chatRoomId - Chat room mesajlarını getir
-app.get('/api/messages/:chatRoomId', async (req, res) => {
-  try {
-    const { chatRoomId } = req.params;
-    const { limit = 50, offset = 0 } = req.query;
-
-    const messages = await Message.find({ chatRoomId })
-      .sort({ timestamp: -1 })
-      .limit(parseInt(limit))
-      .skip(parseInt(offset));
-
-    res.json({
-      success: true,
-      messages: messages.reverse(), // Eski mesajlar üstte
-      total: messages.length
-    });
-  } catch (error) {
-    console.error('Mesajlar alınırken hata:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Mesajlar alınırken hata oluştu'
-    });
-  }
-});
-
-// GET /api/chat-rooms/:userId - Kullanıcının chat room'larını getir
-app.get('/api/chat-rooms/:userId', async (req, res) => {
-  try {
-    const { userId } = req.params;
-
-    const chatRooms = await ChatRoom.find({ 
-      participants: userId,
-      isActive: true 
-    })
-    .populate('lastMessage')
-    .populate('participants', 'username fullName avatar')
-    .sort({ lastMessageTime: -1 });
-
-    res.json({
-      success: true,
-      chatRooms: chatRooms
-    });
-  } catch (error) {
-    console.error('Chat room\'lar alınırken hata:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Chat room\'lar alınırken hata oluştu'
-    });
-  }
-});
-
-// POST /api/messages - Yeni mesaj gönder
-app.post('/api/messages', async (req, res) => {
-  try {
-    const { senderId, receiverId, content, messageType = 'text' } = req.body;
-
-    // Chat room'u bul veya oluştur
-    const room = await ChatRoom.findOrCreateRoom(senderId, receiverId);
-    
-    // Mesajı oluştur
-    const newMessage = new Message({
-      senderId,
-      receiverId,
-      content,
-      chatRoomId: room._id.toString(),
-      messageType
-    });
-    
-    await newMessage.save();
-    
-    // Room'un son mesajını güncelle
-    await ChatRoom.findByIdAndUpdate(room._id, {
-      lastMessage: newMessage._id,
-      lastMessageTime: new Date()
-    });
-
-    res.json({
-      success: true,
-      message: newMessage,
-      chatRoomId: room._id
-    });
-  } catch (error) {
-    console.error('Mesaj gönderme hatası:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Mesaj gönderilemedi'
-    });
-  }
-});
-
-// PUT /api/messages/:messageId/read - Mesajı okundu olarak işaretle
-app.put('/api/messages/:messageId/read', async (req, res) => {
-  try {
-    const { messageId } = req.params;
-    
-    await Message.findByIdAndUpdate(messageId, { isRead: true });
-    
-    res.json({
-      success: true,
-      message: 'Mesaj okundu olarak işaretlendi'
-    });
-  } catch (error) {
-    console.error('Mesaj okundu işaretleme hatası:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Mesaj işaretlenemedi'
-    });
-  }
-});
-
-// Socket.io'yu app.locals'a ekle (route'lardan erişim için)
-app.locals.io = io;
-
 // Database bağlantısını başlat
-connectDB().then(() => {
+// MongoDB'deki kullanıcıları güncelle (isActive field'ı ekle)
+const updateUsersWithIsActive = async () => {
+  try {
+    const result = await User.updateMany(
+      { isActive: { $exists: false } },
+      { $set: { isActive: true } }
+    );
+    console.log(`✅ ${result.modifiedCount} kullanıcı güncellendi (isActive field eklendi)`);
+  } catch (error) {
+    console.log('⚠️ Kullanıcı güncelleme hatası:', error.message);
+  }
+};
+
+connectDB().then(async () => {
+  // MongoDB bağlandıktan sonra kullanıcıları güncelle
+  await updateUsersWithIsActive();
+  
   // MongoDB bağlandıktan sonra sunucuyu başlat
   server.listen(PORT, HOST, () => {
     console.log(`🚀 Feellink server ${HOST}:${PORT} üzerinde çalışıyor`);
@@ -2640,3 +2852,4 @@ connectDB().then(() => {
     console.log('🔌 WebSocket bağlantıları aktif');
   });
 });
+

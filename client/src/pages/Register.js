@@ -283,13 +283,41 @@ const Register = () => {
         }, 1000);
       } else {
         console.log('Registration failed:', result.message);
-        setError(result.message || 'Kayıt olurken bir hata oluştu');
-        toast.error(result.message || 'Kayıt olurken bir hata oluştu');
+        const errorMessage = result.message || 'Kayıt olurken bir hata oluştu';
+        setError(errorMessage);
+        
+        // Eğer email zaten kayıtlı ise özel mesaj göster
+        if (errorMessage.includes('zaten bir hesap bulunmaktadır')) {
+          toast.error('Bu email adresi ile zaten kayıtlı bir hesap var. Giriş yapmayı deneyin.', {
+            duration: 5000,
+            style: {
+              background: '#fee2e2',
+              color: '#dc2626',
+              border: '1px solid #fecaca'
+            }
+          });
+        } else {
+          toast.error(errorMessage);
+        }
       }
     } catch (err) {
       console.error('Registration error:', err);
-      setError(err.message || 'Kayıt olurken bir hata oluştu');
-      toast.error(err.message || 'Kayıt olurken bir hata oluştu');
+      const errorMessage = err.message || 'Kayıt olurken bir hata oluştu';
+      setError(errorMessage);
+      
+      // Eğer email zaten kayıtlı ise özel mesaj göster
+      if (errorMessage.includes('zaten bir hesap bulunmaktadır') || err.response?.status === 409) {
+        toast.error('Bu email adresi ile zaten kayıtlı bir hesap var. Giriş yapmayı deneyin.', {
+          duration: 5000,
+          style: {
+            background: '#fee2e2',
+            color: '#dc2626',
+            border: '1px solid #fecaca'
+          }
+        });
+      } else {
+        toast.error(errorMessage);
+      }
     }
     
     setLoading(false);
@@ -313,7 +341,40 @@ const Register = () => {
           </Logo>
 
           <Form onSubmit={handleSubmit}>
-            {error && <ErrorMessage>{error}</ErrorMessage>}
+            {error && (
+              <div>
+                <ErrorMessage>{error}</ErrorMessage>
+                {error.includes('zaten bir hesap bulunmaktadır') && (
+                  <div style={{ marginTop: '12px', textAlign: 'center' }}>
+                    <button 
+                      type="button" 
+                      onClick={switchToLogin}
+                      style={{ 
+                        background: 'linear-gradient(135deg, #FF6B35, #F7931E)',
+                        border: 'none',
+                        color: 'white',
+                        padding: '12px 24px',
+                        borderRadius: '8px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onMouseOver={(e) => {
+                        e.target.style.transform = 'translateY(-2px)';
+                        e.target.style.boxShadow = '0 8px 25px rgba(255, 107, 53, 0.3)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.boxShadow = 'none';
+                      }}
+                    >
+                      Giriş Yap
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             <FormGroup>
               <Label htmlFor="name">Ad Soyad</Label>

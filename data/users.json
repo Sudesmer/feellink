@@ -12,6 +12,7 @@
     "followers": [],
     "following": [],
     "isVerified": false,
+    "isActive": true,
     "createdAt": "2025-10-26T06:43:58.640Z",
     "updatedAt": "2025-10-26T08:18:17.011Z"
   },
@@ -28,6 +29,7 @@
     "followers": [],
     "following": [],
     "isVerified": false,
+    "isActive": true,
     "createdAt": "2025-10-26T06:44:38.723Z",
     "updatedAt": "2025-10-26T06:44:38.723Z"
   },
@@ -41,6 +43,7 @@
     "website": "",
     "location": "",
     "isVerified": false,
+    "isActive": true,
     "createdAt": "2025-10-26T09:13:03.099Z",
     "updatedAt": "2025-10-26T09:13:03.099Z"
   },
@@ -54,6 +57,7 @@
     "website": "",
     "location": "",
     "isVerified": false,
+    "isActive": true,
     "createdAt": "2025-10-26T09:21:00.097Z",
     "updatedAt": "2025-10-26T09:21:00.097Z"
   },
@@ -70,7 +74,39 @@
     "followers": [],
     "following": [],
     "isVerified": true,
+    "isActive": true,
     "createdAt": "2025-10-26T06:43:58.640Z",
     "updatedAt": "2025-10-26T08:18:17.011Z"
+  },
+  {
+    "_id": "6",
+    "email": "n@gmail.com",
+    "password": "$2a$10$NgIqwx82MmPKDbGSXCJprezZqo32t9atN8elm0voB5NqRCRpOcdYy",
+    "fullName": "neriman",
+    "bio": "",
+    "avatar": "",
+    "website": "",
+    "location": "",
+    "isVerified": false,
+    "isActive": true,
+    "createdAt": "2025-10-26T18:15:08.365Z",
+    "updatedAt": "2025-10-26T18:15:08.365Z"
+  },
+  {
+    "_id": "1761507122935",
+    "email": "test@example.com",
+    "fullName": "Test User",
+    "bio": "",
+    "avatar": "",
+    "website": "",
+    "location": "",
+    "isVerified": false,
+    "isActive": true,
+    "followers": [],
+    "following": [],
+    "savedWorks": [],
+    "createdAt": "2025-10-26T19:32:02.935Z",
+    "updatedAt": "2025-10-26T19:32:02.935Z",
+    "source": "manual"
   }
 ]

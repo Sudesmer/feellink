@@ -196,6 +196,7 @@ router.post('/register', async (req, res) => {
       website: '',
       location: '',
       isVerified: false,
+      isActive: true, // Yeni kayıt olan kullanıcılar aktif olarak başlar
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -217,6 +218,17 @@ router.post('/register', async (req, res) => {
 
     // Token oluştur
     const token = generateToken(newUser._id);
+
+    // Socket.IO ile admin paneline real-time bildirim gönder
+    if (req.app.locals.io) {
+      req.app.locals.io.emit('user_registered', {
+        _id: newUser._id,
+        email: newUser.email,
+        fullName: newUser.fullName,
+        createdAt: newUser.createdAt,
+        timestamp: new Date()
+      });
+    }
 
     res.status(201).json({
       success: true,

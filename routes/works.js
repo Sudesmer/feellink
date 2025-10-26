@@ -205,6 +205,18 @@ router.post('/', async (req, res) => {
     await work.save();
     await work.populate('category', 'name color');
 
+    // Socket.IO ile admin paneline real-time bildirim gönder
+    if (req.app.locals.io) {
+      req.app.locals.io.emit('work_created', {
+        _id: work._id,
+        title: work.title,
+        author: work.author,
+        category: work.category,
+        createdAt: work.createdAt,
+        timestamp: new Date()
+      });
+    }
+
     res.status(201).json({
       success: true,
       message: 'Eser oluşturuldu',
@@ -323,6 +335,17 @@ router.post('/:id/like', async (req, res) => {
     // Basit beğeni sistemi - her tıklamada beğeni sayısını artır
     const currentLikes = work.likeCount || 0;
     work.likeCount = currentLikes + 1;
+
+    // Socket.IO ile admin paneline real-time bildirim gönder
+    if (req.app.locals.io) {
+      req.app.locals.io.emit('work_liked', {
+        workId: work._id,
+        workTitle: work.title,
+        author: work.author,
+        likeCount: work.likeCount,
+        timestamp: new Date()
+      });
+    }
 
     res.json({
       success: true,
