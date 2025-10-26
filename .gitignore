@@ -119,3 +119,8 @@ data/backups/*.json
 *.svg
 
 /generated/prisma
+
+# MongoDB files
+mongodb-macos-x86_64-*/
+*.db
+*.db-journal
