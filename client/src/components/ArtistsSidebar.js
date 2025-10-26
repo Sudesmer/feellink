@@ -26,6 +26,11 @@ const SidebarContainer = styled.div`
   @media (max-width: 1200px) {
     display: none;
   }
+
+  /* Tablet ve mobil için görünür olacak */
+  @media (max-width: 1024px) {
+    display: none !important;
+  }
 `;
 
 const SidebarTitle = styled.h3`

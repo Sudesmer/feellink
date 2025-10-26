@@ -1186,11 +1186,11 @@ const mockProfile = {
 
 
 const Profile = () => {
-  const { id } = useParams();
+  const { username } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { theme } = useTheme();
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, followUser, unfollowUser, sendFollowRequest } = useAuth();
   const [activeTab, setActiveTab] = useState('posts');
   const [showFollowersModal, setShowFollowersModal] = useState(false);
   const [showFollowingModal, setShowFollowingModal] = useState(false);
@@ -1377,20 +1377,32 @@ const Profile = () => {
     return [...pinned, ...filterComments(unpinned)];
   };
 
-  // localStorage'dan takip durumunu yükle (kullanıcıya özel)
-  const getStoredFollowState = () => {
+  // Takip durumunu kontrol et
+  const checkFollowStatus = async (targetUserId) => {
+    if (!currentUser || !targetUserId || currentUser._id === targetUserId) {
+      return { isFollowing: false, status: 'none' };
+    }
+    
     try {
-      const userEmail = currentUser?.email || 'anonymous';
-      const followKey = `userFollowState_${userEmail}`;
-      const stored = localStorage.getItem(followKey);
-      return stored ? JSON.parse(stored) : mockProfile.isFollowing;
+      // Backend'den takip durumunu kontrol et
+      const response = await axios.get(`http://localhost:5000/api/users/follow-status/${targetUserId}`, {
+        headers: {
+          'x-user-id': currentUser._id,
+          skipAuth: true
+        }
+      });
+      
+      return {
+        isFollowing: response.data.isFollowing || false,
+        status: response.data.status || 'none'
+      };
     } catch (error) {
-      console.error('Takip durumu okuma hatası:', error);
-      return mockProfile.isFollowing;
+      console.error('Takip durumu kontrol hatası:', error);
+      return { isFollowing: false, status: 'none' };
     }
   };
   
-  const [isFollowing, setIsFollowing] = useState(getStoredFollowState());
+  const [isFollowing, setIsFollowing] = useState(false);
   const [requestSent, setRequestSent] = useState(false); // İstek gönderildi durumu
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -1512,32 +1524,30 @@ const Profile = () => {
     setPinnedComments(getStoredPinnedComments());
   }, []);
 
-  // Eğer URL'de id varsa, o kullanıcının bilgilerini yükle
+  // Eğer URL'de username varsa, o kullanıcının bilgilerini yükle
   useEffect(() => {
     const loadUserProfile = async () => {
-      if (!id) return; // Eğer id yoksa (kendi profili), hiçbir şey yapma
+      if (!username) return; // Eğer username yoksa (kendi profili), hiçbir şey yapma
       
       setLoadingUser(true);
       try {
-        // Backend'den tüm kullanıcıları al
-        const response = await axios.get('http://localhost:5000/api/users');
+        // Backend'den kullanıcı profilini username ile al
+        const response = await axios.get(`http://localhost:5000/api/users/profile/${username}`);
         if (response.data && response.data.success) {
-          const allUsers = response.data.users || [];
-          // Belirtilen id ile eşleşen kullanıcıyı bul
-          const foundUser = allUsers.find(user => user._id === id);
+          const foundUser = response.data.user;
           if (foundUser) {
             setUserToDisplay(foundUser);
             // Profile state'ini güncelle
             setProfile({
-              username: foundUser.fullName?.split(' ').join('_').toLowerCase() || foundUser.email?.split('@')[0],
+              username: foundUser.username || foundUser.email?.split('@')[0],
               fullName: foundUser.fullName || foundUser.email,
               bio: foundUser.bio || '',
               website: foundUser.website || '',
               location: foundUser.location || '',
               avatar: foundUser.avatar || '',
-              followers: foundUser.followers || 0,
-              following: foundUser.following || 0,
-              posts: 0,
+              followers: foundUser.followers?.length || 0,
+              following: foundUser.following?.length || 0,
+              posts: foundUser.works?.length || 0,
               isFollowing: false,
               isOwnProfile: foundUser._id === currentUser?._id
             });
@@ -1551,7 +1561,21 @@ const Profile = () => {
     };
 
     loadUserProfile();
-  }, [id, currentUser]);
+  }, [username, currentUser]);
+
+  // userToDisplay değiştiğinde followersCount'u güncelle
+  useEffect(() => {
+    if (userToDisplay && userToDisplay.followers) {
+      const realCount = userToDisplay.followers.length;
+      setFollowersCount(realCount);
+      
+      // localStorage'ı da güncelle (başka kullanıcı profili için)
+      if (username && currentUser && userToDisplay._id !== currentUser._id) {
+        const targetUserFollowersKey = `followersCount_user_${userToDisplay._id}`;
+        localStorage.setItem(targetUserFollowersKey, realCount.toString());
+      }
+    }
+  }, [userToDisplay, username, currentUser]);
 
   // Sağ tık menüsünü kapatma
   React.useEffect(() => {
@@ -1617,12 +1641,16 @@ const Profile = () => {
   // Takipçi sayısını localStorage'dan yükle (kullanıcıya özel)
   const getStoredFollowersCount = () => {
     try {
-      // Eğer başka bir kullanıcının profiline bakıyorsak (id var ve currentUser'ın id'si farklıysa)
-      const isOtherUserProfile = id && currentUser && currentUser._id !== id;
+      // Eğer başka bir kullanıcının profiline bakıyorsak (username var ve currentUser'ın id'si farklıysa)
+      const isOtherUserProfile = username && userToDisplay && currentUser && currentUser._id !== userToDisplay._id;
       
       if (isOtherUserProfile) {
+        // Backend'den gelen gerçek takipçi sayısını kullan
+        if (userToDisplay && userToDisplay.followers) {
+          return userToDisplay.followers.length;
+        }
         // O kullanıcının ID'sine göre saklanan sayıyı yükle
-        const targetUserFollowersKey = `followersCount_user_${id}`;
+        const targetUserFollowersKey = `followersCount_user_${userToDisplay._id}`;
         const stored = localStorage.getItem(targetUserFollowersKey);
         if (stored) {
           return parseInt(stored);
@@ -1630,7 +1658,7 @@ const Profile = () => {
         return 0; // Başka kullanıcı için varsayılan 0
       }
       
-      // Aksi halde kendi takipçi sayımızı yükle
+      // Kendi profili için localStorage'dan yükle
       const userEmail = currentUser?.email || 'anonymous';
       const followersKey = `followersCount_${userEmail}`;
       const stored = localStorage.getItem(followersKey);
@@ -1658,16 +1686,45 @@ const Profile = () => {
   
   const [followingCount, setFollowingCount] = useState(getStoredFollowingCount());
   
-  // isOwnProfile kontrolü: eğer id yoksa (kendi profili) veya currentUser'ın id'si id ile eşleşiyorsa
-  const isOwnProfile = !id || (currentUser && currentUser._id === id);
+  // isOwnProfile kontrolü: eğer username yoksa (kendi profili) veya currentUser'ın id'si userToDisplay'in id'si ile eşleşiyorsa
+  const isOwnProfile = !username || (currentUser && userToDisplay && currentUser._id === userToDisplay._id);
+  
+  // Debug için console.log ekleyelim
+  console.log('🔍 Profile Debug:', {
+    username,
+    currentUserId: currentUser?._id,
+    userToDisplayId: userToDisplay?._id,
+    isOwnProfile,
+    currentUserName: currentUser?.fullName,
+    userToDisplayName: userToDisplay?.fullName
+  });
+  
+  // Takip durumunu yükle
+  useEffect(() => {
+    const loadFollowStatus = async () => {
+      if (userToDisplay && !isOwnProfile) {
+        const followData = await checkFollowStatus(userToDisplay._id);
+        setIsFollowing(followData.isFollowing);
+        setRequestSent(followData.status === 'pending');
+        console.log('📊 Takip durumu yüklendi:', {
+          targetUser: userToDisplay.fullName,
+          isFollowing: followData.isFollowing,
+          status: followData.status,
+          requestSent: followData.status === 'pending'
+        });
+      }
+    };
+    
+    loadFollowStatus();
+  }, [userToDisplay, isOwnProfile, currentUser]);
   
   // Gizli hesap durumunu kontrol et
   const getIsPrivateStatus = () => {
     try {
       // Eğer başka bir kullanıcının profiline bakıyorsak
-      if (id && currentUser && currentUser._id !== id) {
+      if (username && currentUser && userToDisplay && currentUser._id !== userToDisplay._id) {
         // O kullanıcının gizlilik durumunu kontrol et
-        const targetUserPrivateKey = `isPrivate_user_${id}`;
+        const targetUserPrivateKey = `isPrivate_user_${userToDisplay._id}`;
         const stored = localStorage.getItem(targetUserPrivateKey);
         return stored === 'true';
       }
@@ -1725,7 +1782,7 @@ const Profile = () => {
     const userEmail = currentUser?.email || 'anonymous';
     
     // isOwnProfile hesapla
-    const isOwnProfileCheck = !id || (currentUser && currentUser._id === id);
+    const isOwnProfileCheck = !username || (currentUser && userToDisplay && currentUser._id === userToDisplay._id);
     
     // Takipçi sayısını yükle
     if (isOwnProfileCheck) {
@@ -1757,19 +1814,22 @@ const Profile = () => {
       }
     } else {
       // Başka kullanıcının profiline bakıyorsak onun takipçi sayısını yükle
-      const targetFollowersKey = `followersCount_user_${id}`;
-      const storedFollowersCount = localStorage.getItem(targetFollowersKey);
-      if (storedFollowersCount) {
-        const count = parseInt(storedFollowersCount);
-        // Negatif değerleri engelle
-        setFollowersCount(Math.max(0, count));
-        // Eğer localStorage'da negatif değer varsa, 0'a set et
-        if (count < 0) {
-          localStorage.setItem(targetFollowersKey, '0');
+      const targetUserId = userToDisplay?._id;
+      if (targetUserId) {
+        const targetFollowersKey = `followersCount_user_${targetUserId}`;
+        const storedFollowersCount = localStorage.getItem(targetFollowersKey);
+        if (storedFollowersCount) {
+          const count = parseInt(storedFollowersCount);
+          // Negatif değerleri engelle
+          setFollowersCount(Math.max(0, count));
+          // Eğer localStorage'da negatif değer varsa, 0'a set et
+          if (count < 0) {
+            localStorage.setItem(targetFollowersKey, '0');
+          }
+        } else {
+          // localStorage'da yoksa 0'a set et
+          setFollowersCount(0);
         }
-      } else {
-        // localStorage'da yoksa 0'a set et
-        setFollowersCount(0);
       }
     }
     
@@ -1805,7 +1865,7 @@ const Profile = () => {
     } catch (error) {
       console.error('localStorage takip verileri yükleme hatası:', error);
     }
-  }, [currentUser, id]);
+  }, [currentUser, username, userToDisplay]);
 
   // localStorage'dan güncellenmiş profil verilerini yükle - eski userProfile verisini kullanma
   React.useEffect(() => {
@@ -1836,11 +1896,11 @@ const Profile = () => {
     setIsPrivateAccount(updatedPrivateStatus);
     
     // Eğer başka birinin hesabına bakıyorsak ve gizli hesaplarsa
-    if (isOtherUserProfile && updatedPrivateStatus) {
+    if (isOtherUserProfile && updatedPrivateStatus && userToDisplay) {
       // Takipçi olup olmadığını kontrol et
       const userEmail = currentUser?.email || 'anonymous';
       const followingList = JSON.parse(localStorage.getItem(`followingList_${userEmail}`) || '[]');
-      const isFollowingUser = followingList.some(u => u._id === id);
+      const isFollowingUser = followingList.some(u => u._id === userToDisplay._id);
       setIsFollower(isFollowingUser);
       
       console.log('🔒 Gizli hesap kontrolü:', {
@@ -1852,236 +1912,67 @@ const Profile = () => {
       // Kendi hesabımız veya gizli değil
       setIsFollower(true); // Kendi hesabımız her zaman erişilebilir
     }
-  }, [id, currentUser, isOtherUserProfile]);
+  }, [username, currentUser, isOtherUserProfile, userToDisplay]);
 
-  const handleFollow = () => {
-    // Karşı tarafın kullanıcı ID'sini belirle (userToDisplay varsa onun ID'sini kullan, yoksa URL'den gelen id'yi kullan)
-    const targetUserId = userToDisplay?._id || id;
+  // Takip isteği gönderme fonksiyonu
+  const handleFollowRequest = async () => {
+    if (!userToDisplay || !currentUser) return;
     
-    console.log('🔍 handleFollow - Debug bilgileri:');
-    console.log('  - currentUser._id:', currentUser?._id);
-    console.log('  - userToDisplay:', userToDisplay);
-    console.log('  - userToDisplay._id:', userToDisplay?._id);
-    console.log('  - id (URL):', id);
-    console.log('  - targetUserId:', targetUserId);
-    console.log('  - isPrivateAccount:', isPrivateAccount);
-    console.log('  - isFollowing:', isFollowing);
-    console.log('  - requestSent:', requestSent);
-    
-    // Eğer gizli hesapsa ve henüz takip isteği gönderilmemişse
-    if (isPrivateAccount && !isFollowing && !requestSent) {
-      setRequestSent(true);
-      
-      // Karşı tarafa takip isteği bildirimi gönder
-      const requestNotification = {
-        id: Date.now(),
-        type: 'follow_request',
-        user: {
-          name: currentUser?.fullName || currentUser?.username || 'Bilinmeyen',
-          avatar: currentUser?.avatar || null
-        },
-        action: 'sana takip isteği gönderdi',
-        time: 'şimdi',
-        read: false,
-        timestamp: new Date().toISOString()
-      };
-      
-      // Karşı tarafın bildirimlerine ekle (ID'ye göre)
-      const targetNotificationsKey = `notifications_user_${targetUserId}`;
-      const existingNotifications = JSON.parse(localStorage.getItem(targetNotificationsKey) || '[]');
-      existingNotifications.unshift(requestNotification);
-      localStorage.setItem(targetNotificationsKey, JSON.stringify(existingNotifications.slice(0, 50))); // En son 50 bildirim
-      
-      console.log('✅ Takip isteği bildirimi eklendi:', requestNotification);
-      console.log('📬 Target User ID:', targetUserId);
-      console.log('📬 Notification Key:', targetNotificationsKey);
-      console.log('📬 Saved to localStorage:', localStorage.getItem(targetNotificationsKey));
-      
-      // localStorage'dan doğrulama
-      const verify = JSON.parse(localStorage.getItem(targetNotificationsKey) || '[]');
-      console.log('📬 Verification - Bildirim localStorage\'da var mı?:', verify.length > 0);
-      
-      return; // İstek gönderildi durumuna geç
+    try {
+      const result = await sendFollowRequest(userToDisplay._id);
+      if (result.success) {
+        setRequestSent(true);
+        // Toast mesajı AuthContext'te gösteriliyor
+      }
+    } catch (error) {
+      console.error('Takip isteği hatası:', error);
     }
+  };
+
+  const handleFollow = async () => {
+    // Karşı tarafın kullanıcı ID'sini belirle (userToDisplay varsa onun ID'sini kullan)
+    const targetUserId = userToDisplay?._id;
     
-    // Eğer gizli hesapsa ve istek gönderilmişse, geri al (istek iptal)
-    if (isPrivateAccount && requestSent && !isFollowing) {
-      setRequestSent(false);
-      
-      // Karşı tarafın bildirimlerinden istek bildirimini kaldır (en son eklenen)
-      const targetNotificationsKey = `notifications_user_${targetUserId}`;
-      const existingNotifications = JSON.parse(localStorage.getItem(targetNotificationsKey) || '[]');
-      const filteredNotifications = existingNotifications.filter(notif => 
-        !(notif.type === 'follow_request' && notif.user.name === (currentUser?.fullName || currentUser?.username))
-      );
-      localStorage.setItem(targetNotificationsKey, JSON.stringify(filteredNotifications));
-      
-      console.log('✅ Takip isteği bildirimi iptal edildi, Target User ID:', targetUserId);
-      
+    // Gizli hesap kontrolü
+    if (userToDisplay?.isPrivate) {
+      // Gizli hesap için takip isteği gönder
+      await handleFollowRequest();
       return;
     }
     
-    const newFollowState = !isFollowing;
-    setIsFollowing(newFollowState);
-    
-    // KARŞI TARAFIN takipçi sayısını güncelle (eğer karşı tarafın profiline bakıyorsak)
-    const isOtherUserProfile = id && currentUser && currentUser._id !== id;
-    
-    console.log('🔍 Yeni follow state:', newFollowState);
-    console.log('🔍 isOtherUserProfile:', isOtherUserProfile);
-    console.log('🔍 targetUserId:', targetUserId);
-    
-    // KARŞI TARAFIN takipçi sayısını güncelle
-    if (isOtherUserProfile) {
-      // localStorage'dan mevcut takipçi sayısını al
-      const targetUserFollowersKey = `followersCount_user_${id}`;
-      const currentTargetFollowersCount = parseInt(localStorage.getItem(targetUserFollowersKey) || '0');
-      
-      // Yeni takipçi sayısını hesapla
-      const newFollowersCount = newFollowState 
-        ? Math.max(0, currentTargetFollowersCount + 1) 
-        : Math.max(0, currentTargetFollowersCount - 1);
-      
-      setFollowersCount(newFollowersCount);
-      
-      // Karşı tarafın takipçi sayısını localStorage'a kaydet (kullanıcı ID'sine göre)
-      localStorage.setItem(targetUserFollowersKey, Math.max(0, newFollowersCount).toString());
-      
-      console.log('✅ Karşı tarafın takipçi sayısı güncellendi:', newFollowersCount, 'User ID:', id);
-    }
-    
-    // BENİM KENDİ takip sayımı güncelle (HER ZAMAN, kendi profilde veya başka profilde olsun)
-    const userEmail = currentUser?.email || 'anonymous';
-    const followingKey = `followingCount_${userEmail}`;
-    
-    // Mevcut takip sayısını localStorage'dan al
-    const currentFollowingCount = parseInt(localStorage.getItem(followingKey) || '0');
-    
-    // YENİ: Takip edilen listeden kontrol et
-    const followingList = JSON.parse(localStorage.getItem(`followingList_${userEmail}`) || '[]');
-    const alreadyFollowing = followingList.some(u => u._id === id);
-    
-    // Eğer zaten takip ediyorsa ve takibe devam ediyorsa, sayıyı artırma
-    // Eğer takibi bırakıyorsa, sayıyı azalt
-    let newFollowingCount;
-    if (newFollowState) {
-      // Takip ediyor
-      if (alreadyFollowing) {
-        // Zaten listede var, sayıyı değiştirme
-        newFollowingCount = Math.max(0, currentFollowingCount);
-      } else {
-        // Listede yok, ekle ve sayıyı artır
-        newFollowingCount = Math.max(0, currentFollowingCount + 1);
-      }
-    } else {
-      // Takibi bırakıyor
-      if (alreadyFollowing) {
-        // Listede var, çıkar ve sayıyı azalt
-        newFollowingCount = Math.max(0, currentFollowingCount - 1);
-      } else {
-        // Zaten listede yok, sayıyı değiştirme
-        newFollowingCount = Math.max(0, currentFollowingCount);
-      }
-    }
-    
-    // localStorage'a kaydet (HER ZAMAN)
-    localStorage.setItem(followingKey, Math.max(0, newFollowingCount).toString());
-    
-    console.log('✅ Benim takip sayım güncellendi:', newFollowingCount, 'LocalStorage\'a kaydedildi');
-    
-    // Kullanıcıya özel takip bilgilerini localStorage'a kaydet
-    const followKey = `userFollowState_${userEmail}`;
-    
-    try {
-      // Takip durumunu kaydet
-      localStorage.setItem(followKey, JSON.stringify(newFollowState));
-      
-      // Takip edilen sayısını kaydet (eksili değer olmaması için)
-      localStorage.setItem(followingKey, Math.max(0, newFollowingCount).toString());
-      
-      // Takip edilenler listesini de kaydet
-      if (newFollowState) {
-        // Takip edilen listesine ekle
-        const followingList = JSON.parse(localStorage.getItem(`followingList_${userEmail}`) || '[]');
-        const userToAdd = {
-          _id: id,
-          email: userToDisplay?.email,
-          fullName: userToDisplay?.fullName,
-          avatar: userToDisplay?.avatar,
-          isFollowing: true
-        };
-        // Duplicate kontrolü
-        const exists = followingList.find(u => u._id === id);
-        if (!exists) {
-          followingList.push(userToAdd);
-          localStorage.setItem(`followingList_${userEmail}`, JSON.stringify(followingList));
-        }
-        
-        // Instagram tarzı bildirim ekle (HER ZAMAN - başka bir kullanıcıyı takip ettiğimizde)
-        if (isOtherUserProfile && targetUserId) {
-          const newNotification = {
-            id: Date.now(),
-            type: 'follow',
-            user: {
-              name: currentUser?.fullName || currentUser?.username || 'Bilinmeyen',
-              avatar: currentUser?.avatar || null
-            },
-            action: 'sizi takip etti',
-            time: 'şimdi',
-            read: false,
-            timestamp: new Date().toISOString()
-          };
-          
-          // Karşı tarafın bildirimlerine ekle (ID'ye göre)
-          const targetNotificationsKey = `notifications_user_${targetUserId}`;
-          const existingNotifications = JSON.parse(localStorage.getItem(targetNotificationsKey) || '[]');
-          existingNotifications.unshift(newNotification);
-          localStorage.setItem(targetNotificationsKey, JSON.stringify(existingNotifications.slice(0, 50))); // En son 50 bildirim
-          
-          console.log('✅✅✅ Takip bildirimi eklendi:', newNotification);
-          console.log('📬 Target User ID (follow):', targetUserId);
-          console.log('📬 Notification Key (follow):', targetNotificationsKey);
-          console.log('📬 Mevcut bildirim sayısı:', existingNotifications.length);
-        }
-        
-        // Karşı tarafın takipçi listesine ekle (sadece başka bir kullanıcıyı takip ediyorsak)
-        if (isOtherUserProfile) {
-            const targetFollowersListKey = `followersList_${targetUserId}`;
-            const targetFollowersList = JSON.parse(localStorage.getItem(targetFollowersListKey) || '[]');
-            const followerToAdd = {
-              _id: currentUser?._id,
-              username: currentUser?.username || currentUser?.email?.split('@')[0] || 'unknown',
-              fullName: currentUser?.fullName || '',
-              avatar: currentUser?.avatar || null,
-              isFollowing: false // Karşı taraf bizi takip ediyor mu?
-            };
-            const followerExists = targetFollowersList.find(u => u._id === currentUser?._id);
-            if (!followerExists) {
-              targetFollowersList.push(followerToAdd);
-              localStorage.setItem(targetFollowersListKey, JSON.stringify(targetFollowersList));
-              console.log('✅ Takipçi listesine eklendi:', followerToAdd);
-            }
+    // Normal hesap için direkt takip
+    const performFollow = async () => {
+      try {
+        if (isFollowing) {
+          // Takipten çık
+          const result = await unfollowUser(targetUserId);
+          if (result && result.success) {
+            setIsFollowing(false);
+            setFollowersCount(prev => Math.max(0, prev - 1));
           }
-      } else {
-        // Takip edilen listesinden çıkar
-        const followingList = JSON.parse(localStorage.getItem(`followingList_${userEmail}`) || '[]');
-        const updatedList = followingList.filter(u => u._id !== id);
-        localStorage.setItem(`followingList_${userEmail}`, JSON.stringify(updatedList));
-        
-        // Karşı tarafın takipçi listesinden çıkar (sadece başka bir kullanıcıyı takipten çıkarıyorsak)
-        if (isOtherUserProfile) {
-          const targetFollowersListKey = `followersList_${targetUserId}`;
-          const targetFollowersList = JSON.parse(localStorage.getItem(targetFollowersListKey) || '[]');
-          const updatedFollowersList = targetFollowersList.filter(u => u._id !== currentUser?._id);
-          localStorage.setItem(targetFollowersListKey, JSON.stringify(updatedFollowersList));
-          console.log('✅ Takipçi listesinden çıkarıldı:', currentUser?._id);
+        } else {
+          // Takip et
+          const result = await followUser(targetUserId);
+          if (result && result.success) {
+            setIsFollowing(true);
+            setFollowersCount(prev => prev + 1);
+          }
         }
+      } catch (error) {
+        console.error('Follow/Unfollow error:', error);
+        // Error handling zaten followUser/unfollowUser içinde yapılıyor
       }
-      
-      console.log('Takip durumu kaydedildi:', newFollowState, 'Takip sayısı:', newFollowingCount);
-    } catch (error) {
-      console.error('Takip durumu kaydetme hatası:', error);
-    }
+    };
+    
+    performFollow();
+  };
+
+  // Mesaj gönderme fonksiyonu
+  const handleMessage = () => {
+    if (!userToDisplay) return;
+    
+    // Mesaj sayfasına yönlendir
+    navigate(`/messages?user=${userToDisplay._id}`);
   };
 
   // Takipçi modal'ındaki takip işlemi
@@ -2653,6 +2544,7 @@ const Profile = () => {
             <ActionButtons>
               {isOwnProfile ? (
                 <>
+                  {/* Kendi hesabımızda sadece düzenleme ve gönderi butonları gösterilir */}
                   <ActionButton theme={theme} onClick={() => navigate('/edit-profile')}>
                     <FiEdit3 size={14} />
                     Profili Düzenle
@@ -2664,6 +2556,7 @@ const Profile = () => {
                 </>
               ) : (
                 <>
+                  {/* Başkasının hesabında sadece takip ve mesaj butonları gösterilir */}
                   <ActionButton 
                     theme={theme} 
                     primary={!isFollowing && !requestSent}
@@ -2682,11 +2575,11 @@ const Profile = () => {
                     ) : (
                       <>
                         <FiUserPlus size={14} />
-                        Takip Et
+                        {userToDisplay?.isPrivate ? 'İstek Gönder' : 'Takip Et'}
                       </>
                     )}
                   </ActionButton>
-                  <ActionButton theme={theme}>
+                  <ActionButton theme={theme} onClick={handleMessage}>
                     <FiMessageCircle size={14} />
                     Mesaj
                   </ActionButton>

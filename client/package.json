@@ -16,11 +16,13 @@
     "react-query": "^3.39.3",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
+    "socket.io-client": "^4.8.1",
     "styled-components": "^6.1.19",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:network": "HOST=0.0.0.0 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

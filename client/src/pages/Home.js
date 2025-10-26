@@ -37,6 +37,22 @@ const Container = styled.div`
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
   }
+
+  /* Tablet ve mobil için iyileştirmeler */
+  @media (max-width: 1024px) {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  @media (max-width: 768px) {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  @media (max-width: 480px) {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
 `;
 
 
@@ -60,6 +76,27 @@ const MainLayout = styled.div`
     margin: 0;
     padding: 0;
   }
+
+  /* Tablet */
+  @media (max-width: 1024px) and (min-width: 769px) {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Mobil tablet */
+  @media (max-width: 768px) {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Küçük mobil */
+  @media (max-width: 480px) {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
 `;
 
 const MainContent = styled.div`
@@ -82,8 +119,28 @@ const MainContent = styled.div`
     margin-right: 0;
   }
 
-  @media (max-width: 768px) {
+  /* Tablet */
+  @media (max-width: 1024px) and (min-width: 769px) {
+    padding: 16px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Mobil tablet */
+  @media (max-width: 768px) and (min-width: 481px) {
     padding: 12px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Küçük mobil */
+  @media (max-width: 480px) {
+    padding: 8px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
   }
 `;
 

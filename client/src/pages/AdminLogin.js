@@ -173,7 +173,6 @@ const ErrorMessage = styled.div`
 const AdminLogin = () => {
   const [formData, setFormData] = useState({
     email: '',
-    username: '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -195,26 +194,43 @@ const AdminLogin = () => {
     setLoading(true);
     setError('');
 
-    // Admin kimlik doğrulama
-    const validAdmins = [
-      { email: 'admin@feellink.com', username: 'admin', password: 'admin123' },
-      { email: 'sude@feellink.com', username: 'sude', password: 'sude123' },
-      { email: 'zeynep@feellink.com', username: 'zeynep', password: 'zeynep123' }
-    ];
+    console.log('Admin login attempt:', formData);
 
-    const isValidAdmin = validAdmins.find(
-      admin => admin.email === formData.email && 
-      admin.username === formData.username && 
-      admin.password === formData.password
-    );
+    try {
+      // Backend API'sine admin girişi için istek gönder
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        }),
+      });
 
-    if (isValidAdmin) {
-      // Admin girişi başarılı
-      localStorage.setItem('adminAuth', 'true');
-      localStorage.setItem('adminUser', formData.username);
-      navigate('/admin');
-    } else {
-      setError('Geçersiz email, kullanıcı adı veya şifre. Lütfen tüm alanları kontrol edin.');
+      console.log('Response status:', response.status);
+      const data = await response.json();
+      console.log('Response data:', data);
+
+      if (data.success) {
+        // Admin girişi başarılı
+        console.log('Login successful, storing data...');
+        localStorage.setItem('adminAuth', 'true');
+        localStorage.setItem('adminUser', data.user.username || data.user.fullName);
+        localStorage.setItem('adminToken', data.token);
+        localStorage.setItem('adminUserData', JSON.stringify(data.user));
+        
+        console.log('Redirecting to admin panel...');
+        // Admin panel'e yönlendir
+        navigate('/admin-panel');
+      } else {
+        console.log('Login failed:', data.message);
+        setError(data.message || 'Geçersiz email, kullanıcı adı veya şifre. Lütfen tüm alanları kontrol edin.');
+      }
+    } catch (error) {
+      console.error('Admin login error:', error);
+      setError('Giriş sırasında bir hata oluştu. Lütfen tekrar deneyin.');
     }
 
     setLoading(false);
@@ -261,16 +277,6 @@ const AdminLogin = () => {
             />
           </InputGroup>
 
-          <InputGroup>
-            <Input
-              type="text"
-              name="username"
-              placeholder="Admin Kullanıcı Adı"
-              value={formData.username}
-              onChange={handleInputChange}
-              required
-            />
-          </InputGroup>
 
           <InputGroup>
             <Input

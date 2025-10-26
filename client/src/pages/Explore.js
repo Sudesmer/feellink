@@ -8,6 +8,7 @@ import axios from 'axios';
 import WorkCard from '../components/WorkCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 import { worksAPI, categoriesAPI } from '../api/mockApi';
 
 const Container = styled.div`
@@ -427,13 +428,87 @@ const UserName = styled.h3`
 const UserEmail = styled.p`
   font-size: 0.9rem;
   color: ${props => props.theme.textSecondary};
-  margin: 0;
+  margin: 0 0 16px 0;
+`;
+
+const UserBio = styled.p`
+  font-size: 0.85rem;
+  color: ${props => props.theme.textSecondary};
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+  max-height: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const UserLocation = styled.p`
+  font-size: 0.8rem;
+  color: ${props => props.theme.textSecondary};
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+`;
+
+const UserUsername = styled.p`
+  font-size: 0.8rem;
+  color: ${props => props.theme.primary};
+  margin: 0 0 12px 0;
+  font-weight: 500;
+`;
+
+const UserMatchType = styled.p`
+  font-size: 0.75rem;
+  color: ${props => props.theme.primary};
+  margin: 0 0 8px 0;
+  font-weight: 600;
+  background: ${props => props.theme.surface};
+  padding: 4px 8px;
+  border-radius: 12px;
+  border: 1px solid ${props => props.theme.border};
+  display: inline-block;
+`;
+
+const NoResultsMessage = styled.div`
+  text-align: center;
+  padding: 40px 20px;
+  color: ${props => props.theme.textSecondary};
+  font-size: 1.1rem;
+  background: ${props => props.theme.surface};
+  border-radius: 12px;
+  border: 1px solid ${props => props.theme.border};
+`;
+
+const FollowButton = styled.button`
+  padding: 8px 16px;
+  background: ${props => props.theme.primary};
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+
+  &:hover {
+    background: ${props => props.theme.primaryHover};
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    background: ${props => props.theme.textMuted};
+    cursor: not-allowed;
+    transform: none;
+  }
 `;
 
 const Explore = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { theme } = useTheme();
+  const { user: currentUser, followUser, unfollowUser } = useAuth();
   
   // URL'den arama parametresini oku
   const searchParams = new URLSearchParams(location.search);
@@ -446,6 +521,7 @@ const Explore = () => {
   const [page, setPage] = useState(1);
   const [searchMode, setSearchMode] = useState('works'); // 'works' or 'users'
   const [users, setUsers] = useState([]);
+  const [followingUsers, setFollowingUsers] = useState(new Set());
 
   // Fetch categories
   const { data: categories } = useQuery(
@@ -464,12 +540,64 @@ const Explore = () => {
       const response = await axios.get('http://localhost:5000/api/users');
       if (response.data && response.data.success) {
         const allUsers = response.data.users || [];
-        // Filter users by query
-        const filtered = allUsers.filter(user => 
-          user.fullName?.toLowerCase().includes(query.toLowerCase()) ||
-          user.email?.toLowerCase().includes(query.toLowerCase())
-        );
-        return filtered;
+        // Filter users by query - tek harf aramaları için optimize edilmiş
+        const filtered = allUsers.map(user => {
+          const searchTerm = query.toLowerCase().trim();
+          let matchType = '';
+          let isMatch = false;
+          
+          // Tek harf aramaları için özel kontrol
+          if (searchTerm.length === 1) {
+            if (user.fullName?.toLowerCase().startsWith(searchTerm)) {
+              isMatch = true;
+              matchType = 'İsim';
+            } else if (user.email?.toLowerCase().startsWith(searchTerm)) {
+              isMatch = true;
+              matchType = 'Email';
+            } else if (user.username?.toLowerCase().startsWith(searchTerm)) {
+              isMatch = true;
+              matchType = 'Kullanıcı Adı';
+            } else if (user.fullName?.toLowerCase().split(' ').some(name => name.startsWith(searchTerm))) {
+              isMatch = true;
+              matchType = 'İsim';
+            } else if (user.email?.split('@')[0]?.toLowerCase().startsWith(searchTerm)) {
+              isMatch = true;
+              matchType = 'Email';
+            }
+          } else {
+            // Çoklu karakter aramaları için normal kontrol
+            if (user.fullName?.toLowerCase().includes(searchTerm)) {
+              isMatch = true;
+              matchType = 'İsim';
+            } else if (user.email?.toLowerCase().includes(searchTerm)) {
+              isMatch = true;
+              matchType = 'Email';
+            } else if (user.username?.toLowerCase().includes(searchTerm)) {
+              isMatch = true;
+              matchType = 'Kullanıcı Adı';
+            } else if (user.bio?.toLowerCase().includes(searchTerm)) {
+              isMatch = true;
+              matchType = 'Biyografi';
+            } else if (user.location?.toLowerCase().includes(searchTerm)) {
+              isMatch = true;
+              matchType = 'Konum';
+            } else if (user.fullName?.toLowerCase().split(' ').some(name => name.includes(searchTerm))) {
+              isMatch = true;
+              matchType = 'İsim';
+            } else if (user.email?.split('@')[0]?.toLowerCase().includes(searchTerm)) {
+              isMatch = true;
+              matchType = 'Email';
+            }
+          }
+          
+          return isMatch ? { ...user, matchType } : null;
+        }).filter(Boolean);
+        
+        // Kendi profilini arama sonuçlarından çıkar
+        const filteredUsers = filtered.filter(user => user._id !== currentUser?._id);
+        
+        console.log(`🔍 "${query}" için ${filteredUsers.length} kullanıcı bulundu:`, filteredUsers.map(u => `${u.fullName} (${u.matchType})`));
+        return filteredUsers;
       }
       return [];
     } catch (error) {
@@ -495,13 +623,17 @@ const Explore = () => {
     }
   );
 
-  // Search users when search query changes
+  // Search users when search query changes - debounced
   useEffect(() => {
-    if (searchQuery.trim() && searchQuery.length > 0) {
-      searchUsers(searchQuery).then(setUsers);
-    } else {
-      setUsers([]);
-    }
+    const timeoutId = setTimeout(() => {
+      if (searchQuery.trim()) {
+        searchUsers(searchQuery).then(setUsers);
+      } else {
+        setUsers([]);
+      }
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timeoutId);
   }, [searchQuery]);
 
   const handleSearch = (e) => {
@@ -511,6 +643,43 @@ const Explore = () => {
 
   const handleLoadMore = () => {
     setPage(prev => prev + 1);
+  };
+
+  // Takip fonksiyonları
+  const handleFollow = async (targetUser) => {
+    if (!currentUser) {
+      alert('Takip etmek için giriş yapmalısınız');
+      return;
+    }
+
+    if (currentUser._id === targetUser._id) {
+      alert('Kendinizi takip edemezsiniz');
+      return;
+    }
+
+    try {
+      const result = await followUser(targetUser._id);
+      if (result && result.success) {
+        setFollowingUsers(prev => new Set([...prev, targetUser._id]));
+      }
+    } catch (error) {
+      console.error('Takip hatası:', error);
+    }
+  };
+
+  const handleUnfollow = async (targetUser) => {
+    try {
+      const result = await unfollowUser(targetUser._id);
+      if (result && result.success) {
+        setFollowingUsers(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(targetUser._id);
+          return newSet;
+        });
+      }
+    } catch (error) {
+      console.error('Takipten çıkma hatası:', error);
+    }
   };
 
   const works = worksData?.works || [];
@@ -573,7 +742,7 @@ const Explore = () => {
                 <SearchInput
                   theme={theme}
                   type="text"
-                  placeholder="Eserler, tasarımcılar ara..."
+                  placeholder="Tek harf bile yazabilirsiniz: z, s, gmail..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -633,32 +802,87 @@ const Explore = () => {
           </FiltersContainer>
 
           {/* User Search Results */}
-          {users.length > 0 && (
+          {searchQuery.trim() && (
             <UserSearchSection>
               <UserSearchTitle theme={theme}>
                 👥 Bulunan Kullanıcılar
               </UserSearchTitle>
-              <UsersGrid>
-                {users.map((user, index) => (
-                                     <UserCard
-                    key={user._id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.05 }}
-                    onClick={() => navigate(`/profile/${user._id}`)}
-                  >
-                    <UserAvatar theme={theme}>
-                      {user.avatar ? (
-                        <img src={user.avatar} alt={user.fullName} />
-                      ) : (
-                        user.fullName?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'
+              {users.length > 0 ? (
+                <UsersGrid>
+                  {users.map((user, index) => (
+                    <UserCard
+                      key={user._id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: index * 0.05 }}
+                    >
+                      <UserAvatar theme={theme}>
+                        {user.avatar ? (
+                          <img src={user.avatar} alt={user.fullName} />
+                        ) : (
+                          user.fullName?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'
+                        )}
+                      </UserAvatar>
+                      <UserName theme={theme}>{user.fullName || user.email}</UserName>
+                      <UserEmail theme={theme}>{user.email}</UserEmail>
+                      
+                      {/* Eşleşme türü */}
+                      <UserMatchType theme={theme}>
+                        🎯 {user.matchType} ile eşleşti
+                      </UserMatchType>
+                      
+                      {/* Kullanıcı bilgileri */}
+                      {user.bio && (
+                        <UserBio theme={theme}>{user.bio}</UserBio>
                       )}
-                    </UserAvatar>
-                    <UserName theme={theme}>{user.fullName || user.email}</UserName>
-                    <UserEmail theme={theme}>{user.email}</UserEmail>
-                  </UserCard>
-                ))}
-              </UsersGrid>
+                      {user.location && (
+                        <UserLocation theme={theme}>📍 {user.location}</UserLocation>
+                      )}
+                      {user.username && (
+                        <UserUsername theme={theme}>@{user.username}</UserUsername>
+                      )}
+                      
+                      {/* Takip Butonu */}
+                      {currentUser && currentUser._id !== user._id && (
+                        <FollowButton
+                          theme={theme}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const isFollowing = followingUsers.has(user._id);
+                            if (isFollowing) {
+                              handleUnfollow(user);
+                            } else {
+                              handleFollow(user);
+                            }
+                          }}
+                        >
+                          {followingUsers.has(user._id) ? 'Takipten Çık' : 'Takip Et'}
+                        </FollowButton>
+                      )}
+                      
+                      {/* Profil Ziyaret Butonu */}
+                      <FollowButton
+                        theme={theme}
+                        onClick={() => {
+                          const identifier = user.username || user.email?.split('@')[0] || user._id;
+                          navigate(`/profile/${identifier}`);
+                        }}
+                        style={{ 
+                          background: theme.surface, 
+                          color: theme.text,
+                          border: `1px solid ${theme.border}`
+                        }}
+                      >
+                        Profili Ziyaret Et
+                      </FollowButton>
+                    </UserCard>
+                  ))}
+                </UsersGrid>
+              ) : (
+                <NoResultsMessage theme={theme}>
+                  🔍 "{searchQuery}" için kullanıcı bulunamadı
+                </NoResultsMessage>
+              )}
             </UserSearchSection>
           )}
 

@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const fs = require('fs').promises;
 const path = require('path');
 const nodemailer = require('nodemailer');
+const User = require('../models/User'); // Added User model import
 
 // Geçici JSON dosyası ile çalışma
 const USERS_FILE = path.join(__dirname, '../data/users.json');
@@ -262,14 +263,12 @@ router.post('/login', async (req, res) => {
     // Email'i normalize et
     const normalizedEmail = email.toLowerCase().trim();
 
-    // Dosyadan kullanıcıları oku
+    // Mock data'dan kullanıcıyı bul
     const users = await readUsers();
-
-    // Kullanıcıyı bul (case-insensitive email ile)
     const user = users.find(u => u.email.toLowerCase().trim() === normalizedEmail);
 
     if (!user) {
-      console.log('User not found:', email);
+      console.log('❌ User not found:', normalizedEmail);
       return res.status(401).json({
         success: false,
         message: 'Geçersiz e-posta veya şifre'
@@ -278,10 +277,9 @@ router.post('/login', async (req, res) => {
 
     console.log('👤 Found user:', user.fullName || user.email);
 
-    // Şifre kontrolü
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      console.log('Password mismatch for:', email);
+    // Şifre kontrolü (basit string karşılaştırma - mock data için)
+    if (user.password !== password) {
+      console.log('❌ Password mismatch for:', normalizedEmail);
       return res.status(401).json({
         success: false,
         message: 'Geçersiz e-posta veya şifre'
@@ -298,13 +296,13 @@ router.post('/login', async (req, res) => {
       token,
       user: {
         _id: user._id,
-        username: user.fullName,
+        username: user.username,
         email: user.email,
         fullName: user.fullName,
         bio: user.bio || '',
         avatar: user.avatar || '',
-        followers: 0,
-        following: 0,
+        followers: user.followers?.length || 0,
+        following: user.following?.length || 0,
         isVerified: user.isVerified,
         createdAt: user.createdAt
       }
@@ -531,6 +529,98 @@ router.put('/profile', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Profil güncellenirken hata oluştu'
+    });
+  }
+});
+
+// Kalıcı oturum için me endpoint'i
+router.get('/me', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({
+        success: false,
+        message: 'Token bulunamadı'
+      });
+    }
+
+    const token = authHeader.substring(7); // "Bearer " kısmını çıkar
+    
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_super_secret_jwt_key_here_change_in_production');
+      const userId = decoded.userId;
+      
+      console.log('🔍 JWT decoded, userId:', userId);
+      
+      // MongoDB'den kullanıcıyı bul
+      try {
+        const user = await User.findById(userId).select('-password');
+        if (user) {
+          console.log('✅ MongoDB\'den kullanıcı bulundu:', user.email);
+          return res.json({
+            success: true,
+            user: {
+              _id: user._id,
+              email: user.email,
+              fullName: user.fullName,
+              username: user.username,
+              bio: user.bio,
+              website: user.website,
+              location: user.location,
+              avatar: user.avatar,
+              isPrivate: user.isPrivate,
+              createdAt: user.createdAt
+            }
+          });
+        }
+      } catch (mongoError) {
+        console.log('MongoDB hatası, JSON dosyasından kontrol ediliyor:', mongoError.message);
+      }
+      
+      // MongoDB'de bulunamazsa JSON dosyasından kontrol et
+      const users = await readUsers();
+      const user = users.find(u => u._id === userId);
+      
+      if (user) {
+        console.log('✅ JSON\'dan kullanıcı bulundu:', user.email);
+        return res.json({
+          success: true,
+          user: {
+            _id: user._id,
+            email: user.email,
+            fullName: user.fullName,
+            username: user.username,
+            bio: user.bio,
+            website: user.website,
+            location: user.location,
+            avatar: user.avatar,
+            isPrivate: user.isPrivate,
+            createdAt: user.createdAt
+          }
+        });
+      } else {
+        console.log('❌ Kullanıcı bulunamadı, userId:', userId);
+        return res.status(404).json({
+          success: false,
+          message: 'Kullanıcı bulunamadı'
+        });
+      }
+      
+    } catch (jwtError) {
+      console.error('JWT doğrulama hatası:', jwtError.message);
+      console.error('Token:', token.substring(0, 50) + '...');
+      return res.status(401).json({
+        success: false,
+        message: 'Geçersiz token'
+      });
+    }
+    
+  } catch (error) {
+    console.error('Auth me endpoint hatası:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Sunucu hatası'
     });
   }
 });

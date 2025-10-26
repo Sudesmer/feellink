@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { FiHeart, FiEye, FiTrendingUp, FiMessageCircle, FiBookmark, FiFolder, FiZap } from 'react-icons/fi';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import axios from 'axios';
 
 const Card = styled.div`
   background: ${props => props.theme.surface};
@@ -21,12 +23,28 @@ const Card = styled.div`
     box-shadow: none;
   }
 
-  @media (max-width: 768px) {
-    width: 340px;
+  /* Tablet */
+  @media (max-width: 1024px) and (min-width: 769px) {
+    width: 100%;
+    max-width: 480px;
   }
 
+  /* Mobil tablet */
+  @media (max-width: 768px) and (min-width: 481px) {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  /* Küçük mobil */
   @media (max-width: 480px) {
-    width: 320px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Çok küçük ekranlar */
+  @media (max-width: 375px) {
+    width: 100%;
+    max-width: 100%;
   }
 `;
 
@@ -36,6 +54,26 @@ const ImageContainer = styled.div`
   height: 250px;
   overflow: hidden;
   background: #1a1a1a;
+
+  /* Tablet */
+  @media (max-width: 1024px) and (min-width: 769px) {
+    height: 220px;
+  }
+
+  /* Mobil tablet */
+  @media (max-width: 768px) and (min-width: 481px) {
+    height: 200px;
+  }
+
+  /* Küçük mobil */
+  @media (max-width: 480px) {
+    height: 180px;
+  }
+
+  /* Çok küçük ekranlar */
+  @media (max-width: 375px) {
+    height: 160px;
+  }
 `;
 
 const WorkImage = styled.img`
@@ -622,29 +660,30 @@ const ModalComments = styled.div`
 
 const CommentItem = styled.div`
   display: flex;
-  gap: 8px;
-  margin-bottom: 6px;
-  padding: 2px 0;
-  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid ${props => props.theme.border};
+  
+  &:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
 `;
 
 const CommentAvatar = styled.div`
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #FF6B35;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-  flex-shrink: 0;
-  margin-top: 5px;
   overflow: hidden;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  flex-shrink: 0;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 `;
 
 const CommentContent = styled.div`
@@ -838,6 +877,76 @@ const HoverReactionEmoji = styled.button`
   }
 `;
 
+// Yorumlar için styled components
+const CommentsSection = styled.div`
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid ${props => props.theme.border};
+`;
+
+const CommentsHeader = styled.div`
+  margin-bottom: 16px;
+  
+  h4 {
+    color: ${props => props.theme.text};
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+  }
+`;
+
+const CommentsList = styled.div`
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+`;
+
+const CommentHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+`;
+
+const CommentTime = styled.span`
+  color: ${props => props.theme.textSecondary};
+  font-size: 12px;
+`;
+
+const CommentActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+`;
+
+const CommentForm = styled.div`
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+`;
+
+const CommentSubmitButton = styled.button`
+  padding: 12px 20px;
+  background: #FF6B35;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover:not(:disabled) {
+    background: #e55a2b;
+  }
+  
+  &:disabled {
+    background: ${props => props.theme.textSecondary};
+    cursor: not-allowed;
+  }
+`;
+
+
 
 
 
@@ -845,8 +954,90 @@ const HoverReactionEmoji = styled.button`
 const WorkCard = ({ work }) => {
   const { theme } = useTheme();
   const location = useLocation();
+  const { user } = useAuth();
   const [pinnedComments, setPinnedComments] = useState([]);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(work.likeCount || 0);
+  const [showComments, setShowComments] = useState(false);
+  const [comments, setComments] = useState(work.comments || []);
+  const [newComment, setNewComment] = useState('');
+  const [isLiking, setIsLiking] = useState(false);
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [commentLikes, setCommentLikes] = useState({});
   
+  // Beğeni fonksiyonu
+  const handleLike = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await axios.post(`http://localhost:5000/api/works/${work._id}/like`, {
+        userId: user._id
+      }, {
+        headers: { skipAuth: true }
+      });
+      
+      if (response.data.success) {
+        setIsLiked(response.data.liked);
+        setLikeCount(response.data.likeCount);
+      }
+    } catch (error) {
+      console.error('Beğeni hatası:', error);
+    }
+  };
+
+  // Yorum ekleme fonksiyonu
+  const handleAddComment = async () => {
+    if (!user || !newComment.trim()) return;
+    
+    try {
+      const response = await axios.post(`http://localhost:5000/api/works/${work._id}/comments`, {
+        userId: user._id,
+        content: newComment.trim(),
+        userName: user.fullName,
+        userAvatar: user.avatar
+      }, {
+        headers: { skipAuth: true }
+      });
+      
+      if (response.data.success) {
+        setComments(prev => [...prev, response.data.comment]);
+        setNewComment('');
+      }
+    } catch (error) {
+      console.error('Yorum ekleme hatası:', error);
+    }
+  };
+
+  // Yorum beğeni fonksiyonu
+  const handleCommentLike = async (commentId) => {
+    if (!user) return;
+    
+    try {
+      const response = await axios.post(`http://localhost:5000/api/comments/${commentId}/like`, {
+        userId: user._id
+      }, {
+        headers: { skipAuth: true }
+      });
+      
+      if (response.data.success) {
+        setComments(prev => prev.map(comment => 
+          comment._id === commentId 
+            ? { ...comment, likeCount: response.data.likeCount }
+            : comment
+        ));
+      }
+    } catch (error) {
+      console.error('Yorum beğeni hatası:', error);
+    }
+  };
+
+  // Kullanıcının beğenip beğenmediğini kontrol et
+  useEffect(() => {
+    if (user && work.likes) {
+      setIsLiked(work.likes.includes(user._id));
+    }
+  }, [user, work.likes]);
+
   // Sabitlenmiş yorumları al
   const getPinnedCommentsForWork = () => {
     try {
@@ -899,10 +1090,6 @@ const WorkCard = ({ work }) => {
     }
   };
   
-  // Beğeni state'leri
-  const [isLiked, setIsLiked] = useState(getStoredLikeState());
-  const [likeCount, setLikeCount] = useState(getStoredLikeCount());
-  const [isLiking, setIsLiking] = useState(false);
   
   // Kaydetme state'leri
   const [isSaved, setIsSaved] = useState(getStoredSaveState());
@@ -998,11 +1185,6 @@ const WorkCard = ({ work }) => {
   };
   
   
-  // Yorum state'leri
-  const [newComment, setNewComment] = useState('');
-  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
-  const [comments, setComments] = useState([]);
-  const [commentLikes, setCommentLikes] = useState(getStoredCommentLikes());
   
   // Hover reaksiyon state'i
   const [showHoverReactions, setShowHoverReactions] = useState(false);
@@ -1149,30 +1331,7 @@ const WorkCard = ({ work }) => {
     }
   };
 
-  // Yorum beğenme fonksiyonu
-  const handleCommentLike = (commentId) => {
-    const newLikeState = !commentLikes[commentId];
-    setCommentLikes(prev => ({
-      ...prev,
-      [commentId]: newLikeState
-    }));
-    
-    // localStorage'a yorum beğenme durumunu kaydet
-    try {
-      const commentLikesData = JSON.parse(localStorage.getItem('commentLikes') || '{}');
-      if (newLikeState) {
-        commentLikesData[commentId] = true;
-      } else {
-        delete commentLikesData[commentId];
-      }
-      localStorage.setItem('commentLikes', JSON.stringify(commentLikesData));
-      console.log('Yorum beğenme durumu localStorage\'a kaydedildi');
-    } catch (error) {
-      console.error('Yorum beğenme kaydetme hatası:', error);
-    }
-  };
   
-
   // Rozet oylama fonksiyonu
   const handleBadgeVote = (badgeKey) => {
     const newBadgeVotes = { ...badgeVotes };
@@ -1201,46 +1360,7 @@ const WorkCard = ({ work }) => {
   };
   
 
-  // Beğeni fonksiyonu
-  const handleLike = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    if (isLiking) return;
-    
-    setIsLiking(true);
-    
-    try {
-      const newLikeState = !isLiked;
-      const newLikeCount = newLikeState ? likeCount + 1 : likeCount - 1;
-      
-      // State'i güncelle
-      setIsLiked(newLikeState);
-      setLikeCount(newLikeCount);
-      
-      // localStorage'a kaydet
-      const likedWorks = JSON.parse(localStorage.getItem('likedWorks') || '{}');
-      if (newLikeState) {
-        likedWorks[work._id] = true;
-      } else {
-        delete likedWorks[work._id];
-      }
-      localStorage.setItem('likedWorks', JSON.stringify(likedWorks));
-      
-      // Like count'u da kaydet
-      const workLikes = JSON.parse(localStorage.getItem('workLikes') || '{}');
-      workLikes[work._id] = newLikeCount;
-      localStorage.setItem('workLikes', JSON.stringify(workLikes));
-      
-      console.log('Like durumu localStorage\'a kaydedildi');
-      
-    } catch (error) {
-      console.error('Beğeni hatası:', error);
-    } finally {
-      setIsLiking(false);
-    }
-  };
-
+  
   // Kaydetme fonksiyonu
   const handleSave = async (e) => {
     e.preventDefault();
@@ -1523,8 +1643,10 @@ const WorkCard = ({ work }) => {
                       fill={isLiked ? '#FF6B35' : 'none'}
                       style={{ 
                         color: isLiked ? '#FF6B35' : theme.text,
-                        transition: 'all 0.2s ease'
+                        transition: 'all 0.2s ease',
+                        cursor: 'pointer'
                       }}
+                      onClick={handleLike}
                     />
                   </ModalActionButton>
                   <span style={{ 
@@ -1540,7 +1662,14 @@ const WorkCard = ({ work }) => {
                   </span>
                 </div>
                 <ModalActionButton theme={theme}>
-                  <FiMessageCircle size={20} />
+                  <FiMessageCircle 
+                    size={20} 
+                    style={{ 
+                      color: theme.text,
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => setShowComments(!showComments)}
+                  />
                 </ModalActionButton>
                 <ModalActionButton 
                   theme={theme} 

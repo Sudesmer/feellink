@@ -10,6 +10,7 @@ import Navbar from './components/Navbar';
 import LoginNavbar from './components/LoginNavbar';
 import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Pages
 import Home from './pages/Home';
@@ -28,16 +29,27 @@ import AdminLogin from './pages/AdminLogin';
 import MuseumLogin from './pages/MuseumLogin';
 import MuseumDashboard from './pages/MuseumDashboard';
 import MuseumPanel from './pages/MuseumPanel';
+import AdminPanel from './pages/AdminPanel';
+import Dashboard from './pages/Dashboard';
 import NotFound from './pages/NotFound';
 
 // Global styles
 const GlobalStyles = styled.div`
   min-height: 100vh;
+  min-height: -webkit-fill-available; /* iOS Safari için */
   background: ${props => props.theme.background};
   color: ${props => props.theme.text};
   transition: all 0.3s ease;
   position: relative;
   overflow-x: hidden;
+  width: 100vw;
+  max-width: 100vw;
+  
+  /* iPad ve tablet için iyileştirme */
+  @supports (-webkit-touch-callout: none) {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
   
   &::before {
     content: '';
@@ -51,6 +63,12 @@ const GlobalStyles = styled.div`
     background-size: 20px 20px;
     opacity: 0.3;
     z-index: -1;
+  }
+  
+  /* Tablet ve mobil için responsive */
+  @media (max-width: 768px) {
+    width: 100%;
+    overflow-x: hidden;
   }
 `;
 
@@ -91,7 +109,7 @@ function App() {
 
   // Show different navbar for login/register pages
   const isAuthPage = pathname === '/login' || pathname === '/register';
-  const isAdminPage = pathname === '/admin' || pathname === '/admin-login';
+  const isAdminPage = pathname === '/admin' || pathname === '/admin-login' || pathname === '/admin-panel';
   const isMuseumPage = pathname === '/museum-login' || pathname === '/museum-dashboard' || pathname === '/museum-panel';
 
   // Show auth pages if user is not authenticated
@@ -174,6 +192,20 @@ function App() {
                   } 
                 />
                 <Route 
+                  path="/admin-panel" 
+                  element={
+                    <motion.div
+                      initial="initial"
+                      animate="in"
+                      exit="out"
+                      variants={pageVariants}
+                      transition={pageTransition}
+                    >
+                      <AdminPanel />
+                    </motion.div>
+                  } 
+                />
+                <Route 
                   path="/museum-login" 
                   element={
                     <motion.div
@@ -236,6 +268,22 @@ function App() {
                   } 
                 />
                 <Route 
+                  path="/dashboard" 
+                  element={
+                    <ProtectedRoute>
+                      <motion.div
+                        initial="initial"
+                        animate="in"
+                        exit="out"
+                        variants={pageVariants}
+                        transition={pageTransition}
+                      >
+                        <Dashboard />
+                      </motion.div>
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
                   path="/explore" 
                   element={
                     <motion.div
@@ -292,7 +340,7 @@ function App() {
                   } 
                 />
                 <Route 
-                  path="/profile/:id" 
+                  path="/profile/:username" 
                   element={
                     <motion.div
                       initial="initial"

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test LocalStorage</title>
+</head>
+<body>
+    <h1>LocalStorage Test</h1>
+    <button onclick="setTestData()">Test Verisi Ekle</button>
+    <button onclick="checkData()">Veriyi Kontrol Et</button>
+    <div id="result"></div>
+
+    <script>
+        function setTestData() {
+            // Test kullanıcı verisi
+            const testUser = {
+                _id: "1",
+                username: "sudesmer001",
+                email: "sudesmer001@gmail.com",
+                fullName: "Sude Esmer",
+                avatar: "/sude.jpg",
+                followers: [],
+                following: [],
+                isVerified: false,
+                createdAt: new Date().toISOString()
+            };
+
+            // Test token
+            const testToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxIiwiaWF0IjoxNzYxNDcwNDYwLCJleHAiOjE3NjIwNzUyNjB9.test";
+
+            // LocalStorage'a kaydet
+            localStorage.setItem('feellink-user', JSON.stringify(testUser));
+            localStorage.setItem('feellink-token', testToken);
+
+            document.getElementById('result').innerHTML = 
+                '<p style="color: green;">✅ Test verisi localStorage\'a eklendi!</p>' +
+                '<p>Kullanıcı: ' + testUser.fullName + '</p>' +
+                '<p>ID: ' + testUser._id + '</p>';
+        }
+
+        function checkData() {
+            const user = localStorage.getItem('feellink-user');
+            const token = localStorage.getItem('feellink-token');
+            
+            if (user && token) {
+                const userData = JSON.parse(user);
+                document.getElementById('result').innerHTML = 
+                    '<p style="color: green;">✅ Veriler mevcut!</p>' +
+                    '<p>Kullanıcı: ' + userData.fullName + '</p>' +
+                    '<p>Token: ' + token.substring(0, 20) + '...</p>';
+            } else {
+                document.getElementById('result').innerHTML = 
+                    '<p style="color: red;">❌ Veriler bulunamadı!</p>';
+            }
+        }
+    </script>
+</body>
+</html>

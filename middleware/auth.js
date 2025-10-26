@@ -14,20 +14,32 @@ const authenticateToken = async (req, res, next) => {
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select('-password');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_super_secret_jwt_key_here_change_in_production');
+    
+    // Önce MongoDB'den arama yap (ObjectId ile)
+    let user = null;
+    try {
+      user = await User.findById(decoded.userId).select('-password');
+    } catch (mongoError) {
+      console.log('MongoDB User.findById hatası:', mongoError.message);
+    }
+    
+    // MongoDB'de bulunamazsa JSON dosyasından arama yap
+    if (!user) {
+      try {
+        const fs = require('fs').promises;
+        const usersData = await fs.readFile('./data/users.json', 'utf8');
+        const users = JSON.parse(usersData);
+        user = users.find(u => u._id === decoded.userId);
+      } catch (jsonError) {
+        console.log('JSON dosyası okuma hatası:', jsonError.message);
+      }
+    }
     
     if (!user) {
       return res.status(401).json({
         success: false,
         message: 'Geçersiz token'
-      });
-    }
-
-    if (!user.isActive) {
-      return res.status(401).json({
-        success: false,
-        message: 'Hesap deaktif edilmiş'
       });
     }
 
@@ -63,17 +75,35 @@ const optionalAuth = async (req, res, next) => {
     const token = authHeader && authHeader.split(' ')[1];
 
     if (token) {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findById(decoded.id).select('-password');
-      
-      if (user && user.isActive) {
-        req.user = user;
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        
+        // Mock data'dan kullanıcıyı bul
+        const fs = require('fs').promises;
+        const path = require('path');
+        const USERS_FILE = path.join(__dirname, '../data/users.json');
+        
+        try {
+          const data = await fs.readFile(USERS_FILE, 'utf8');
+          const users = JSON.parse(data);
+          const user = users.find(u => u._id === decoded.userId);
+          
+          if (user) {
+            req.user = user;
+          }
+        } catch (fileError) {
+          console.log('Optional auth file read error:', fileError.message);
+        }
+      } catch (tokenError) {
+        // Token geçersizse sessizce devam et
+        console.log('Optional auth token error:', tokenError.message);
       }
     }
     
     next();
   } catch (error) {
     // Opsiyonel auth'da hata durumunda devam et
+    console.log('Optional auth error:', error.message);
     next();
   }
 };
@@ -104,6 +134,7 @@ module.exports = {
   requireAdmin,
   generateToken
 };
+
 
 
 

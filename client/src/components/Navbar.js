@@ -17,7 +17,9 @@ import {
   FiSettings,
   FiVolume2,
   FiVolumeX,
-  FiShield
+  FiShield,
+  FiMessageCircle,
+  FiBell
 } from 'react-icons/fi';
 
 const Nav = styled.nav`
@@ -56,14 +58,28 @@ const SearchContainer = styled.div`
   width: 400px;
   max-width: 90%;
 
-  @media (max-width: 768px) {
-    width: 200px;
+  /* Tablet */
+  @media (max-width: 1024px) and (min-width: 769px) {
+    width: 300px;
+    max-width: 85%;
+  }
+
+  /* Mobil tablet */
+  @media (max-width: 768px) and (min-width: 481px) {
+    width: 250px;
     max-width: 80%;
   }
 
+  /* Küçük mobil */
   @media (max-width: 480px) {
-    width: 150px;
+    width: 180px;
     max-width: 70%;
+  }
+
+  /* Çok küçük ekranlar */
+  @media (max-width: 375px) {
+    width: 150px;
+    max-width: 65%;
   }
 `;
 
@@ -728,10 +744,16 @@ const Navbar = () => {
           </ThemeToggle>
           
           {user && (user.email === 'admin@feellink.com' || user.username === 'admin') && (
-            <AdminButton onClick={() => navigate('/admin-login')}>
-              <FiShield size={18} />
-              Admin
-            </AdminButton>
+            <>
+              <AdminButton onClick={() => navigate('/admin-panel')}>
+                <FiShield size={18} />
+                Admin Panel
+              </AdminButton>
+              <AdminButton onClick={() => navigate('/admin-login')}>
+                <FiShield size={18} />
+                Admin Login
+              </AdminButton>
+            </>
           )}
           
           <UserMenu className="user-menu">
@@ -756,6 +778,18 @@ const Navbar = () => {
                     <DropdownItem onClick={() => navigate('/profile')}>
                       <FiUser size={16} />
                       Profilim
+                    </DropdownItem>
+                    <DropdownItem onClick={() => navigate('/dashboard')}>
+                      <FiHome size={16} />
+                      Dashboard
+                    </DropdownItem>
+                    <DropdownItem onClick={() => navigate('/messages')}>
+                      <FiMessageCircle size={16} />
+                      Mesajlar
+                    </DropdownItem>
+                    <DropdownItem onClick={() => navigate('/notifications')}>
+                      <FiBell size={16} />
+                      Bildirimler
                     </DropdownItem>
                     <DropdownItem onClick={handleLogout}>
                       <FiLogOut size={16} />

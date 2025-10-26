@@ -2,12 +2,12 @@
 const mockUsers = [
   {
     _id: '1',
-    username: 'testuser',
-    email: 'test@example.com',
-    password: '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password: password
-    fullName: 'Test User',
-    bio: 'Test kullanıcısı',
-    avatar: '',
+    username: 'sudesmer001',
+    email: 'sudesmer001@gmail.com',
+    password: '123456',
+    fullName: 'Sude Esmer',
+    bio: '',
+    avatar: '/sude.jpg',
     followers: [],
     following: [],
     savedWorks: [],
@@ -21,7 +21,7 @@ const mockUsers = [
     password: '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password: password
     fullName: 'Admin User',
     bio: 'Feellink yöneticisi',
-    avatar: '',
+    avatar: '/zeynep.jpg',
     followers: [],
     following: [],
     savedWorks: [],
@@ -35,11 +35,26 @@ const mockUsers = [
     password: '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password: password
     fullName: 'Creative Designer',
     bio: 'Profesyonel grafik tasarımcı',
-    avatar: '',
+    avatar: '/can.jpg',
     followers: [],
     following: [],
     savedWorks: [],
     isVerified: true,
+    createdAt: new Date()
+  },
+  {
+    _id: '6',
+    username: 'znp.esmer',
+    email: 'znp.esmer@gmail.com',
+    password: '123456',
+    fullName: 'Zeynep Esmer',
+    bio: 'Sanatçı ve tasarımcı',
+    avatar: '/can.jpg',
+    followers: [],
+    following: [],
+    savedWorks: [],
+    isVerified: true,
+    isPrivate: true, // Gizli hesap
     createdAt: new Date()
   }
 ];
@@ -89,10 +104,35 @@ const mockWorks = [
       _id: '17',
       username: 'botticelli',
       fullName: 'Sandro Botticelli',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 18000
     },
+    likes: ['1', '2', '3', '6'],
+    likeCount: 4,
+    comments: [
+      {
+        _id: 'c1',
+        userId: '1',
+        userName: 'Sude Esmer',
+        userAvatar: '/sude.jpg',
+        content: 'Rönesans sanatının en güzel örneklerinden biri!',
+        createdAt: new Date('2024-01-16'),
+        likes: ['2', '3'],
+        likeCount: 2
+      },
+      {
+        _id: 'c2',
+        userId: '2',
+        userName: 'Admin User',
+        userAvatar: '/zeynep.jpg',
+        content: 'Botticelli\'nin ustalığı gerçekten etkileyici.',
+        createdAt: new Date('2024-01-17'),
+        likes: ['1'],
+        likeCount: 1
+      }
+    ],
+    commentCount: 2,
     likes: [],
     likeCount: 3200,
     views: 75000,
@@ -123,7 +163,7 @@ const mockWorks = [
       _id: '18',
       username: 'dali',
       fullName: 'Salvador Dalí',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 28000
     },
@@ -157,7 +197,7 @@ const mockWorks = [
       _id: '19',
       username: 'klimt',
       fullName: 'Gustav Klimt',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 25000
     },
@@ -191,7 +231,7 @@ const mockWorks = [
       _id: '1',
       username: 'testuser',
       fullName: 'Test User',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: false,
       followers: 0
     },
@@ -225,7 +265,7 @@ const mockWorks = [
       _id: '1',
       username: 'testuser',
       fullName: 'Test User',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: false,
       followers: 0
     },
@@ -260,7 +300,7 @@ const mockWorks = [
       _id: '2',
       username: 'leonardo',
       fullName: 'Leonardo da Vinci',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 15000
     },
@@ -294,7 +334,7 @@ const mockWorks = [
       _id: '3',
       username: 'vangogh',
       fullName: 'Vincent van Gogh',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 20000
     },
@@ -328,7 +368,7 @@ const mockWorks = [
       _id: '4',
       username: 'picasso',
       fullName: 'Pablo Picasso',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 30000
     },
@@ -362,7 +402,7 @@ const mockWorks = [
       _id: '5',
       username: 'munch',
       fullName: 'Edvard Munch',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 18000
     },
@@ -396,7 +436,7 @@ const mockWorks = [
       _id: '6',
       username: 'hokusai',
       fullName: 'Katsushika Hokusai',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 12000
     },
@@ -431,7 +471,7 @@ const mockWorks = [
       _id: '7',
       username: 'dali',
       fullName: 'Salvador Dalí',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 25000
     },
@@ -465,7 +505,7 @@ const mockWorks = [
       _id: '8',
       username: 'botticelli',
       fullName: 'Sandro Botticelli',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 16000
     },
@@ -499,7 +539,7 @@ const mockWorks = [
       _id: '9',
       username: 'klimt',
       fullName: 'Gustav Klimt',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 22000
     },
@@ -533,7 +573,7 @@ const mockWorks = [
       _id: '10',
       username: 'monet',
       fullName: 'Claude Monet',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 28000
     },
@@ -567,7 +607,7 @@ const mockWorks = [
       _id: '2',
       username: 'leonardo',
       fullName: 'Leonardo da Vinci',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 15000
     },
@@ -601,7 +641,7 @@ const mockWorks = [
       _id: '6',
       username: 'hokusai',
       fullName: 'Katsushika Hokusai',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 12000
     },
@@ -635,7 +675,7 @@ const mockWorks = [
       _id: '5',
       username: 'munch',
       fullName: 'Edvard Munch',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 18000
     },
@@ -669,7 +709,7 @@ const mockWorks = [
       _id: '3',
       username: 'vangogh',
       fullName: 'Vincent van Gogh',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 20000
     },
@@ -703,7 +743,7 @@ const mockWorks = [
       _id: '11',
       username: 'vermeer',
       fullName: 'Johannes Vermeer',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 14000
     },
@@ -737,7 +777,7 @@ const mockWorks = [
       _id: '12',
       username: 'michelangelo',
       fullName: 'Michelangelo',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 35000
     },
@@ -771,7 +811,7 @@ const mockWorks = [
       _id: '13',
       username: 'rembrandt',
       fullName: 'Rembrandt',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 19000
     },
@@ -805,7 +845,7 @@ const mockWorks = [
       _id: '14',
       username: 'bosch',
       fullName: 'Hieronymus Bosch',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 13000
     },
@@ -839,7 +879,7 @@ const mockWorks = [
       _id: '15',
       username: 'vaneyck',
       fullName: 'Jan van Eyck',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 11000
     },
@@ -873,7 +913,7 @@ const mockWorks = [
       _id: '16',
       username: 'raphael',
       fullName: 'Raphael',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 17000
     },
@@ -907,7 +947,7 @@ const mockWorks = [
       _id: '8',
       username: 'botticelli',
       fullName: 'Sandro Botticelli',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 16000
     },
@@ -941,7 +981,7 @@ const mockWorks = [
       _id: '6',
       username: 'hokusai',
       fullName: 'Katsushika Hokusai',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 12000
     },
@@ -975,7 +1015,7 @@ const mockWorks = [
       _id: '2',
       username: 'leonardo',
       fullName: 'Leonardo da Vinci',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 15000
     },
@@ -1009,7 +1049,7 @@ const mockWorks = [
       _id: '26',
       username: 'uidesigner',
       fullName: 'UI Designer',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 12000
     },
@@ -1043,7 +1083,7 @@ const mockWorks = [
       _id: '27',
       username: 'abstractartist',
       fullName: 'Abstract Artist',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: false,
       followers: 5000
     },
@@ -1077,7 +1117,7 @@ const mockWorks = [
       _id: '28',
       username: 'logodesigner',
       fullName: 'Logo Designer',
-      avatar: '',
+      avatar: '/can.jpg',
       isVerified: true,
       followers: 8000
     },

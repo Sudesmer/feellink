@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
+import io from 'socket.io-client';
 import { 
   FiHeart, 
   FiMessageCircle, 
@@ -10,7 +12,6 @@ import {
   FiAward, 
   FiTrendingUp,
   FiClock,
-  FiMoreHorizontal,
   FiCheck,
   FiBell,
   FiUser,
@@ -301,9 +302,15 @@ const ActionButton = styled.button`
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative;
+  z-index: 10;
   
   &:hover {
     background: ${props => props.primary ? props.theme.primaryHover : props.theme.surfaceHover};
+  }
+  
+  &:active {
+    transform: scale(0.95);
   }
 `;
 
@@ -328,20 +335,6 @@ const NotificationImageImg = styled.img`
   object-fit: cover;
 `;
 
-const MoreButton = styled.button`
-  background: transparent;
-  border: none;
-  color: ${props => props.theme.textSecondary};
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background: ${props => props.theme.surfaceHover};
-    color: ${props => props.theme.text};
-  }
-`;
 
 const EmptyState = styled.div`
   text-align: center;
@@ -389,81 +382,187 @@ const Notifications = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { theme } = useTheme();
+  const { user, acceptFollowRequest, rejectFollowRequest, updateFollowersCount } = useAuth();
   const [activeFilter, setActiveFilter] = useState('all');
+  const [socket, setSocket] = useState(null);
   
   // localStorage'dan kullanıcının bildirimlerini yükle
-  const loadNotifications = () => {
-    try {
-      // currentUser'ı localStorage'dan al
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.log('📬 Token yok, boş dizi dönüyor');
-        return [];
-      }
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [disappearingNotifications, setDisappearingNotifications] = useState(new Set());
+  
+  // Gerçek zamanlı bildirim dinleyicisi
+  useEffect(() => {
+    if (!user || !user._id) return;
+
+    // Socket.IO bağlantısı
+    const newSocket = io('http://localhost:5000', { 
+      transports: ['websocket', 'polling'] 
+    });
+
+    setSocket(newSocket);
+
+    newSocket.on('connect', () => {
+      console.log('🔌 Notifications Socket.IO bağlandı');
+      newSocket.emit('user_login', user._id);
+    });
+
+    // Yeni bildirim geldiğinde
+    newSocket.on('new_notification', (data) => {
+      console.log('🔔 Yeni bildirim geldi:', data);
       
-      const userData = localStorage.getItem('user');
-      if (!userData) {
-        console.log('📬 User data yok, boş dizi dönüyor');
-        return [];
+      // Bildirimleri güncelle
+      setNotifications(prev => {
+        const newNotification = {
+          _id: data.notification._id,
+          type: data.notification.type,
+          message: data.notification.message,
+          fromUserId: data.notification.fromUserId,
+          fromUserName: data.notification.fromUserName,
+          fromUserAvatar: data.notification.fromUserAvatar,
+          status: 'unread',
+          createdAt: new Date(data.notification.createdAt)
+        };
+        
+        return [newNotification, ...prev];
+      });
+      
+      // Okunmamış sayısını artır
+      setUnreadCount(prev => prev + 1);
+    });
+
+    // Takip isteği geldiğinde
+    newSocket.on('new_follow_request', (notification) => {
+      console.log('👥 Yeni takip isteği:', notification);
+      
+      setNotifications(prev => {
+        const newNotification = {
+          _id: notification._id,
+          type: notification.type,
+          message: notification.message,
+          fromUserId: notification.fromUserId,
+          fromUserName: notification.fromUserName || 'Kullanıcı',
+          fromUserAvatar: notification.fromUserAvatar || '/images/default-avatar.png',
+          status: notification.status,
+          createdAt: new Date(notification.createdAt),
+          relatedId: notification.relatedId
+        };
+        
+        return [newNotification, ...prev];
+      });
+      
+      setUnreadCount(prev => prev + 1);
+    });
+
+    // Takip isteği kabul edildiğinde
+    newSocket.on('follow_accepted', (notification) => {
+      console.log('✅ Takip isteği kabul edildi:', notification);
+      
+      setNotifications(prev => {
+        const newNotification = {
+          _id: notification._id,
+          type: notification.type,
+          message: notification.message,
+          fromUserId: notification.fromUserId,
+          fromUserName: notification.fromUserName || 'Kullanıcı',
+          fromUserAvatar: notification.fromUserAvatar || '/images/default-avatar.png',
+          status: notification.status,
+          createdAt: new Date(notification.createdAt),
+          relatedId: notification.relatedId
+        };
+        
+        return [newNotification, ...prev];
+      });
+      
+      setUnreadCount(prev => prev + 1);
+    });
+
+    newSocket.on('disconnect', () => {
+      console.log('🔌 Notifications Socket.IO bağlantısı kesildi');
+    });
+
+    return () => {
+      newSocket.emit('user_logout', user._id);
+      newSocket.disconnect();
+    };
+  }, [user]);
+  
+  const loadNotifications = async () => {
+    try {
+      setLoading(true);
+      
+      // Her zaman test verisi ekle (geliştirme için)
+      const testUser = {
+        _id: "1",
+        username: "sudesmer001",
+        email: "sudesmer001@gmail.com", 
+        fullName: "Sude Esmer",
+        avatar: "/sude.jpg",
+        followers: [],
+        following: [],
+        isVerified: false,
+        createdAt: new Date().toISOString()
+      };
+      const testToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxIiwiaWF0IjoxNzYxNDcwNDYwLCJleHAiOjE3NjIwNzUyNjB9.test";
+      
+      // Her zaman localStorage'a test verisi ekle
+      localStorage.setItem('feellink-user', JSON.stringify(testUser));
+      localStorage.setItem('feellink-token', testToken);
+      
+      const token = localStorage.getItem('feellink-token');
+      const userData = localStorage.getItem('feellink-user');
+      
+      if (!token || !userData) {
+        console.log('📬 Token veya user data yok');
+        setNotifications([]);
+        setLoading(false);
+        return;
       }
       
       const user = JSON.parse(userData);
-      console.log('📬 User objesi:', user);
-      
       const userId = user._id || user.id;
       
       if (!userId) {
-        console.log('📬 User ID bulunamadı, boş dizi dönüyor');
-        return [];
+        console.log('📬 User ID bulunamadı');
+        setNotifications([]);
+        setLoading(false);
+        return;
       }
+
+      // API'den bildirimleri çek
+      const response = await axios.get(`http://localhost:5000/api/notifications`, {
+        headers: {
+          'x-user-id': userId
+        }
+      });
       
-      const notificationsKey = `notifications_user_${userId}`;
-      const storedNotifications = localStorage.getItem(notificationsKey);
-      
-      console.log('📬 Bildirimler yükleniyor - User ID:', userId, 'Key:', notificationsKey);
-      console.log('📬 Kaydedilmiş bildirimler (ham):', storedNotifications);
-      
-      // Tüm localStorage'ı kontrol et
-      console.log('📬 Tüm localStorage anahtarları:', Object.keys(localStorage).filter(key => key.includes('notifications')));
-      
-      const parsedNotifications = storedNotifications ? JSON.parse(storedNotifications) : [];
-      console.log('📬 Parse edilmiş bildirimler:', parsedNotifications);
-      
-      return parsedNotifications;
+      if (response.data.success) {
+        const apiNotifications = response.data.notifications || [];
+        setNotifications(apiNotifications);
+        setUnreadCount(response.data.unreadCount || 0);
+      } else {
+        setNotifications([]);
+      }
     } catch (error) {
       console.error('Bildirimler yüklenirken hata:', error);
-      return [];
+      setNotifications([]);
+    } finally {
+      setLoading(false);
     }
   };
-  
-  const [notifications, setNotifications] = useState(loadNotifications());
 
-  // localStorage'da değişiklikleri dinle
+  // Sayfa yüklendiğinde bildirimleri yükle
   useEffect(() => {
-    const handleStorageChange = () => {
-      const updatedNotifications = loadNotifications();
-      setNotifications(updatedNotifications);
-    };
+    loadNotifications();
 
-    // Sayfa yüklendiğinde bildirimleri yükle
-    handleStorageChange();
-
-    // Custom event listener - storage değişikliklerini dinle
-    window.addEventListener('storage', handleStorageChange);
-
-    // Sayfa içi değişiklikleri de dinle (aynı window'da)
+    // Her 30 saniyede bir bildirimleri güncelle
     const interval = setInterval(() => {
-      const currentNotifications = loadNotifications();
-      if (JSON.stringify(currentNotifications) !== JSON.stringify(notifications)) {
-        setNotifications(currentNotifications);
-      }
-    }, 1000);
+      loadNotifications();
+    }, 30000);
 
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      clearInterval(interval);
-    };
-  }, [notifications]);
+    return () => clearInterval(interval);
+  }, []);
 
   const getNotificationIcon = (type) => {
     switch (type) {
@@ -493,159 +592,208 @@ const Notifications = () => {
     }
   };
 
-    const markAsRead = (id) => {
-    setNotifications(prev => {
-      const updated = prev.map(notif => 
-        notif.id === id ? { ...notif, read: true } : notif
-      );
+  const markAsRead = async (id) => {
+    try {
+      // API'ye bildir
+      await axios.put(`http://localhost:5000/api/notifications/${id}/read`);
       
-      // localStorage'a kaydet
-      try {
-        const token = localStorage.getItem('token');
-        if (token) {
-          const userData = localStorage.getItem('user');
-          if (userData) {
-            const user = JSON.parse(userData);
-            const userId = user._id || user.id;
-            if (userId) {
-              const notificationsKey = `notifications_user_${userId}`;
-              localStorage.setItem(notificationsKey, JSON.stringify(updated));
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Bildirim güncelleme hatası:', error);
-      }
+      // Local state'i güncelle
+      setNotifications(prev => {
+        const updated = prev.map(notif => 
+          notif._id === id ? { ...notif, status: 'read' } : notif
+        );
+        return updated;
+      });
       
-      return updated;
-    });
+      // Unread count'u güncelle
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (error) {
+      console.error('Bildirim okundu olarak işaretlenirken hata:', error);
+    }
   };
 
   // Takip isteği kabul etme
-  const handleAcceptRequest = (notification) => {
-    console.log('✅ Takip isteği kabul edildi:', notification);
+  const handleAcceptRequest = async (notification) => {
+    console.log('✅ Kabul Et butonuna tıklandı:', notification);
+    
+    // Animasyon başlat - bildirimi kaybolan listesine ekle
+    setDisappearingNotifications(prev => new Set([...prev, notification._id]));
+    
+    // JavaScript ile animasyon
+    const notificationElement = document.querySelector(`[data-notification-id="${notification._id}"]`);
+    if (notificationElement) {
+      // Animasyonu başlat
+      notificationElement.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+      notificationElement.style.opacity = '0';
+      notificationElement.style.transform = 'translateX(-100%) scale(0.8)';
+      notificationElement.style.pointerEvents = 'none';
+    }
     
     try {
-      const token = localStorage.getItem('token');
-      const userData = localStorage.getItem('user');
+      const requestId = notification.relatedId;
+      console.log('🔍 Request ID:', requestId);
       
-      if (userData && token) {
-        const user = JSON.parse(userData);
-        const userId = user._id || user.id;
-        
-        // Gönderen kullanıcının ID'sini bul (bildirimden)
-        const senderName = notification.user.name;
-        
-        // Gönderen kullanıcıyı takipçi listesine ekle
-        const followersKey = `followersList_${userId}`;
-        const followersList = JSON.parse(localStorage.getItem(followersKey) || '[]');
-        
-        // Gönderen kullanıcıyı bul ve ekle
-        axios.get('http://localhost:5000/api/users')
-          .then(response => {
-            const allUsers = response.data.users || [];
-            const senderUser = allUsers.find(u => (u.fullName || u.email) === senderName);
-            
-            if (senderUser) {
-              const senderToAdd = {
-                _id: senderUser._id,
-                username: senderUser.username || senderUser.email?.split('@')[0] || 'unknown',
-                fullName: senderUser.fullName || '',
-                avatar: senderUser.avatar || null,
-                isFollowing: false
-              };
-              
-              const exists = followersList.find(u => u._id === senderUser._id);
-              if (!exists) {
-                followersList.push(senderToAdd);
-              }
-            }
-            
-            // Takipçi sayısını güncelle
-            const followersCountKey = `followersCount_user_${userId}`;
-            const currentCount = parseInt(localStorage.getItem(followersCountKey) || '0');
-            localStorage.setItem(followersCountKey, (currentCount + 1).toString());
-            
-            // Takipçi listesini kaydet
-            localStorage.setItem(followersKey, JSON.stringify(followersList));
-            
-            // Gönderen kullanıcının takip listesine bizi ekle
-            const senderFollowingKey = `followingList_${senderUser.email || 'unknown'}`;
-            const senderFollowingList = JSON.parse(localStorage.getItem(senderFollowingKey) || '[]');
-            
-            const meToAdd = {
-              _id: userId,
-              username: user.username || user.email?.split('@')[0] || 'unknown',
-              fullName: user.fullName || '',
-              avatar: user.avatar || null,
-              isFollowing: true
-            };
-            
-            const meExists = senderFollowingList.find(u => u._id === userId);
-            if (!meExists) {
-              senderFollowingList.push(meToAdd);
-            }
-            
-            // Gönderen kullanıcının takip sayısını güncelle
-            const senderFollowingCountKey = `followingCount_${senderUser.email || 'unknown'}`;
-            const senderCurrentCount = parseInt(localStorage.getItem(senderFollowingCountKey) || '0');
-            localStorage.setItem(senderFollowingCountKey, (senderCurrentCount + 1).toString());
-            
-            // Takip listesini kaydet
-            localStorage.setItem(senderFollowingKey, JSON.stringify(senderFollowingList));
-            
-            // Gönderen kullanıcıya başarı bildirimi gönder
-            const acceptNotification = {
-              id: Date.now(),
-              type: 'follow',
-              user: {
-                name: user.fullName || user.username || 'Bilinmeyen',
-                avatar: user.avatar || null
-              },
-              action: 'takip isteğinizi kabul etti',
-              time: 'şimdi',
-              read: false,
-              timestamp: new Date().toISOString()
-            };
-            
-            const senderNotificationsKey = `notifications_user_${senderUser._id}`;
-            const senderNotifications = JSON.parse(localStorage.getItem(senderNotificationsKey) || '[]');
-            senderNotifications.unshift(acceptNotification);
-            localStorage.setItem(senderNotificationsKey, JSON.stringify(senderNotifications.slice(0, 50)));
-            
-            console.log('✅ Takip isteği başarıyla kabul edildi ve işleme alındı');
-          })
-          .catch(error => {
-            console.error('Kullanıcı bilgisi alınamadı:', error);
-          });
+      if (!requestId) {
+        console.error('❌ Request ID bulunamadı');
+        return;
       }
+
+      // Socket.IO ile gerçek zamanlı kabul etme
+      if (socket) {
+        socket.emit('accept_follow', {
+          requestId: requestId,
+          accepterId: user._id,
+          requesterId: notification.fromUserId
+        });
+      }
+
+      console.log('📡 API çağrısı yapılıyor:', `http://localhost:5000/api/follow/accept/${requestId}`);
+      const response = await axios.post(`http://localhost:5000/api/follow/accept/${requestId}`);
       
-      // Bildirimi okundu olarak işaretle
-      markAsRead(notification.id);
+      console.log('📡 API yanıtı:', response.data);
       
-      // Bildirimi listeden kaldır
-      setNotifications(prev => prev.filter(n => n.id !== notification.id));
+      if (response.data.success) {
+        console.log('✅ Takip isteği başarıyla kabul edildi');
+        
+        // Animasyon tamamlandıktan sonra element'i DOM'dan kaldır ve bildirimleri yeniden yükle
+        setTimeout(async () => {
+          // Element'i DOM'dan kaldır
+          if (notificationElement) {
+            notificationElement.remove();
+          }
+          
+          // State'den de kaldır
+          setDisappearingNotifications(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(notification._id);
+            return newSet;
+          });
+          
+          // Bildirimleri yeniden yükle
+          await loadNotifications();
+          
+          // Takipçi sayısını güncelle
+          if (user && user._id) {
+            await updateFollowersCount(user._id);
+          }
+          
+          console.log('✅ İşlem tamamlandı: Bildirim silindi, takipçi sayısı güncellendi');
+        }, 600); // 600ms animasyon süresi
+      }
     } catch (error) {
-      console.error('Takip isteği kabul etme hatası:', error);
+      console.error('❌ Takip isteği kabul edilirken hata:', error);
+      // Hata durumunda animasyonu geri al
+      setDisappearingNotifications(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(notification._id);
+        return newSet;
+      });
+      
+      // Animasyonu geri al
+      if (notificationElement) {
+        notificationElement.style.opacity = '1';
+        notificationElement.style.transform = 'translateX(0) scale(1)';
+        notificationElement.style.pointerEvents = 'auto';
+      }
     }
   };
 
   // Takip isteği reddetme
-  const handleRejectRequest = (notification) => {
-    console.log('❌ Takip isteği reddedildi:', notification);
+  const handleRejectRequest = async (notification) => {
+    console.log('❌ Reddet butonuna tıklandı:', notification);
     
-    // Bildirimi okundu olarak işaretle
-    markAsRead(notification.id);
+    // Animasyon başlat - bildirimi kaybolan listesine ekle
+    setDisappearingNotifications(prev => new Set([...prev, notification._id]));
     
-    // Bildirimi listeden kaldır
-    setNotifications(prev => prev.filter(n => n.id !== notification.id));
+    // JavaScript ile animasyon
+    const notificationElement = document.querySelector(`[data-notification-id="${notification._id}"]`);
+    if (notificationElement) {
+      // Animasyonu başlat
+      notificationElement.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+      notificationElement.style.opacity = '0';
+      notificationElement.style.transform = 'translateX(-100%) scale(0.8)';
+      notificationElement.style.pointerEvents = 'none';
+    }
+    
+    try {
+      const requestId = notification.relatedId;
+      console.log('🔍 Request ID:', requestId);
+      
+      if (!requestId) {
+        console.error('❌ Request ID bulunamadı');
+        return;
+      }
+
+      // Socket.IO ile gerçek zamanlı reddetme
+      if (socket) {
+        socket.emit('reject_follow', {
+          requestId: requestId,
+          rejecterId: user._id,
+          requesterId: notification.fromUserId
+        });
+      }
+
+      console.log('📡 API çağrısı yapılıyor:', `http://localhost:5000/api/follow/reject/${requestId}`);
+      const response = await axios.post(`http://localhost:5000/api/follow/reject/${requestId}`);
+      
+      console.log('📡 API yanıtı:', response.data);
+      
+      if (response.data.success) {
+        console.log('✅ Takip isteği başarıyla reddedildi');
+        
+        // Animasyon tamamlandıktan sonra element'i DOM'dan kaldır ve bildirimleri yeniden yükle
+        setTimeout(async () => {
+          // Element'i DOM'dan kaldır
+          if (notificationElement) {
+            notificationElement.remove();
+          }
+          
+          // State'den de kaldır
+          setDisappearingNotifications(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(notification._id);
+            return newSet;
+          });
+          
+          // Bildirimleri yeniden yükle
+          await loadNotifications();
+          
+          console.log('✅ İşlem tamamlandı: Bildirim silindi');
+        }, 600); // 600ms animasyon süresi
+      }
+    } catch (error) {
+      console.error('❌ Takip isteği reddedilirken hata:', error);
+      // Hata durumunda animasyonu geri al
+      setDisappearingNotifications(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(notification._id);
+        return newSet;
+      });
+      
+      // Animasyonu geri al
+      if (notificationElement) {
+        notificationElement.style.opacity = '1';
+        notificationElement.style.transform = 'translateX(0) scale(1)';
+        notificationElement.style.pointerEvents = 'auto';
+      }
+    }
   };
   
   const filteredNotifications = notifications.filter(notification => {
     if (activeFilter === 'all') return true;
-    if (activeFilter === 'unread') return !notification.read;
+    if (activeFilter === 'unread') return notification.status === 'unread';
     return notification.type === activeFilter;
   });
+
+  if (loading) {
+    return (
+      <Container theme={theme}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+          <p style={{ color: theme.textSecondary }}>Yükleniyor...</p>
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <Container theme={theme}>
@@ -752,16 +900,16 @@ const Notifications = () => {
           <NotificationList theme={theme}>
             {filteredNotifications.map((notification) => (
               <NotificationItem 
-                key={notification.id} 
+                key={notification._id} 
                 theme={theme}
+                data-notification-id={notification._id}
                 style={{ 
-                  opacity: notification.read ? 0.7 : 1,
-                  background: notification.read ? theme.surface : theme.cardBackground
+                  background: notification.status === 'read' ? theme.surface : theme.cardBackground
                 }}
               >
                 <NotificationAvatar theme={theme}>
-                  {notification.user.avatar ? (
-                    <NotificationAvatarImg src={notification.user.avatar} alt={notification.user.name} />
+                  {notification.fromUser && notification.fromUser.avatar ? (
+                    <NotificationAvatarImg src={notification.fromUser.avatar} alt={notification.fromUser.fullName || 'User'} />
                   ) : (
                     <FiUser />
                   )}
@@ -775,22 +923,34 @@ const Notifications = () => {
 
                 <NotificationContent theme={theme}>
                   <NotificationText theme={theme}>
-                    {getNotificationText(notification)}
+                    {notification.fromUser && (
+                      <>
+                        <strong>{notification.fromUser.fullName || notification.fromUser.username}</strong> {notification.message}
+                      </>
+                    )}
                   </NotificationText>
                   
                   <NotificationTime theme={theme}>
                     <FiClock size={12} />
-                    {notification.time}
+                    {new Date(notification.createdAt).toLocaleDateString('tr-TR', {
+                      day: 'numeric',
+                      month: 'short',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
                   </NotificationTime>
 
-                  {!notification.read && (
+                  {notification.status === 'unread' && (
                     <NotificationActions theme={theme}>
                       {notification.type === 'follow_request' ? (
                         <>
                           <ActionButton 
                             theme={theme} 
                             primary
-                            onClick={() => handleAcceptRequest(notification)}
+                            onClick={() => {
+                              console.log('✅ Kabul Et butonuna tıklandı');
+                              handleAcceptRequest(notification);
+                            }}
                           >
                             <FiCheck size={12} />
                             Kabul Et
@@ -798,7 +958,10 @@ const Notifications = () => {
                           <ActionButton 
                             theme={theme}
                             style={{ marginLeft: '8px', background: '#ff4444' }}
-                            onClick={() => handleRejectRequest(notification)}
+                            onClick={() => {
+                              console.log('❌ Reddet butonuna tıklandı');
+                              handleRejectRequest(notification);
+                            }}
                           >
                             <FiX size={12} />
                             Reddet
@@ -808,7 +971,7 @@ const Notifications = () => {
                         <ActionButton 
                           theme={theme} 
                           primary
-                          onClick={() => markAsRead(notification.id)}
+                          onClick={() => markAsRead(notification._id)}
                         >
                           <FiCheck size={12} />
                           Okundu
@@ -817,19 +980,6 @@ const Notifications = () => {
                     </NotificationActions>
                   )}
                 </NotificationContent>
-
-                {notification.targetImage && (
-                  <NotificationImage theme={theme}>
-                    <NotificationImageImg 
-                      src={notification.targetImage} 
-                      alt={notification.target} 
-                    />
-                  </NotificationImage>
-                )}
-
-                <MoreButton theme={theme}>
-                  <FiMoreHorizontal size={16} />
-                </MoreButton>
               </NotificationItem>
             ))}
           </NotificationList>
